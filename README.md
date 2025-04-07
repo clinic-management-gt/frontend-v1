@@ -13,15 +13,21 @@
 
 The `Dockerfile` contains the necessary instructions to build the frontend image:
 
-- Installs dependencies
-- Builds the project with Vite
-- Serves the files using Nginx
+Step-by-step explanation:
+
+1. **Use Node.js Alpine image** as the base for building the app.
+2. **Set the working directory** to `/app`.
+3. **Copy the project files** into the container.
+4. **Install dependencies** and build the frontend with Vite.
+5. **Use Nginx** as the production web server.
+6. **Copy the built files** from the build stage into Nginx's default HTML directory.
+7. **Expose port 80** for HTTP access.
 
 ---
 
 ### 🐳 docker-compose.yml
 
-The `docker-compose.yml` file is used to start the frontend container, connecting it to the `clinica-network`:
+The `docker-compose.yml` file is used to start the frontend container, connecting it to the `clinica-network` or the newtork name you wanna use, just make sure you use the same network name in the backend and frontend:
 
 ```yaml
 services:
@@ -42,23 +48,32 @@ networks:
 
 ### ⚙️ Environment Variables
 
-Inside the `frontend-app` folder, there is a `.env` file with the following configuration:
+Inside the `frontend-app` folder, there is a `.env` file used to configure the backend API endpoint:
 
 ```env
 VITE_API_URL=http://localhost:9000
+```
+
+This allows the frontend to dynamically access the backend from different environments.  
+For example, in `App.vue`, the API call is made using:
+
+```js
+fetch(import.meta.env.VITE_API_URL + '/pacientes')
 ```
 
 ---
 
 ## ✅ How to Run the Environment
 
-1. Build and start the container:
+1. Open a terminal in the frontend project root folder.
+2. Make sure Docker is running.
+3. Run:
 
 ```bash
 docker-compose up --build
 ```
 
-2. Once running:
+4. Once running:
 
 - Frontend available at: `http://localhost:5173`
 - The frontend automatically connects to the backend at: `http://localhost:9000/pacientes`
