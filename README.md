@@ -67,7 +67,9 @@ fetch(import.meta.env.VITE_API_URL + '/pacientes')
 
 1. Open a terminal in the frontend project root folder.
 2. Make sure Docker is running.
-3. Run:
+3. Make sure the docker network is running
+4. Run first docker newtork, then the bakcen and finnaly the front end
+5. Run:
 
 ```bash
 docker-compose up --build
