@@ -67,15 +67,28 @@ fetch(import.meta.env.VITE_API_URL + '/pacientes')
 
 1. Open a terminal in the frontend project root folder.
 2. Make sure Docker is running.
-3. Make sure the docker network is running
-4. Run first docker network, then the backend and finnaly the frontend
-5. Run:
+3. Make sure the Docker network exists (create it if necessary):
 
 ```bash
+docker network ls
+docker network create clinica-network
+```
+
+4. Start the backend container:
+
+```bash
+cd ../backend-folder
 docker-compose up --build
 ```
 
-4. Once running:
+5. Then, in another terminal, start the frontend:
+
+```bash
+cd frontend-folder
+docker-compose up --build
+```
+
+6. Once running:
 
 - Frontend available at: `http://localhost:5173`
 - The frontend automatically connects to the backend at: `http://localhost:9000/pacientes`
