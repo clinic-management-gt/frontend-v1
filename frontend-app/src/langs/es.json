@@ -1,0 +1,31 @@
+{
+  "general": {
+    "patient": "Paciente",
+    "empty": "",
+    "exit": "Salir",
+    "search": "Buscar"
+  },
+  "login": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "mail": "Correo",
+    "placeholder-mail": "Ingrese su correo",
+    "password": "Contraseña",
+    "placeholder-password": "Ingrese su contraseña"
+  },
+  "dashboard": {
+    "dashboard": "Dashboard"
+  },
+  "patients": {
+    "patients": "Pacientes"
+  },
+  "graph": {
+    "graph": "Graficar"
+  },
+  "calendar": {
+    "calendar": "Calendario"
+  },
+  "vee-validate": {
+    "required-input": "Este campo es obligatorio"
+  }
+}
