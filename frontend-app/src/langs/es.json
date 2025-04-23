@@ -3,7 +3,8 @@
     "patient": "Paciente",
     "empty": "",
     "exit": "Salir",
-    "search": "Buscar"
+    "search": "Buscar",
+    "search-patient": "Buscar paciente"
   },
   "login": {
     "login": "Iniciar sesión",

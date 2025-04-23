@@ -41,7 +41,7 @@
           </div>
           <primary-button additionalCSS="justify-start gap-2" @click="logout">
                <x-circle-icon class="h-6 w-6 shrink-0 text-white"></x-circle-icon>
-               {{ $t('general.exit') }}
+               <span class="text-md">{{ $t('general.exit') }}</span>
           </primary-button>
      </ul>
 </template>
@@ -49,7 +49,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore'
-import { HomeIcon, UserIcon, ChartBarIcon, CalendarIcon, XCircleIcon, ChevronRightIcon } from '@heroicons/vue/20/solid'
+import { HomeIcon, UserIcon, ChartBarIcon, CalendarIcon, XCircleIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
 
 import PrimaryButton from "@/components/forms/PrimaryButton.vue"
 

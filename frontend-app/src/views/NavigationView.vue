@@ -27,8 +27,8 @@
                                    </TransitionChild>
                                    <!-- Sidebar component, swap this element with another sidebar if you like -->
                                    <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-[#489FB5] px-6 pb-4">
-                                        <div class="flex h-16 shrink-0 items-center">
-                                             <img class="h-8 w-auto" src="/logo-gastro.png" />
+                                        <div class="flex h-16 shrink-0 items-center bg-[#82C0CC] rounded-md mt-2">
+                                             <img class="flex h-16 w-auto mx-auto mt-2" src="/logo-gastro.png" />
                                         </div>
                                         <nav class="flex flex-1 flex-col">
                                              <NavigationBar />
@@ -43,9 +43,10 @@
           <!-- Static sidebar for desktop -->
           <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
                <!-- Sidebar component, swap this element with another sidebar if you like -->
-               <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-[#489FB5] px-6 pb-4">
-                    <div class="flex h-16 shrink-0 items-center">
-                         <img class="h-8 w-auto" src="/logo-gastro.png" />
+               <div
+                    class="flex grow flex-col gap-y-5 overflow-y-auto bg-[#489FB5] align-center justify-center min-h-screen px-6 pb-4">
+                    <div class="flex h-16 shrink-0 items-center bg-[#82C0CC] rounded-md mt-2">
+                         <img class="flex h-16 w-auto mx-auto mt-2" src="/logo-gastro.png" />
                     </div>
                     <nav class="flex flex-1 flex-col">
                          <NavigationBar />
@@ -55,7 +56,7 @@
 
           <div class="lg:pl-72">
                <div
-                    class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+                    class="sticky top-0 z-40 flex h-20 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
                     <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
                          <span class="sr-only">Open sidebar</span>
                          <Bars3Icon class="size-6" aria-hidden="true" />
@@ -68,7 +69,7 @@
                          <form class="grid flex-1 grid-cols-1" action="#" method="GET">
                               <input type="search" name="search" aria-label="Search"
                                    class="col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-none placeholder:text-gray-400 sm:text-sm/6"
-                                   :placeholder="$t('general.search')" />
+                                   :placeholder="$t('general.search-patient')" />
                               <MagnifyingGlassIcon
                                    class="pointer-events-none col-start-1 row-start-1 size-5 self-center text-gray-400"
                                    aria-hidden="true" />
@@ -128,7 +129,7 @@ import {
      TransitionChild,
      TransitionRoot,
 } from '@headlessui/vue'
-import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
+import { ChevronDownIcon, MagnifyingGlassIcon, Bars3Icon, XMarkIcon } from '@heroicons/vue/20/solid'
 import { RouterView } from 'vue-router'
 import NavigationBar from '@/components/navigation/NavigationBar.vue'
 
