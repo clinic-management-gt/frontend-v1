@@ -21,7 +21,7 @@ const patientsOfTheDay = {
           reason: "first-consult",
           start_time: "9.00",
           end_time: "10.00",
-          status: "has-not-arrived"
+          status: "finished"
      },
      "2": {
           name: "Oscar Pop",
@@ -29,7 +29,7 @@ const patientsOfTheDay = {
           reason: "first-consult",
           start_time: "9.00",
           end_time: "10.00",
-          status: "has-not-arrived"
+          status: "in-consult"
      },
 
 }
