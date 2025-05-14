@@ -2,32 +2,39 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export const PatientsStore = defineStore('patients', () => {
-     const appointments = ref([])
+  const appointments = ref([])
+  const isLoadingAppointments = ref(false)
+  const isLoadingPatientsStore = ref(false)
 
-     const isLoadingPatientsStore = ref(false)
-     const isLoadingAppointments = ref(false)
+  async function fetchAppointments() {
+    try {
+      isLoadingAppointments.value = true
 
-     async function fetchAppointments() {
-          try {
-               isLoadingAppointments.value = true
-               const res = await fetch('http://localhost:9000/appointments')
-               console.log(res)
-               console.log(res.json())
-               appointments.value = await res.json()
-          } catch (error) {
-               console.error('Error al obtener citas:', error)
-          } finally {
-               isLoadingAppointments.value = false
-          }
-     }
+      const res = await fetch('http://localhost:9000/appointments')
+      if (!res.ok) {
+        // Opcional: maneja errores de HTTP
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+      }
 
-     return {
-          appointments, isLoadingPatientsStore, isLoadingAppointments, 
-          fetchAppointments
-     }
+      const data = await res.json()     // ← Aquí consumes el body sólo una vez
+      console.log('Datos recibidos:', data)
+      appointments.value = data
+
+    } catch (error) {
+      console.error('Error al obtener citas:', error)
+    } finally {
+      isLoadingAppointments.value = false
+    }
+  }
+
+  return {
+    appointments,
+    isLoadingAppointments,
+    isLoadingPatientsStore,
+    fetchAppointments
+  }
 }, {
-     persist: {
-          paths:[ 'appointments']
-     }
+  persist: {
+    paths: ['appointments']
+  }
 })
-
