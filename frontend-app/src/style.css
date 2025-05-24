@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+     --primary-color: #40D7C3;
+     --primary-color-variation-1: #3bc0ae;
+     --primary-color-variation-2: #1edfc5;
+     --patient-page-color: #B300C7;
+}
