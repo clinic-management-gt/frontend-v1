@@ -4,7 +4,15 @@
     "empty": "",
     "exit": "Salir",
     "search": "Buscar",
-    "search-patient": "Buscar paciente"
+    "search-patient": "Buscar paciente",
+    "alergies": "Alergias",
+    "sex": "Sexo",
+    "age": "Edad",
+    "female": "Femenino",
+    "male": "Masculino",
+    "not-specified": "No especificado",
+    "create": "Crear",
+    "see-chart": "Ver gráfico"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -18,13 +26,37 @@
     "dashboard": "Dashboard"
   },
   "patients": {
-    "patients": "Pacientes"
+    "patients": "Pacientes",
+    "last-visit": "Ultima visita",
+    "birthdate": "Nacimiento",
+    "syndrome": "Sindrome",
+    "data-sheet": "Ficha de datos",
+    "patient-history": "Historial del paciente"
   },
   "graph": {
     "graph": "Graficar"
   },
   "calendar": {
-    "calendar": "Calendario"
+    "calendar": "Calendario",
+    "january": "Enero",
+    "february": "Febrero",
+    "march": "Marzo",
+    "april": "Abril",
+    "may": "Mayo",
+    "june": "Junio",
+    "july": "Julio",
+    "august": "Agosto",
+    "september": "Septiembre",
+    "october": "Octubre",
+    "november": "Noviembre",
+    "december": "Diciembre",
+    "sun": "D",
+    "mon": "L",
+    "tue": "M",
+    "wed": "M",
+    "thu": "J",
+    "fri": "V",
+    "sat": "S"
   },
   "vee-validate": {
     "required-input": "Este campo es obligatorio"

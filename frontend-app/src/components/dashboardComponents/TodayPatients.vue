@@ -1,5 +1,5 @@
 <template>
-     <h1 class="text-4xl font-bold text-back mb-8">Pacientes de Hoy</h1>
+     <h1 class="text-xl font-bold text-back mb-8">Agendados</h1>
      <div v-if="isLoadingAppointments" class="text-center py-6">
           <basic-spinner-loading color="#489FB5" class="mx-auto" />
      </div>
@@ -29,11 +29,11 @@
 <script setup>
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { PatientsStore } from '../../stores/patientsStore';
+import { usePatientsStore } from '../../stores/patientsStore';
 
 import BasicSpinnerLoading from '../forms/BasicSpinnerLoading.vue';
 
-const patientsStore = PatientsStore()
+const patientsStore = usePatientsStore()
 const { appointments, isLoadingAppointments } = storeToRefs(patientsStore)
 
 const todaysAppointments = computed(() => {

@@ -14,7 +14,7 @@ const props = defineProps({
      },
      additionalCSS: {
           type: String,
-          default: 'justify-center mt-4 shadow-sm'
+          default: ''
      },
      isDisabled: {
           type: Boolean,
@@ -23,7 +23,7 @@ const props = defineProps({
 })
 
 const colorsCatalog = {
-     clinic: 'bg-[#489FB5] focus-visible:outline-[#489FB5] hover:bg-[#489FB5] text-white',
+     clinic: 'bg-primary-color focus-visible:outline-primary-color hover:bg-primary-color-variation-1 text-white',
      red: 'bg-red-500 focus-visible:outline-red-600 hover:bg-red-600 text-white',
      blue: 'bg-blue-500 focus-visible:outline-blue-600 hover:bg-blue-600 text-white',
      emerald: 'bg-emerald-500 focus-visible:outline-emerald-600 hover:bg-emerald-600 text-white',
