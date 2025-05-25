@@ -1,0 +1,18 @@
+services:
+  frontend:
+    build:
+      context: .                   
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend-app:/app        
+      - /app/node_modules        
+    ports:
+      - "TU PUERTO:5176"                
+    restart: on-failure
+    networks:
+      - clinica-network
+
+
+networks:
+  clinica-network:
+    external: true
