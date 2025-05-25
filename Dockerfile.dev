@@ -1,0 +1,15 @@
+# En la raíz de frontend-v1
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copia los package*.json de dentro de frontend-app
+COPY frontend-app/package*.json ./
+
+RUN npm install
+
+# Volumen en Compose montará el resto del código para hot-reload
+EXPOSE 5176
+
+# Ajusta el script: 'dev' si usas Vite, o 'serve' si tu package.json lo llama así.
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5176"]
