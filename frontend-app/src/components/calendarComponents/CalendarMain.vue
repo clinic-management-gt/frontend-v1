@@ -46,7 +46,6 @@ const lastDayOfWeek = computed(() => {
   return new Date(currentYear.value, currentMonth.value + 1, 0).getDay()
 })
 
-// Días del mes anterior para rellenar el inicio
 const prevMonthDays = computed(() => {
   const prevMonthLastDate = new Date(currentYear.value, currentMonth.value, 0).getDate()
   const days = []
@@ -61,7 +60,6 @@ const prevMonthDays = computed(() => {
   return days
 })
 
-// Días del mes siguiente para rellenar el final
 const nextMonthDays = computed(() => {
   const days = []
   const totalCells = prevMonthDays.value.length + daysInMonth.value
@@ -77,12 +75,9 @@ const nextMonthDays = computed(() => {
   return days
 })
 
-// Todos los días a mostrar en el calendario
 const calendarCells = computed(() => {
   const cells = []
-  // Días del mes anterior
   cells.push(...prevMonthDays.value)
-  // Días del mes actual
   for (let d = 1; d <= daysInMonth.value; d++) {
     cells.push({
       day: d,
@@ -91,12 +86,10 @@ const calendarCells = computed(() => {
       isOtherMonth: false
     })
   }
-  // Días del mes siguiente
   cells.push(...nextMonthDays.value)
   return cells
 })
 
-// Cambiar año
 const years = computed(() => {
   const arr = []
   for (let y = currentYear.value - 5; y <= currentYear.value + 5; y++) {
@@ -119,7 +112,6 @@ function selectYear(year) {
   showYearSelect.value = false
 }
 
-// Agregar evento
 const showEventModal = ref(false)
 const newEventText = ref('')
 
@@ -144,72 +136,67 @@ function addEvent() {
   }
 }
 
-// Mostrar todos los eventos de un día
 function getEventsForDay(cell) {
   return events.value.filter(
     e => e.day === cell.day && e.month === cell.month && e.year === cell.year
   )
 }
-
-
 </script>
 
 <template>
   <div :class="styles['main-content']">
-    <div :class="styles.calendar">
-      <div :class="styles['calendar-header']">
-        <button
-          @click="prevMonth"
-          :class="styles['calendar-btn']"
-        >&lt;</button>
-        <div :class="styles['calendar-title']">
-          <span>{{ monthNames[currentMonth] }}</span>
-          <button
-            @click="showYearSelect = !showYearSelect"
-            :class="styles['calendar-year-btn']"
-          >
-            {{ currentYear }}
-          </button>
-          <div v-if="showYearSelect" :class="styles['year-select']">
-            <div v-for="year in years" :key="year" @click="selectYear(year)" :class="styles['year-option']">
-              {{ year }}
-            </div>
+    <!-- Header del calendario -->
+    <div :class="styles['calendar-header']">
+      <button @click="prevMonth" :class="styles['calendar-btn']">&lt;</button>
+      <div :class="styles['calendar-title']">
+        <span>{{ monthNames[currentMonth] }}</span>
+        <button @click="showYearSelect = !showYearSelect" :class="styles['calendar-year-btn']">
+          {{ currentYear }}
+        </button>
+        <div v-if="showYearSelect" :class="styles['year-select']">
+          <div v-for="year in years" :key="year" @click="selectYear(year)" :class="styles['year-option']">
+            {{ year }}
           </div>
         </div>
-        <button
-          @click="nextMonth"
-          :class="styles['calendar-btn']"
-        >&gt;</button>
       </div>
-      <div :class="styles['calendar-grid']">
+      <button @click="nextMonth" :class="styles['calendar-btn']">&gt;</button>
+    </div>
+
+    <!-- Tabla del calendario -->
+    <div :class="styles['calendar-table']">
+      <!-- Días de la semana -->
+      <div :class="styles['calendar-row']">
         <div v-for="day in days" :key="day" :class="styles['calendar-day']">{{ day }}</div>
+      </div>
+
+      <!-- Semanas del mes -->
+      <div v-for="(week, weekIndex) in weeks" :key="'week-' + weekIndex" :class="styles['calendar-row']">
+        <!-- Celdas de días -->
         <div
-          v-for="(cell, idx) in calendarCells"
-          :key="idx"
+          v-for="cell in week"
+          :key="'day-' + cell.day + '-' + cell.month + '-' + cell.year"
           :class="[styles['calendar-cell'], cell.isOtherMonth ? styles['other-month'] : '']"
           @click="dayClicked(cell)"
         >
+          <!-- Número del día -->
           <span>{{ cell.day }}</span>
-          <div
-            v-for="(event, i) in getEventsForDay(cell)"
-            :key="i"
-            :style="{
-              background: event.color,
-              color: '#fff',
-              borderRadius: '4px',
-              padding: '2px 4px',
-              fontSize: '0.8em',
-              marginTop: '4px',
-              width: '90%',
-              wordBreak: 'break-word'
-            }"
-          >
-            {{ event.text }}
+          
+          <!-- Contenedor de eventos -->
+          <div :class="styles['calendar-events']">
+            <div
+              v-for="(event, eventIndex) in getEventsForDay(cell)"
+              :key="'event-' + eventIndex"
+              :class="styles['event']"
+              :style="{ background: event.color }"
+            >
+              {{ event.text }}
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Modal para agregar evento -->
+
+    <!-- Modal para agregar eventos -->
     <div v-if="showEventModal" :class="styles['modal-overlay']">
       <div :class="styles['modal-content']">
         <h3>Agregar evento al día {{ selectedDay }}</h3>
