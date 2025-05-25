@@ -67,14 +67,8 @@
                     <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true" />
 
                     <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-                         <form class="grid flex-1 grid-cols-1" action="#" method="GET">
-                              <input type="search" name="search" aria-label="Search"
-                                   class="col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-none placeholder:text-gray-400 sm:text-sm/6"
-                                   :placeholder="$t('general.search-patient')" />
-                              <MagnifyingGlassIcon
-                                   class="pointer-events-none col-start-1 row-start-1 size-5 self-center text-gray-400"
-                                   aria-hidden="true" />
-                         </form>
+                         <!-- Aquí va el buscador de pacientes -->
+                         <PatientsSearch class="flex-1" />
                          <div class="flex items-center gap-x-4 lg:gap-x-6">
                               <!-- Separator -->
                               <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true" />
@@ -133,6 +127,7 @@ import {
 import { ChevronDownIcon, MagnifyingGlassIcon, Bars3Icon, XMarkIcon } from '@heroicons/vue/20/solid'
 import { RouterView } from 'vue-router'
 import NavigationBar from '@/components/navigation/NavigationBar.vue'
+import PatientsSearch from '@/components/patientsComponents/PatientsSearch.vue'
 
 const userNavigation = [
      { name: 'Your profile', href: '#' },

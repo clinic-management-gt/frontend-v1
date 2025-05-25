@@ -1,6 +1,7 @@
 <script setup>
 import styles from './CalendarMain.module.css'
 import { ref, computed } from 'vue'
+import { onMounted } from 'vue'
 
 // Puedes cambiar esto cuando tengas tu componente real
 const PatientSearch = {
@@ -235,6 +236,40 @@ function deleteEvent(i) {
     editingEventId.value = null
   }
 }
+
+const appointments = ref([])
+
+async function fetchAppointments() {
+  try {
+    const res = await fetch('http://localhost:9000/appointments')
+    if (!res.ok) throw new Error('Error al obtener citas')
+    const data = await res.json()
+    appointments.value = data
+
+    // Limpia eventos previos de tipo 'Cita'
+    events.value = events.value.filter(e => e.type !== 'Cita')
+
+    // Agrega las citas como eventos
+    data.forEach(app => {
+      const date = new Date(app.date || app.appointment_date)
+      events.value.push({
+        day: date.getDate(),
+        month: date.getMonth(),
+        year: date.getFullYear(),
+        text: `Cita: ${app.PatientName || app.patientName} (${app.Status || app.status})`,
+        startTime: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        endTime: null,
+        color: '#1976d2',
+        type: 'Cita'
+      })
+    })
+  } catch (e) {
+    console.error('Error al obtener citas:', e)
+  }
+}
+
+onMounted(() => {fetchAppointments()})
+
 </script>
 
 <template>
