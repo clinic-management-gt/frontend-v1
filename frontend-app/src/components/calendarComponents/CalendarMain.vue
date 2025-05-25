@@ -2,7 +2,7 @@
 import styles from './CalendarMain.module.css'
 import { ref, computed } from 'vue'
 
-// Simula tu componente PatientSearch (puedes comentar cuando lo tengas real)
+// Puedes cambiar esto cuando tengas tu componente real
 const PatientSearch = {
   template: `<input type="text" placeholder="Buscar paciente..." />`
 }
@@ -140,6 +140,7 @@ function dayClicked(cell) {
   activityColor.value = '#ff9800'
 }
 
+/* --- Agregar Paciente o Actividad --- */
 function addPatientEvent() {
   if (selectedPatient.value && patientStartTime.value && selectedDayObj.value) {
     events.value.push({
@@ -185,6 +186,54 @@ function getEventsForDay(dayObj) {
       e => e.day === dayObj.day && e.month === dayObj.month && e.year === dayObj.year
     )
     .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''))
+}
+
+/* --- Edición y Eliminación --- */
+const editingIndex = ref(null)      // Índice en la lista visual
+const editingEventId = ref(null)    // Índice real en events.value
+const editingText = ref('')
+const editingStart = ref('')
+const editingEnd = ref('')
+const editingColor = ref('')
+
+// Computado para acceder a los eventos del día actual fácilmente
+const dayEvents = computed(() => getEventsForDay(selectedDayObj.value))
+
+function startEdit(i, event) {
+  editingIndex.value = i
+  editingText.value = event.text
+  editingStart.value = event.startTime
+  editingEnd.value = event.endTime || ''
+  editingColor.value = event.color
+  // Índice real del evento en events.value
+  editingEventId.value = events.value.findIndex(e => e === dayEvents.value[i])
+}
+
+function saveEdit(i) {
+  if (editingEventId.value === null || editingEventId.value === -1) return
+  if (editingText.value && editingStart.value) {
+    const event = events.value[editingEventId.value]
+    event.text = editingText.value
+    event.startTime = editingStart.value
+    event.endTime = editingEnd.value || null
+    event.color = editingColor.value
+    editingIndex.value = null
+    editingEventId.value = null
+  }
+}
+
+function cancelEdit() {
+  editingIndex.value = null
+  editingEventId.value = null
+}
+
+function deleteEvent(i) {
+  const realIndex = events.value.findIndex(e => e === dayEvents.value[i])
+  if (realIndex !== -1) events.value.splice(realIndex, 1)
+  if (editingIndex.value === i) {
+    editingIndex.value = null
+    editingEventId.value = null
+  }
 }
 </script>
 
@@ -244,52 +293,57 @@ function getEventsForDay(dayObj) {
       </h3>
 
       <ul>
-      <li v-for="(event, i) in getEventsForDay(selectedDayObj)" :key="i">
-         <span>
-            <span v-if="event.type === 'Paciente'">👤 </span>
-            <span v-else>📋 </span>
-            {{ event.text }}
-         </span>
-         <span style="display: flex; align-items: center; gap: 0.6em;">
-            {{ event.startTime }}
-            <template v-if="event.endTime">-{{ event.endTime }}</template>
-            <!-- Viñeta de color más grande -->
-            <span
-            :style="{
-               background: event.color,
-               borderRadius: '50%',
-               marginLeft: '0.7rem',
-               display: 'inline-block',
-               width: '28px',
-               height: '28px',
-               border: '2px solid #fff',
-               boxShadow: '0 0 0 1.5px #ccc'
-            }"
-            ></span>
-         </span>
-      </li>
-      <li v-if="getEventsForDay(selectedDayObj).length === 0">No hay actividades ni pacientes.</li>
+        <li v-for="(event, i) in getEventsForDay(selectedDayObj)" :key="i">
+          <template v-if="editingIndex === i">
+            <div class="edit-fields">
+              <input v-model="editingText" placeholder="Texto" />
+              <input v-model="editingStart" type="time" />
+              <input v-model="editingEnd" type="time" placeholder="Fin (opcional)" />
+              <input v-model="editingColor" type="color" />
+            </div>
+            <div class="edit-buttons-centered">
+              <button @click="saveEdit(i)">Guardar</button>
+              <button @click="cancelEdit">Cancelar</button>
+            </div>
+          </template>
+          <template v-else>
+            <span>
+              <span v-if="event.type === 'Paciente'">👤 </span>
+              <span v-else>📋 </span>
+              {{ event.text }}
+            </span>
+            <span style="display: flex; align-items: center; gap: 0.7em;">
+              {{ event.startTime }}
+              <template v-if="event.endTime">-{{ event.endTime }}</template>
+              <span class="color-dot" :style="{ background: event.color }"></span>
+              <button @click="startEdit(i, event)">Editar</button>
+              <button @click="deleteEvent(i)" style="color: #c62828; font-weight: bold;">🗑️</button>
+            </span>
+          </template>
+        </li>
+        <li v-if="getEventsForDay(selectedDayObj).length === 0">
+          No hay actividades ni pacientes.
+        </li>
       </ul>
 
-
       <div :class="styles['agenda-forms']">
-      <!-- Pacientes fila -->
-      <form @submit.prevent="addPatientEvent" :class="styles['agenda-form']">
-         <input v-model="selectedPatient" placeholder="Buscar o seleccionar paciente" required>
-         <input v-model="patientStartTime" type="time" required>
-         <input v-model="patientEndTime" type="time" placeholder="Fin (opcional)">
-         <input v-model="patientColor" type="color" title="Color paciente" class="color-input">
-         <button type="submit">Añadir paciente</button>
-      </form>
+        <!-- Pacientes fila -->
+        <form @submit.prevent="addPatientEvent" :class="styles['agenda-form']">
+          <input v-model="selectedPatient" placeholder="Buscar o seleccionar paciente" required>
+          <input v-model="patientStartTime" type="time" required>
+          <input v-model="patientEndTime" type="time" placeholder="Fin (opcional)">
+          <input v-model="patientColor" type="color" title="Color paciente" class="color-input">
+          <button type="submit">Añadir paciente</button>
+        </form>
 
-      <!-- Actividad fila -->
-      <form @submit.prevent="addActivityEvent" :class="styles['agenda-form']">
-         <input v-model="activityText" placeholder="Actividad" required>
-         <input v-model="activityStartTime" type="time" required>
-         <input v-model="activityEndTime" type="time" placeholder="Fin (opcional)">
-         <input v-model="activityColor" type="color" title="Color actividad" class="color-input">
-         <button type="submit">Añadir actividad</button>
-      </form>
+        <!-- Actividad fila -->
+        <form @submit.prevent="addActivityEvent" :class="styles['agenda-form']">
+          <input v-model="activityText" placeholder="Actividad" required>
+          <input v-model="activityStartTime" type="time" required>
+          <input v-model="activityEndTime" type="time" placeholder="Fin (opcional)">
+          <input v-model="activityColor" type="color" title="Color actividad" class="color-input">
+          <button type="submit">Añadir actividad</button>
+        </form>
       </div>
     </div>
   </div>

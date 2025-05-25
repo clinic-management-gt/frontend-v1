@@ -36,7 +36,6 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  /* background: #e3f2fd; */   /* <- QUITADO fondo celeste */
   color: #1976d2;
   border-radius: 8px;
   padding: 0.5rem 2rem;
@@ -190,7 +189,6 @@
   font-size: 0.95em;
 }
 
-/* Bordes derechos e inferiores para tabla */
 .calendar-row .calendar-day:last-child,
 .calendar-row .calendar-cell:last-child {
   border-right: 1px solid #e0e0e0;
@@ -221,14 +219,17 @@
 
 .day-agenda-panel li {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   background: #fff;
   border-radius: 8px;
   margin-bottom: 0.7rem;
   padding: 1.1rem 1.2rem;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
   font-size: 1.11rem;
+}
+
+.day-agenda-panel li > span:first-child {
+  margin-bottom: 0.3em;
 }
 
 /* Viñeta de color (agrega class="color-dot" al span en tu template) */
@@ -300,4 +301,61 @@
 }
 .agenda-form button:hover {
   background: #125ea2;
+}
+
+/* --- Edición en dos filas, botones centrados --- */
+.edit-fields {
+  display: flex;
+  gap: 1.1em;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  width: 100%;
+  margin-bottom: 0.8em;
+}
+.edit-fields input[type="text"] {
+  min-width: 110px;
+}
+.edit-fields input[type="color"] {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  margin-left: 0.5em;
+}
+.edit-fields input[type="time"] {
+  min-width: 120px;
+}
+.edit-buttons-centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5em;             /* MUCHO espacio entre botones */
+  width: 100%;
+  min-width: 350px;
+  margin-top: 1em;
+}
+.edit-buttons-centered button {
+  padding: 0.7em 1.7em;
+  font-size: 1.05em;
+  border-radius: 7px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  /* NO margin aquí */
+}
+.edit-buttons-centered button:first-child {
+  background: #1976d2;
+  color: #fff;
+}
+.edit-buttons-centered button:last-child {
+  background: #fdecea;
+  color: #c62828;
+}
+.edit-buttons-centered button:first-child:hover {
+  background: #125ea2;
+}
+.edit-buttons-centered button:last-child:hover {
+  background: #f7bdbd;
 }
