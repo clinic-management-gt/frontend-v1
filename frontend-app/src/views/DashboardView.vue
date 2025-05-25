@@ -1,15 +1,17 @@
 <template>
-  <div class="px-6 py-8 max-w-4xl mx-auto">
+  <div class="px-6 py-8 mx-auto">
     <today-patients />
   </div>
 </template>
 <script setup>
-import { PatientsStore } from "../stores/patientsStore";
+import { usePatientsStore } from "@stores/patientsStore";
+
+const patientStore = usePatientsStore()
+
+import TodayPatients from "@components/dashboardComponents/TodayPatients.vue";
 
 const patientStore = PatientsStore()
 
-import TodayPatients from "../components/dashboardComponents/TodayPatients.vue";
 
 patientStore.fetchAppointments()
-
 </script>

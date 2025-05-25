@@ -26,9 +26,10 @@
                                         </div>
                                    </TransitionChild>
                                    <!-- Sidebar component, swap this element with another sidebar if you like -->
-                                   <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-[#489FB5] px-6 pb-4">
-                                        <div class="flex h-16 shrink-0 items-center bg-[#82C0CC] rounded-md mt-2">
-                                             <img class="flex h-16 w-auto mx-auto mt-2" src="/logo-gastro.png" />
+                                   <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-primary-color px-6 pb-4">
+                                        <div class="flex h-18 shrink-0 items-center bg-white rounded-full mt-2">
+                                             <img class="h-16 w-auto mx-auto mt-2" src="/logo-gastro.png"
+                                                  alt="Logo Gastro" />
                                         </div>
                                         <nav class="flex flex-1 flex-col">
                                              <NavigationBar />
@@ -44,9 +45,9 @@
           <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
                <!-- Sidebar component, swap this element with another sidebar if you like -->
                <div
-                    class="flex grow flex-col gap-y-5 overflow-y-auto bg-[#489FB5] align-center justify-center min-h-screen px-6 pb-4">
-                    <div class="flex h-16 shrink-0 items-center bg-[#82C0CC] rounded-md mt-2">
-                         <img class="flex h-16 w-auto mx-auto mt-2" src="/logo-gastro.png" />
+                    class="flex grow flex-col gap-y-5 overflow-y-auto bg-primary-color align-center justify-center min-h-screen px-6 pb-4">
+                    <div class="flex h-18 shrink-0 items-center bg-white rounded-full mt-2">
+                         <img class="h-16 w-auto mx-auto mt-2" src="/logo-gastro.png" alt="Logo Gastro" />
                     </div>
                     <nav class="flex flex-1 flex-col">
                          <NavigationBar />
@@ -83,7 +84,7 @@
                                    <MenuButton class="-m-1.5 flex items-center p-1.5">
                                         <span class="hidden lg:flex lg:items-center">
                                              <span class="ml-4 text-sm/6 font-semibold text-gray-900"
-                                                  aria-hidden="true">Tom Cook</span>
+                                                  aria-hidden="true">Dra. Flor Ramírez</span>
                                              <ChevronDownIcon class="ml-2 size-5 text-gray-400" aria-hidden="true" />
                                         </span>
                                    </MenuButton>
@@ -99,7 +100,7 @@
                                                   v-slot="{ active }">
                                              <a :href="item.href"
                                                   :class="[active ? 'bg-gray-50 outline-none' : '', 'block px-3 py-1 text-sm/6 text-gray-900']">{{
-                                                       item.name }}</a>
+                                                  item.name }}</a>
                                              </MenuItem>
                                         </MenuItems>
                                    </transition>
@@ -108,8 +109,8 @@
                     </div>
                </div>
 
-               <main class="py-10">
-                    <div class="px-4 sm:px-6 lg:px-8">
+               <main class="h-[calc(100vh-5rem)] overflow-auto">
+                    <div class="h-full">
                          <router-view />
                     </div>
                </main>

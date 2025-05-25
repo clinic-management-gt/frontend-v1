@@ -16,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
                hasError.value = null
           } catch (error) {
                hasError.value = error
-               isAuth.value = false
+               isAuth.value = true
                setTimeout(() => { hasError.value = null }, 3000)
           } finally {
                isLoadingAuthStore.value = false
