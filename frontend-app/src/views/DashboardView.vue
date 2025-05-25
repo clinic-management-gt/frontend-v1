@@ -10,7 +10,7 @@ const patientStore = usePatientsStore()
 
 import TodayPatients from "@components/dashboardComponents/TodayPatients.vue";
 
-const patientStore = PatientsStore()
+//const patientStore = PatientsStore()
 
 
 patientStore.fetchAppointments()
