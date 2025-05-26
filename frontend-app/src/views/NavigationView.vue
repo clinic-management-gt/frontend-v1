@@ -1,6 +1,8 @@
 <template>
      <div>
+          <!-- Barra lateral y navegación principal de la app -->
           <TransitionRoot as="template" :show="sidebarOpen">
+               <!-- Diálogo para la barra lateral en pantallas pequeñas -->
                <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
                     <TransitionChild as="template" enter="transition-opacity ease-linear duration-300"
                          enter-from="opacity-0" enter-to="opacity-100"
@@ -8,7 +10,6 @@
                          leave-to="opacity-0">
                          <div class="fixed inset-0 bg-gray-900/80" />
                     </TransitionChild>
-
                     <div class="fixed inset-0 flex">
                          <TransitionChild as="template" enter="transition ease-in-out duration-300 transform"
                               enter-from="-translate-x-full" enter-to="translate-x-0"
@@ -25,13 +26,14 @@
                                              </button>
                                         </div>
                                    </TransitionChild>
-                                   <!-- Sidebar component, swap this element with another sidebar if you like -->
+                                   <!-- Contenido de la barra lateral -->
                                    <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-primary-color px-6 pb-4">
                                         <div class="flex h-18 shrink-0 items-center bg-white rounded-full mt-2">
                                              <img class="h-16 w-auto mx-auto mt-2" src="/logo-gastro.png"
                                                   alt="Logo Gastro" />
                                         </div>
                                         <nav class="flex flex-1 flex-col">
+                                             <!-- Componente de navegación lateral -->
                                              <NavigationBar />
                                         </nav>
                                    </div>
@@ -41,9 +43,8 @@
                </Dialog>
           </TransitionRoot>
 
-          <!-- Static sidebar for desktop -->
+          <!-- Barra lateral estática para escritorio -->
           <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-               <!-- Sidebar component, swap this element with another sidebar if you like -->
                <div
                     class="flex grow flex-col gap-y-5 overflow-y-auto bg-primary-color align-center justify-center min-h-screen px-6 pb-4">
                     <div class="flex h-18 shrink-0 items-center bg-white rounded-full mt-2">
@@ -55,25 +56,41 @@
                </div>
           </div>
 
+          <!-- Barra superior y contenido principal -->
           <div class="lg:pl-72">
                <div
                     class="sticky top-0 z-40 flex h-20 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+                    <!-- Botón para abrir la barra lateral en móvil -->
                     <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
                          <span class="sr-only">Open sidebar</span>
                          <Bars3Icon class="size-6" aria-hidden="true" />
                     </button>
 
-                    <!-- Separator -->
+                    <!-- Separador visual -->
                     <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true" />
 
+                    <!-- Buscador de pacientes en la barra superior -->
                     <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-                         <!-- Aquí va el buscador de pacientes -->
-                         <PatientsSearch class="flex-1" />
+                         <!-- Formulario de búsqueda con autocompletado -->
+                         <form class="grid flex-1 grid-cols-1" action="#" method="GET">
+                              <!-- Componente de autocompletado para buscar pacientes -->
+                              <combo-box-autocomplete-input
+                                   :data="allPatients"
+                                   v-model:currentSelected="currentPatientSelectedId"
+                                   class="col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-none placeholder:text-gray-400 sm:text-sm/6"
+                                   :placeholder="$t('general.search-patient')"
+                              />
+                              <!-- Icono de lupa sobre el input -->
+                              <MagnifyingGlassIcon
+                                   class="pointer-events-none col-start-1 row-start-1 size-5 self-center text-gray-400"
+                                   aria-hidden="true"
+                              />
+                         </form>
                          <div class="flex items-center gap-x-4 lg:gap-x-6">
-                              <!-- Separator -->
+                              <!-- Separador visual -->
                               <div class="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" aria-hidden="true" />
 
-                              <!-- Profile dropdown -->
+                              <!-- Menú de perfil de usuario -->
                               <Menu as="div" class="relative">
                                    <MenuButton class="-m-1.5 flex items-center p-1.5">
                                         <span class="hidden lg:flex lg:items-center">
@@ -103,6 +120,7 @@
                     </div>
                </div>
 
+               <!-- Contenido principal de la página -->
                <main class="h-[calc(100vh-5rem)] overflow-auto">
                     <div class="h-full">
                          <router-view />
@@ -113,6 +131,9 @@
 </template>
 
 <script setup>
+// Este archivo define la vista principal de navegación, incluyendo la barra lateral y la barra superior.
+// Aquí se importa el store de pacientes para alimentar el autocompletado de búsqueda.
+
 import { ref } from 'vue'
 import {
      Dialog,
@@ -127,12 +148,20 @@ import {
 import { ChevronDownIcon, MagnifyingGlassIcon, Bars3Icon, XMarkIcon } from '@heroicons/vue/20/solid'
 import { RouterView } from 'vue-router'
 import NavigationBar from '@/components/navigation/NavigationBar.vue'
-import PatientsSearch from '@/components/patientsComponents/PatientsSearch.vue'
+import ComboBoxAutocompleteInput from '@/components/forms/ComboBoxAutocompleteInput.vue'
+import { storeToRefs } from 'pinia'
+import { usePatientsStore } from '@/stores/patientsStore'
 
+// Se obtiene el store de pacientes y sus referencias reactivas
+const patientsStore = usePatientsStore()
+const { allPatients, currentPatientSelectedId } = storeToRefs(patientsStore)
+
+// Opciones del menú de usuario
 const userNavigation = [
      { name: 'Your profile', href: '#' },
      { name: 'Sign out', href: '#' },
 ]
 
+// Estado para mostrar/ocultar la barra lateral en móvil
 const sidebarOpen = ref(false)
 </script>

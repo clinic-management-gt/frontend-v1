@@ -1,30 +1,26 @@
 <template>
-     <div class="flex flex-wrap items-center justify-center gap-4">
-          <div class="w-72">
-               <combo-box-autocomplete-input :data="allPatients" v-model:currentSelected="currentPatientSelectedId"/>
-          </div>
-          <div class="w-72 h-8">
-               <primary-button>
-                    <span class="flex uppercase items-center"> Agregar nuevo paciente </span>
-               </primary-button>
+     <!-- Componente de búsqueda de pacientes con autocompletado.
+          Este componente solo muestra el box de búsqueda, sin botón de agregar. -->
+     <div class="w-full flex items-center justify-center">
+          <div class="w-full max-w-xl">
+               <!-- Se utiliza el componente de autocompletado, recibiendo la lista de pacientes y el id seleccionado -->
+               <combo-box-autocomplete-input
+                    :data="allPatients"
+                    v-model:currentSelected="currentPatientSelectedId"
+               />
           </div>
      </div>
 </template>
 
 <script setup>
+// Este componente conecta el store de pacientes con el componente de autocompletado.
+// Solo sirve como wrapper para facilitar la reutilización y mantener el código limpio.
+
 import { storeToRefs } from 'pinia';
-import { watch } from 'vue';
 import { usePatientsStore } from '../../stores/patientsStore';
-
 import ComboBoxAutocompleteInput from '../forms/ComboBoxAutocompleteInput.vue';
-import PrimaryButton from '../forms/PrimaryButton.vue'
 
+// Se obtiene el store de pacientes y sus referencias reactivas
 const patientsStore = usePatientsStore()
-
 const { allPatients, currentPatientSelectedId } = storeToRefs(patientsStore)
-
-watch(() => {
-     console.log(currentPatientSelectedId)
-})
-
 </script>
