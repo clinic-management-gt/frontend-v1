@@ -28,9 +28,8 @@
                                    </TransitionChild>
                                    <!-- Contenido de la barra lateral -->
                                    <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-primary-color px-6 pb-4">
-                                        <div class="flex h-18 shrink-0 items-center bg-white rounded-full mt-2">
-                                             <img class="h-16 w-auto mx-auto mt-2" src="/logo-gastro.png"
-                                                  alt="Logo Gastro" />
+                                        <div class="flex h-18 shrink-0 items-center bg-white rounded-full">
+                                             <img class="h-16 w-auto mx-auto" src="/logo-gastro.png" alt="Logo Gastro" />
                                         </div>
                                         <nav class="flex flex-1 flex-col">
                                              <!-- Componente de navegación lateral -->
@@ -47,8 +46,8 @@
           <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
                <div
                     class="flex grow flex-col gap-y-5 overflow-y-auto bg-primary-color align-center justify-center min-h-screen px-6 pb-4">
-                    <div class="flex h-18 shrink-0 items-center bg-white rounded-full mt-2">
-                         <img class="h-16 w-auto mx-auto mt-2" src="/logo-gastro.png" alt="Logo Gastro" />
+                    <div class="flex h-18 shrink-0 items-center bg-white rounded-full">
+                         <img class="h-16 w-auto mx-auto" src="/logo-gastro.png" alt="Logo Gastro" />
                     </div>
                     <nav class="flex flex-1 flex-col">
                          <NavigationBar />
@@ -59,7 +58,7 @@
           <!-- Barra superior y contenido principal -->
           <div class="lg:pl-72">
                <div
-                    class="sticky top-0 z-40 flex h-20 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+                    class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
                     <!-- Botón para abrir la barra lateral en móvil -->
                     <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
                          <span class="sr-only">Open sidebar</span>
@@ -72,7 +71,7 @@
                     <!-- Buscador de pacientes en la barra superior -->
                     <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
                          <!-- Formulario de búsqueda con autocompletado -->
-                         <form class="grid flex-1 grid-cols-1" action="#" method="GET">
+                         <form class="grid flex-1 grid-cols-1 mt-4" action="#" method="GET">
                               <!-- Componente de autocompletado para buscar pacientes -->
                               <combo-box-autocomplete-input
                                    :data="allPatients"

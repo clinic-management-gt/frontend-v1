@@ -7,6 +7,8 @@
                <combo-box-autocomplete-input
                     :data="allPatients"
                     v-model:currentSelected="currentPatientSelectedId"
+                    class="col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-none placeholder:text-gray-400 sm:text-sm/6"
+                    :placeholder="$t('general.search-patient')"
                />
           </div>
      </div>

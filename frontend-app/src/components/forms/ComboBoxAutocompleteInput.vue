@@ -1,7 +1,7 @@
 <template>
      <!-- Componente de autocompletado reutilizable para seleccionar pacientes.
           Muestra un input con sugerencias y permite seleccionar un paciente de la lista. -->
-     <div class="w-full mt-6">
+     <div class="w-full ">
      <Combobox v-model="selected" @update:modelValue="onSelect">
           <div class="relative">
           <!-- Input de búsqueda con placeholder y autocompletado -->
