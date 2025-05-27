@@ -7,6 +7,7 @@ import DashboardView  from '@/views/DashboardView.vue'
 import PatientsView   from '@/views/PatientsView.vue'
 import GraphView      from '@/views/GraphView.vue'
 import CalendarView   from '@/views/CalendarView.vue'
+import ProfileView    from '@/views/ProfileView.vue'    
 
 const routes = [
   {
@@ -43,7 +44,13 @@ const routes = [
         name: 'calendar',
         component: CalendarView,
         meta: { requiresAuth: true }
-      }
+      },
+      { 
+          path: 'profile',   
+          name: 'profile',   
+          component: ProfileView,   
+          meta: { requiresAuth: true } 
+     }
     ]
   }
 ]
