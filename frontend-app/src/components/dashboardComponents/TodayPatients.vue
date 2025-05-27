@@ -51,83 +51,67 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { storeToRefs } from 'pinia'
+import { storeToRefs }    from 'pinia'
 import { usePatientsStore } from '../../stores/patientsStore'
 import BasicSpinnerLoading from '../forms/BasicSpinnerLoading.vue'
 
-// Pinia store
+// Pinia
 const patientsStore = usePatientsStore()
 const { appointmentsToday, isLoadingAppointmentsToday } = storeToRefs(patientsStore)
 
-// Al montar, traemos las citas de hoy
 onMounted(() => {
   patientsStore.fetchAppointmentsToday()
 })
 
 // Fecha de hoy formateada
-const today = ref(new Date())
 const todayFormatted = computed(() =>
-  today.value.toLocaleDateString('es-GT', {
+  new Date().toLocaleDateString('es-GT', {
     day:   'numeric',
     month: 'long',
     year:  'numeric'
   })
 )
 
-// Sólo los estados válidos en el enum
-const statusOrder = [
-  'pendiente',
-  'confirmado',
-  'completado',
-  'cancelado',
-  'espera'
+// --------------------------------------------------
+// Un único array con toda la info de cada estado:
+// - `key` es el valor lowercase en UI
+// - `label` es el string exacto para el enum de Postgres
+// - `class` la clase de Tailwind/CSS que quieres aplicar
+// --------------------------------------------------
+const statuses = [
+  { key: 'pendiente',  label: 'Pendiente',  class: 'bg-[#F4A261] text-yellow-900' },
+  { key: 'confirmado', label: 'Confirmado', class: 'bg-blue-500'            },
+  { key: 'completado', label: 'Completado', class: 'bg-[#48C9B0]'           },
+  { key: 'cancelado',  label: 'Cancelado',  class: 'bg-red-500'             },
+  { key: 'espera',     label: 'Espera',     class: 'bg-[#F39C12]'           },
 ]
 
-// Mapeo a los literales exactos que espera Postgres
-const statusEnumMap = {
-  pendiente:  'Pendiente',
-  confirmado: 'Confirmado',
-  completado: 'Completado',
-  cancelado:  'Cancelado',
-  espera:     'Espera'
-}
+// Para buscar rápido un estado por su key
+const statusMap = Object.fromEntries(statuses.map(s => [s.key, s]))
 
-// Cambiar estado al click (optimista + confirmación)
 async function changueStatus(appointment) {
-  const curr = appointment.status.toLowerCase()
-  const next = statusOrder[(statusOrder.indexOf(curr) + 1) % statusOrder.length]
-  const enumValue = statusEnumMap[next]
+  // 1) Calcula índice y nextKey
+  const currKey = appointment.status.toLowerCase()
+  const idx     = statuses.findIndex(s => s.key === currKey)
+  const next    = statuses[(idx + 1) % statuses.length]
 
-  // Cambio optimista en UI
-  appointment.status = next
+  // 2) Cambio optimista
+  appointment.status = next.key
 
-  // Llamada al servidor
-  const ok = await patientsStore.updateAppointmentStatus(appointment.id, enumValue)
+  // 3) PATCH contra el backend
+  const ok = await patientsStore.updateAppointmentStatus(appointment.id, next.label)
   if (!ok) {
-    // Si falla, revertimos el cambio
-    appointment.status = curr
+    // si fallo, revertimos
+    appointment.status = currKey
   }
 }
 
-// Clase de color según estado
+// Ahora simplemente buscamos en statusMap para aplicar clases
 function statusClass(status) {
-  switch (status?.toLowerCase()) {
-    case 'completado':
-      return 'bg-[#48C9B0]'
-    case 'confirmado':
-      return 'bg-blue-500'
-    case 'pendiente':
-      return 'bg-[#F4A261] text-yellow-900'
-    case 'cancelado':
-      return 'bg-red-500'
-    case 'espera':
-      return 'bg-[#F39C12]'
-    default:
-      return 'bg-gray-400'
-  }
+  const key = status?.toLowerCase()
+  return statusMap[key]?.class || 'bg-gray-400'
 }
 
-// Formatear fecha-hora
 function formatDateTime(dateString) {
   return new Date(dateString).toLocaleString('es-GT', {
     year:   'numeric',
@@ -139,6 +123,7 @@ function formatDateTime(dateString) {
   })
 }
 </script>
+
 
 <style>
 .fade-enter-active,
