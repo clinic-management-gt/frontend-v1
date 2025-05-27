@@ -3,12 +3,14 @@ import { ref } from 'vue'
 
 export const usePatientsStore = defineStore('patients', () => {
   const appointments = ref([])
+  const appointmentsToday = ref([])
   const allPatients = ref([])
   const currentPatientSelectedId = ref(undefined)
   const currentPatientSelectedData = ref(undefined)
 
   const isLoadingPatientsStore = ref(false)
   const isLoadingAppointments = ref(false)
+  const isLoadingAppointmentsToday = ref(false)
   const isLoadingAllPatients = ref(false)
   const isLoadingPatientData = ref(false)
 
@@ -32,6 +34,48 @@ export const usePatientsStore = defineStore('patients', () => {
       isLoadingAppointments.value = false
     }
   }
+
+  async function fetchAppointmentsToday() {
+    try {
+      isLoadingAppointmentsToday.value = true
+      const res = await fetch('http://localhost:9000/appointments/today')
+      if (!res.ok) {
+        console.error(`Error ${res.status} al obtener citas de hoy:`, await res.text())
+        return
+      }
+      appointmentsToday.value = await res.json()
+    } catch (error) {
+      console.error('Error al obtener citas de hoy:', error)
+    } finally {
+      isLoadingAppointmentsToday.value = false
+    }
+    
+  }
+
+  // patientsStore.js
+  async function updateAppointmentStatus(id, newStatus) {
+    try {
+      const res = await fetch(`http://localhost:9000/appointments/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!res.ok) {
+        console.error(`Error ${res.status}:`, await res.text());
+        return false;
+      }
+      // Si todo OK, actualizo sólo ese elemento en el array:
+      const idx = appointmentsToday.value.findIndex(a => a.id === id);
+      if (idx !== -1) {
+        appointmentsToday.value[idx].status = newStatus;
+      }
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  }
+
 
   async function fetchAllPatients() {
     try {
@@ -73,16 +117,20 @@ export const usePatientsStore = defineStore('patients', () => {
   return {
     // state
     appointments,
+    appointmentsToday,
     allPatients,
     currentPatientSelectedId,
     currentPatientSelectedData,
     isLoadingPatientsStore,
     isLoadingAppointments,
+    isLoadingAppointmentsToday,
     isLoadingAllPatients,
     isLoadingPatientData,
     // actions
     setPatientsData,
     fetchAppointments,
+    fetchAppointmentsToday,
+    updateAppointmentStatus,
     fetchAllPatients,
     fetchPatientData,
   }
@@ -90,6 +138,7 @@ export const usePatientsStore = defineStore('patients', () => {
   persist: {
     paths: [
       'appointments',
+      'appointmentsToday',
       'allPatients',
       'currentPatientSelectedId',
       'currentPatientSelectedData'
