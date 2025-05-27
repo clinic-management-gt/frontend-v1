@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h1 class="text-xl font-bold text-back mb-8">Agendados</h1>
+    <h1 class="text-xl font-bold text-back mb-8">
+      Pacientes para el día de hoy — {{ todayFormatted }}
+    </h1>
 
     <div v-if="isLoadingAppointmentsToday" class="text-center py-6">
       <basic-spinner-loading color="#489FB5" class="mx-auto" />
@@ -13,6 +15,7 @@
           :key="appointment.id"
           class="flex items-stretch h-32 rounded-xl overflow-hidden mb-4"
         >
+          <!-- Info del paciente y cita -->
           <div class="flex items-center bg-gray-200 rounded-xl w-3/4 p-4 flex-1">
             <div class="flex-1">
               <h2 class="text-3xl font-bold text-gray-800">
@@ -29,6 +32,7 @@
             </div>
           </div>
 
+          <!-- Botón de estado -->
           <div
             :class="[
               'flex items-center justify-center h-full w-1/4 ml-4 rounded-xl text-white font-bold text-xl',
@@ -45,90 +49,104 @@
   </div>
 </template>
 
-<style>
-     .fade-enter-active,
-     .fade-leave-active {
-     transition: opacity 0.3s;
-     }
-     .fade-enter-from,
-     .fade-leave-to {
-     opacity: 0;
-     }
-</style>
-
 <script setup>
-     import { onMounted } from 'vue';
-     import { storeToRefs } from 'pinia';
-     import { usePatientsStore } from '../../stores/patientsStore';
-     import BasicSpinnerLoading from '../forms/BasicSpinnerLoading.vue';
+import { ref, computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { usePatientsStore } from '../../stores/patientsStore'
+import BasicSpinnerLoading from '../forms/BasicSpinnerLoading.vue'
 
-     const patientsStore = usePatientsStore()
-     const { appointmentsToday, isLoadingAppointmentsToday } = storeToRefs(patientsStore)
+// Pinia store
+const patientsStore = usePatientsStore()
+const { appointmentsToday, isLoadingAppointmentsToday } = storeToRefs(patientsStore)
 
-     onMounted(() => {
-          patientsStore.fetchAppointmentsToday();
-     });
+// Al montar, traemos las citas de hoy
+onMounted(() => {
+  patientsStore.fetchAppointmentsToday()
+})
 
-     // Solo los que realmente existen en el enum de tu DB
-     const statusOrder = [
-     "pendiente",
-     "confirmado",
-     "completado",
-     "cancelado",
-     "espera"
-     ];
+// Fecha de hoy formateada
+const today = ref(new Date())
+const todayFormatted = computed(() =>
+  today.value.toLocaleDateString('es-GT', {
+    day:   'numeric',
+    month: 'long',
+    year:  'numeric'
+  })
+)
 
-     const statusEnumMap = {
-     pendiente:  'Pendiente',
-     confirmado: 'Confirmado', 
-     completado: 'Completado',
-     cancelado:  'Cancelado',
-     espera:     'Espera',
-     };
-     
-     async function changueStatus(appointment) {
-          const curr = appointment.status.toLowerCase();
-          const next = statusOrder[(statusOrder.indexOf(curr) + 1) % statusOrder.length];
-          const enumValue = statusEnumMap[next];
+// Sólo los estados válidos en el enum
+const statusOrder = [
+  'pendiente',
+  'confirmado',
+  'completado',
+  'cancelado',
+  'espera'
+]
 
-          appointment.status = next;
+// Mapeo a los literales exactos que espera Postgres
+const statusEnumMap = {
+  pendiente:  'Pendiente',
+  confirmado: 'Confirmado',
+  completado: 'Completado',
+  cancelado:  'Cancelado',
+  espera:     'Espera'
+}
 
-          const ok = await patientsStore.updateAppointmentStatus(appointment.id, enumValue);
-          if (!ok) {
-          appointment.status = curr;
-          }
-     }
+// Cambiar estado al click (optimista + confirmación)
+async function changueStatus(appointment) {
+  const curr = appointment.status.toLowerCase()
+  const next = statusOrder[(statusOrder.indexOf(curr) + 1) % statusOrder.length]
+  const enumValue = statusEnumMap[next]
 
+  // Cambio optimista en UI
+  appointment.status = next
 
+  // Llamada al servidor
+  const ok = await patientsStore.updateAppointmentStatus(appointment.id, enumValue)
+  if (!ok) {
+    // Si falla, revertimos el cambio
+    appointment.status = curr
+  }
+}
 
-     function statusClass(status) {
-          switch (status?.toLowerCase()) {
-          case "completado":
-               return "bg-[#48C9B0]";
-          case "confirmado":
-               return "bg-blue-500";
-          case "pendiente":
-               return "bg-[#F4A261] text-yellow-900";
-          case "cancelado":
-               return "bg-red-500";
-          case "espera":
-               return "bg-[#F39C12]";
-          case "consulta":
-               return "bg-[#5DADE2]";
-          default:
-               return "bg-gray-400";
-          }
-     }
+// Clase de color según estado
+function statusClass(status) {
+  switch (status?.toLowerCase()) {
+    case 'completado':
+      return 'bg-[#48C9B0]'
+    case 'confirmado':
+      return 'bg-blue-500'
+    case 'pendiente':
+      return 'bg-[#F4A261] text-yellow-900'
+    case 'cancelado':
+      return 'bg-red-500'
+    case 'espera':
+      return 'bg-[#F39C12]'
+    default:
+      return 'bg-gray-400'
+  }
+}
 
-     function formatDateTime(dateString) {
-          const options = {
-               year: "numeric",
-               month: "numeric",
-               day: "numeric",
-               hour: "numeric",
-               minute: "numeric",
-               hour12: true,
-          };
-          return new Date(dateString).toLocaleString("es-GT", options);
-     }
+// Formatear fecha-hora
+function formatDateTime(dateString) {
+  return new Date(dateString).toLocaleString('es-GT', {
+    year:   'numeric',
+    month:  'numeric',
+    day:    'numeric',
+    hour:   'numeric',
+    minute: 'numeric',
+    hour12: true
+  })
+}
 </script>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
