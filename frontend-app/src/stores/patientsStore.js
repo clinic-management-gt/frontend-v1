@@ -118,22 +118,40 @@ export const usePatientsStore = defineStore('patients', () => {
     }
   }
 
-  async function fetchPatientMedicalRecords() {
-    if (!currentPatientSelectedId.value) return
-    isLoadingMedicalRecords.value = true
+// Busca la función fetchPatientMedicalRecords y modifícala para manejar mejor el error 404
+
+async function fetchPatientMedicalRecords(patientId) {
+    if (!patientId) return;
+    
+    patientId = patientId || currentPatientSelectedId.value;
+    if (!patientId) return;
+    
+    isLoadingMedicalRecords.value = true;
+    
     try {
-      const res = await fetch(`http://localhost:9000/Patients/${currentPatientSelectedId.value}/medicalrecords`)
-      if (!res.ok) throw new Error('Error al obtener medical records')
-      const result = await res.json()
-      // Si el backend devuelve un objeto, conviértelo en array
-      currentPatientMedicalRecords.value = Array.isArray(result) ? result : [result]
-    } catch (e) {
-      currentPatientMedicalRecords.value = []
-      console.error(e)
+        // Usar la URL correcta
+        const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords`);
+        
+        // Manejar explícitamente el caso 404
+        if (response.status === 404) {
+            console.warn(`No hay registros médicos para el paciente ${patientId}`);
+            currentPatientMedicalRecords.value = []; // Array vacío en vez de error
+            return;
+        }
+        
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        currentPatientMedicalRecords.value = data;
+    } catch (error) {
+        console.error('Error al obtener medical records:', error);
+        currentPatientMedicalRecords.value = []; // Asignar array vacío en caso de error
     } finally {
-      isLoadingMedicalRecords.value = false
+        isLoadingMedicalRecords.value = false;
     }
-  }
+}
 
   return {
     // state
