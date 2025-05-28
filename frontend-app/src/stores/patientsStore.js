@@ -14,9 +14,13 @@ export const usePatientsStore = defineStore('patients', () => {
   const isLoadingAllPatients = ref(false)
   const isLoadingPatientData = ref(false)
 
+  const currentPatientMedicalRecords = ref(undefined)
+  const isLoadingMedicalRecords = ref(false)
+
   function setPatientsData(id) {
     currentPatientSelectedId.value = id
     fetchPatientData()
+    fetchPatientMedicalRecords()
   }
 
   async function fetchAppointments() {
@@ -114,6 +118,23 @@ export const usePatientsStore = defineStore('patients', () => {
     }
   }
 
+  async function fetchPatientMedicalRecords() {
+    if (!currentPatientSelectedId.value) return
+    isLoadingMedicalRecords.value = true
+    try {
+      const res = await fetch(`http://localhost:9000/Patients/${currentPatientSelectedId.value}/medicalrecords`)
+      if (!res.ok) throw new Error('Error al obtener medical records')
+      const result = await res.json()
+      // Si el backend devuelve un objeto, conviértelo en array
+      currentPatientMedicalRecords.value = Array.isArray(result) ? result : [result]
+    } catch (e) {
+      currentPatientMedicalRecords.value = []
+      console.error(e)
+    } finally {
+      isLoadingMedicalRecords.value = false
+    }
+  }
+
   return {
     // state
     appointments,
@@ -126,7 +147,10 @@ export const usePatientsStore = defineStore('patients', () => {
     isLoadingAppointmentsToday,
     isLoadingAllPatients,
     isLoadingPatientData,
+    currentPatientMedicalRecords,
+    isLoadingMedicalRecords,
     // actions
+    fetchPatientMedicalRecords,
     setPatientsData,
     fetchAppointments,
     fetchAppointmentsToday,
