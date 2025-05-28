@@ -84,6 +84,7 @@
             <combo-box-autocomplete-input
               :data="allPatients"
               v-model:currentSelected="currentPatientSelectedId"
+              @update:currentSelected="handlePatientSelection"
               class="col-start-1 row-start-1 block w-full bg-white pl-8 text-base text-gray-900 outline-none placeholder:text-gray-400 sm:text-sm/6"
               :placeholder="$t('general.search-patient')"
             />
@@ -143,7 +144,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import {
@@ -169,6 +170,24 @@ const { allPatients, currentPatientSelectedId } = storeToRefs(patientsStore)
 // Router y Auth
 const router    = useRouter()
 const authStore = useAuthStore()
+
+// Función para manejar la selección de paciente
+function handlePatientSelection(patientId) {
+  if (patientId) {
+    console.log('Paciente seleccionado, redirigiendo a detalles:', patientId);
+    
+    // Redirecciona a la vista de pacientes
+    router.push('/patients');
+  }
+}
+
+// Cargar todos los pacientes al iniciar
+onMounted(() => {
+  // Asegúrate de que los pacientes estén disponibles para la búsqueda
+  if (!allPatients.value || allPatients.value.length === 0) {
+    patientsStore.fetchAllPatients();
+  }
+});
 
 // Saludo dinámico
 const greeting = computed(() => {

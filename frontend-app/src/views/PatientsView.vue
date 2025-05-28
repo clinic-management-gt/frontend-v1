@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import { storeToRefs } from "pinia";
 import { usePatientsStore } from "@stores/patientsStore";
 
@@ -253,6 +253,27 @@ watch(currentPatientSelectedId, async (newId) => {
           } catch (error) {
                console.error('Error al cargar datos del paciente:', error);
           }
+     }
+});
+
+// Cargar datos del paciente seleccionado al montar el componente
+onMounted(async () => {
+     // Si ya hay un ID seleccionado, cargar sus datos
+     if (currentPatientSelectedId.value) {
+     console.log('Componente montado con ID seleccionado:', currentPatientSelectedId.value);
+     try {
+          // Cargar datos básicos del paciente
+          await patientsStore.fetchPatientData(currentPatientSelectedId.value);
+          
+          // Intentar cargar registros médicos
+          try {
+          await patientsStore.fetchPatientMedicalRecords(currentPatientSelectedId.value);
+          } catch (medicalError) {
+          console.warn('No se pudieron cargar registros médicos:', medicalError);
+          }
+     } catch (error) {
+          console.error('Error al cargar datos del paciente:', error);
+     }
      }
 });
 </script>
