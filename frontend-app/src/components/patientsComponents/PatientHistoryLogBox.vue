@@ -5,7 +5,7 @@
           <div v-for="item in paginatedData" :key="item.id" class="mb-2">
                <div class="bg-gray-100 rounded-md">
                     <div class="flex justify-between items-center my-2 m-2">
-                         <p class="text-xl">{{ isoFormatDate(item.date).longSpanishDate }}</p>
+                         <p class="text-xl">{{ isoFormatDate(item.createdAt).longSpanishDate }}</p>
                          <div class="flex">
                               <action-button-solid-icon icon="EyeIcon" size="h-10 w-10"
                                    color="text-patient-page-color" />

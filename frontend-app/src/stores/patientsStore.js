@@ -111,6 +111,7 @@ export const usePatientsStore = defineStore('patients', () => {
         return
       }
       currentPatientSelectedData.value = await res.json()
+      console.log("DANG",currentPatientSelectedData.value)
     } catch (error) {
       console.error('Error al obtener data del paciente:', error)
     } finally {

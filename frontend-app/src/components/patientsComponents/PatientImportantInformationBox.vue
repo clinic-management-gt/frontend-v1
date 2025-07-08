@@ -2,11 +2,11 @@
      <div class="flex flex-col my-4 mx-6">
           <div class="mb-2">
                <p class="text-md font-semibold text-gray-500">{{ $t('patients.last-visit') }}</p>
-               <p class="text-xl font-medium"> {{ lastVisit.longSpanishDate }}</p>
+               <p class="text-xl font-medium"> {{ lastVisit?.longSpanishDate || $t('general.nodata') }}</p>
           </div>
           <div class="mb-2">
                <p class="text-md font-semibold text-gray-500">{{ $t('patients.birthdate') }}</p>
-               <p class="text-xl font-medium">{{ birthdate.longSpanishDate }}</p>
+               <p class="text-xl font-medium">{{ birthdate?.longSpanishDate || $t('general.nodata') }}</p>
           </div>
           <div class="mb-2">
                <p class="text-md font-semibold text-gray-500">{{ $t('general.alergies') }}</p>

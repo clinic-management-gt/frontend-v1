@@ -42,7 +42,7 @@
                 </div>
               </TransitionChild>
               <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-primary-color px-6 pb-4">
-                <div class="flex h-18 shrink-0 items-center bg-white rounded-full">
+                <div class="flex h-18 shrink-0 mt-2 items-center bg-white rounded-full">
                   <img class="h-16 w-auto mx-auto" src="/logo-gastro.png" alt="Logo Gastro" />
                 </div>
                 <nav class="flex flex-1 flex-col">
@@ -58,7 +58,7 @@
     <!-- Barra lateral estática para escritorio -->
     <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
       <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-primary-color align-center justify-center min-h-screen px-6 pb-4">
-        <div class="flex h-18 shrink-0 items-center bg-white rounded-full">
+        <div class="flex h-18 shrink-0 items-center bg-white mt-2 rounded-full">
           <img class="h-16 w-auto mx-auto" src="/logo-gastro.png" alt="Logo Gastro" />
         </div>
         <nav class="flex flex-1 flex-col">
@@ -70,7 +70,7 @@
     <!-- Barra superior y contenido principal -->
     <div class="lg:pl-72">
       <div
-        class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8"
+        class="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 mt-2 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8"
       >
         <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
           <span class="sr-only">Open sidebar</span>
@@ -78,9 +78,9 @@
         </button>
 
         <div class="h-6 w-px bg-gray-900/10 lg:hidden" aria-hidden="true" />
-
+        
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-          <form class="grid flex-1 grid-cols-1 mt-4" action="#" method="GET">
+          <form class="grid flex-1 grid-cols-1 justify-center items-center" action="#" method="GET">
             <combo-box-autocomplete-input
               :data="allPatients"
               v-model:currentSelected="currentPatientSelectedId"
@@ -174,8 +174,6 @@ const authStore = useAuthStore()
 // Función para manejar la selección de paciente
 function handlePatientSelection(patientId) {
   if (patientId) {
-    console.log('Paciente seleccionado, redirigiendo a detalles:', patientId);
-    
     // Redirecciona a la vista de pacientes
     router.push('/patients');
   }

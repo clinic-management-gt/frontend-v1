@@ -2,6 +2,7 @@
   "general": {
     "patient": "Paciente",
     "empty": "",
+    "nodata": "Sin datos",
     "exit": "Salir",
     "search": "Buscar",
     "search-patient": "Buscar paciente",
@@ -31,7 +32,8 @@
     "birthdate": "Nacimiento",
     "syndrome": "Sindrome",
     "data-sheet": "Ficha de datos",
-    "patient-history": "Historial del paciente"
+    "patient-history": "Historial del paciente",
+    "loading-patients-data": "Cargando datos del paciente"
   },
   "graph": {
     "graph": "Graficar"
