@@ -14,7 +14,7 @@ const props = defineProps({
      },
      additionalCSS: {
           type: String,
-          default: ''
+          default: 'justify-center mt-4 shadow-sm'
      },
      isDisabled: {
           type: Boolean,
