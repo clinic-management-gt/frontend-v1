@@ -55,8 +55,6 @@ import PrimaryButton from "@/components/forms/PrimaryButton.vue"
 
 const authStore = useAuthStore()
 
-const { user } = storeToRefs(authStore)
-console.log(user.value)
 const logout = () => {
      authStore.logout()
 }
