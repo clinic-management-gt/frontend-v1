@@ -180,6 +180,23 @@ function addActivityEvent() {
   }
 }
 
+//funcion para limitar eventos mostrados en el calendario
+
+function getLimitedEventsForDay(dayObj) {
+  if (!dayObj) return { visibleEvents: [], remainingCount: 0 }
+
+  const allEvents = events.value
+    .filter(e => e.day === dayObj.day && e.month === dayObj.month && e.year === dayObj.year)
+    .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''))
+
+  const maxVisible = 3
+  const visibleEvents = allEvents.slice(0, maxVisible)
+  const remainingCount = Math.max(0, allEvents.length - maxVisible)
+
+  return { visibleEvents, remainingCount }
+}
+
+
 function getEventsForDay(dayObj) {
   if (!dayObj) return []
   return events.value
@@ -272,11 +289,19 @@ async function fetchAppointments() {
 const refDaySelectedAgenda = ref(null)
 
 watch(selectedDayObj, async (newVal) => {
-  if (newVal && refDaySelectedAgenda.value) {
+  if (newVal) {
     await nextTick()
-    refDaySelectedAgenda.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    //esperar que se cargue el componente
+    setTimeout(() => {
+      if (refDaySelectedAgenda.value) {
+        refDaySelectedAgenda.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 50)
   }
 })
+
+
+
 
 
 onMounted(() => {fetchAppointments()})
@@ -316,17 +341,35 @@ onMounted(() => {fetchAppointments()})
         >
           <span>{{ cell.day }}</span>
           <div :class="styles['calendar-events']">
+            <!--Mostrar evento limitados-->
             <div
-              v-for="(event, eventIndex) in getEventsForDay(cell)"
+              v-for="(event, eventIndex) in getLimitedEventsForDay(cell).visibleEvents"
               :key="'event-' + eventIndex"
-              :class="styles['event']"
-              :style="{ background: event.color }"
+              :class="[styles['event'], styles[`event-${event.type.toLowerCase()}`]]"
+              :style="{ backgroundColor: event.color }"
             >
-              {{ event.type === 'Paciente' ? '👤 ' : '📋 ' }}{{ event.text }}
-              <span style="font-size:0.95em;">
-                ({{ event.startTime }}<span v-if="event.endTime">-{{ event.endTime }}</span>)
-              </span>
+              <div :class="styles['event-header']">
+                <span :class="styles['event-icon']">
+                  {{ event.type === 'Paciente' ? '👤' : event.type === 'Cita' ? '🩺' : '📋' }}
+                </span>
+                <span :class="styles['event-time']">
+                  {{ event.startTime }}<span v-if="event.endTime">-{{ event.endTime }}</span>
+                </span>
+              </div>
+              <div :class="styles['event-text']">
+                {{ event.type === 'Cita' ? event.text.replace('Cita: ', '') : event.text }}
+              </div>
             </div>
+            
+            <!--Indicador de eventos adicionales-->
+            <div 
+              v-if="getLimitedEventsForDay(cell).remainingCount > 0"
+              :class="styles['more-events']"
+              @click.stop="dayClicked(cell)"
+            >
+              +{{ getLimitedEventsForDay(cell).remainingCount }} más
+            </div>
+            
           </div>
         </div>
       </div>
