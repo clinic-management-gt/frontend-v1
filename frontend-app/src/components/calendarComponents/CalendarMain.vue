@@ -1,6 +1,6 @@
 <script setup>
 import styles from './CalendarMain.module.css'
-import { ref, computed } from 'vue'
+import { ref , watch, nextTick, computed } from 'vue'
 import { onMounted } from 'vue'
 
 // Puedes cambiar esto cuando tengas tu componente real
@@ -268,6 +268,17 @@ async function fetchAppointments() {
   }
 }
 
+//referencia al div del panel de la agenda
+const refDaySelectedAgenda = ref(null)
+
+watch(selectedDayObj, async (newVal) => {
+  if (newVal && refDaySelectedAgenda.value) {
+    await nextTick()
+    refDaySelectedAgenda.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+})
+
+
 onMounted(() => {fetchAppointments()})
 
 </script>
@@ -322,7 +333,7 @@ onMounted(() => {fetchAppointments()})
     </div>
 
     <!-- Panel de actividades del día seleccionado -->
-    <div v-if="selectedDayObj" :class="styles['day-agenda-panel']">
+    <div v-if="selectedDayObj" ref="refDaySelectedAgenda" :class="styles['day-agenda-panel']">
       <h3>
         Agenda para el {{ selectedDayObj.day }}/{{ selectedDayObj.month + 1 }}/{{ selectedDayObj.year }}
       </h3>
