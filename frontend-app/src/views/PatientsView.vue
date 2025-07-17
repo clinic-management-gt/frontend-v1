@@ -14,19 +14,22 @@
                     <patient-contact-data-box :data="currentPatientSelectedData" />
                </panel>
                <panel class="col-span-3 col-start-3 row-start-2">
-                    <patient-data-sheet-box :data="currentPatientSelectedData" />
+                    <patient-data-sheet-box :viewDataSheet="openDataSheetPatientDialog"/>
                </panel>
                <div class="col-span-3 row-span-3 col-start-3 row-start-3">
                     <patient-history-log-box :data="currentPatientMedicalRecords" />
                </div>
           </div>
      </div>
+     <patients-data-sheet-dialog v-if="showDataSheetPatientDialog" @close="closeAllPatientDialog"
+          :isOpen="showDataSheetPatientDialog" />
 </template>
 
 <script setup>
-import { ref, watch, computed, onMounted } from 'vue';
-import { storeToRefs } from "pinia";
 import { usePatientsStore } from "@stores/patientsStore";
+import { usePatientsLogicStore } from '@stores/patientsLogicStore.js'
+import { ref, watch, computed, onMounted, defineAsyncComponent } from 'vue';
+import { storeToRefs } from "pinia";
 import { isoFormatDate } from '@/utils/isoFormatDate';
 import { formatAgeFromDate } from '@/utils/formatAge';
 import { normalizeGender } from '@/utils/normalizeGender';
@@ -36,6 +39,8 @@ import PatientDataSheetBox from "@components/patientsComponents/PatientDataSheet
 import PatientHistoryLogBox from "@components/patientsComponents/PatientHistoryLogBox.vue"
 import PatientImportantInformationBox from "@components/patientsComponents/PatientImportantInformationBox.vue"
 import PatientMainDataBox from "@components/patientsComponents/PatientMainDataBox.vue"
+
+import PatientsDataSheetDialog from '@components/patientsDialogsComponents/patientsDataSheetDialog.vue';
 import Panel from "@components/forms/Panel.vue"
 
 const patientsStore = usePatientsStore();
@@ -45,6 +50,13 @@ const {
      currentPatientMedicalRecords,
      isLoadingPatientData
 } = storeToRefs(patientsStore);
+
+const patientsLogicStore = usePatientsLogicStore()
+const { 
+     showDataSheetPatientDialog 
+} = storeToRefs(patientsLogicStore)
+const { openDataSheetPatientDialog, closeAllPatientDialog } = patientsLogicStore
+
 
 // Observador para cargar datos cuando cambie el ID
 watch(currentPatientSelectedId, async (newId) => {
