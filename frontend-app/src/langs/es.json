@@ -1,6 +1,9 @@
 {
   "general": {
     "patient": "Paciente",
+    "first-name": "Nombre",
+    "last-name": "Apellido",
+    "birthdate": "Nacimiento",
     "empty": "",
     "nodata": "Sin datos",
     "exit": "Salir",
@@ -15,7 +18,9 @@
     "create": "Crear",
     "see-chart": "Ver gráfico",
     "cancel": "Cancelar",
-    "accept": "Aceptar"
+    "accept": "Aceptar",
+    "insurance": "Seguro",
+    "family-pediatrician": "Pediatra de cabecera"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -37,7 +42,12 @@
     "syndrome": "Sindrome",
     "data-sheet": "Ficha de datos",
     "patient-history": "Historial del paciente",
-    "loading-patients-data": "Cargando datos del paciente"
+    "loading-patients-data": "Cargando datos del paciente",
+    "patients-data": "Datos del paciente",
+    "record": "Antecedentes",
+    "exams": "Examenes",
+    "laboratories": "Laboratorios",
+    "current-illnesses": "Enfermedades actuales"
   },
   "graph": {
     "graph": "Graficar"
