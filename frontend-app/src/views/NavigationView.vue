@@ -124,7 +124,7 @@
                         'w-full text-left px-3 py-1 text-sm/6 text-gray-900'
                       ]"
                     >
-                      {{ item.name }}
+                      {{ $t(item.name) }}
                     </button>
                   </MenuItem>
                 </MenuItems>
@@ -190,17 +190,17 @@ onMounted(() => {
 // Saludo dinámico
 const greeting = computed(() => {
   const u = authStore.user
-  return u ? `Bienvenido/a ${u.first_name}` : ''
+  return u ? `${u.first_name} ${u.last_name}` : ''
 })
 
 // Menú de usuario
 const userNavigation = [
   {
-    name: 'Your profile',
+    name: 'login.your-profile',
     action: () => router.push('/profile')
   },
   {
-    name: 'Sign out',
+    name: 'login.logout',
     action: () => {
       authStore.logout()
       router.push('/login')
