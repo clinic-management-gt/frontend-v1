@@ -8,7 +8,7 @@
           <template #body>
                <div className="grid grid-cols-2 grid-rows-3 gap-4">
                     <div className="col-span-2">
-                         <panel>
+                         <!-- <panel> -->
                               <p class="font-bold">
                                    {{ $t('patients.patients-data') }}
                               </p>
@@ -23,24 +23,24 @@
                                    </div>
                                    <div>
                                         <p class="font-thin text-gray-600">{{ $t('general.birthdate') }}</p>
-                                        <p>{{ insurance }}</p>
+                                        <p>{{ birthdate }}</p>
                                    </div>
                                    <div>
                                         <p class="font-thin text-gray-600">{{ $t('general.insurance') }}</p>
-                                        <p>{{ familyPediatrician }}</p>
+                                        <p>{{ insurance }}</p>
                                    </div>
                                    <div>
                                         <p class="font-thin text-gray-600">{{ $t('general.family-pediatrician') }}</p>
-                                        <p>{{ gender }}</p>
+                                        <p>{{ familyPediatrician }}</p>
                                    </div>
                                    <div>
                                         <p class="font-thin text-gray-600">{{ $t('general.sex') }}</p>
-                                        <p>{{ birthdate }}</p>
+                                        <p>{{ gender }}</p>
                                    </div>
                               </div>
-                         </panel>
+                         <!-- </panel> -->
                     </div>
-                    <div className="row-start-2">
+                    <!-- <div className="row-start-2">
                          <panel>
                               2
                          </panel>
@@ -59,7 +59,7 @@
                          <panel>
                               5
                          </panel>
-                    </div>
+                    </div> -->
                </div>
           </template>
           <template #buttons>
@@ -103,12 +103,21 @@ const props = defineProps({
      },
 })
 
-console.log(currentPatientSelectedData.value)
-const firstName = ref(currentPatientSelectedData.value.name)
-const lastName = ref(currentPatientSelectedData.value.lastName)
-const insurance = ref(currentPatientSelectedData.value.gender)
-const gender = ref(currentPatientSelectedData.value.gender)
-const familyPediatrician = ref(currentPatientSelectedData.value.gender)
-const birthdate = ref(currentPatientSelectedData.value.birthdate)
+// Computed para acceder a los datos reactivamente
+const patientData = computed(() => patientsStore.currentPatientSelectedData.value)
+
+const firstName = computed(() => patientData.value?.name ?? '')
+const lastName = computed(() => patientData.value?.lastName ?? '')
+const insurance = computed(() => patientData.value?.insurance ?? '')
+const gender = computed(() => patientData.value?.gender ?? '')
+const familyPediatrician = computed(() => patientData.value?.familyPediatrician ?? '')
+const birthdate = computed(() => patientData.value?.birthdate ?? '')
+
+const showDialog = computed({
+     get: () => patientsLogicStore.showDataSheetPatientDialog,
+     set: (val) => {
+          patientsLogicStore.showDataSheetPatientDialog = val
+     }
+})
 
 </script>
