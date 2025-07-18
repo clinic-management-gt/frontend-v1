@@ -103,6 +103,7 @@ const props = defineProps({
      },
 })
 // Probando comentarios
+// Mas prueba de comentarios
 // Computed para acceder a los datos reactivamente
 const patientData = computed(() => patientsStore.currentPatientSelectedData.value)
 
