@@ -2,17 +2,32 @@
      <div>
           <p class="text-2xl">{{ $t('patients.patient-history') }}</p>
 
-          <div v-for="item in paginatedData" :key="item.id" class="mb-2">
-               <div class="bg-gray-100 rounded-md">
+          <!-- Lista de botones de recetas -->
+          <!-- <div class="flex flex-col gap-2 mb-6">
+               <button
+               v-for="receta in props.data"
+               :key="receta.id"
+               class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded text-left"
+               @click="$emit('ver-receta', receta)"
+               >
+               Receta de {{ isoFormatDate(receta.createdAt).longSpanishDate }}
+               </button>
+          </div>
+          -->
+
+          <div
+               v-for="item in paginatedData"
+               :key="item.id"
+               class="mb-2 cursor-pointer"
+               @click="$emit('ver-receta', item)"
+               >
+               <div class="bg-gray-100 hover:bg-gray-300 rounded-md transition-colors duration-200">
                     <div class="flex justify-between items-center my-2 m-2">
                          <p class="text-xl">{{ isoFormatDate(item.createdAt).longSpanishDate }}</p>
                          <div class="flex">
-                              <action-button-solid-icon icon="EyeIcon" size="h-10 w-10"
-                                   color="text-patient-page-color" />
-                              <action-button-solid-icon icon="PencilIcon" size="h-10 w-10"
-                                   color="text-patient-page-color" />
-                              <action-button-solid-icon icon="ArrowDownTrayIcon" size="h-10 w-10"
-                                   color="text-patient-page-color" />
+                              <action-button-solid-icon icon="EyeIcon" size="h-10 w-10" color="text-patient-page-color" />
+                              <action-button-solid-icon icon="PencilIcon" size="h-10 w-10" color="text-patient-page-color" />
+                              <action-button-solid-icon icon="ArrowDownTrayIcon" size="h-10 w-10" color="text-patient-page-color" />
                          </div>
                     </div>
                </div>
