@@ -1,6 +1,9 @@
 {
   "general": {
     "patient": "Paciente",
+    "first-name": "Nombre",
+    "last-name": "Apellido",
+    "birthdate": "Nacimiento",
     "empty": "",
     "nodata": "Sin datos",
     "exit": "Salir",
@@ -13,7 +16,11 @@
     "male": "Masculino",
     "not-specified": "No especificado",
     "create": "Crear",
-    "see-chart": "Ver gráfico"
+    "see-chart": "Ver gráfico",
+    "cancel": "Cancelar",
+    "accept": "Aceptar",
+    "insurance": "Seguro",
+    "family-pediatrician": "Pediatra de cabecera"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -21,10 +28,12 @@
     "mail": "Correo",
     "placeholder-mail": "Ingrese su correo",
     "password": "Contraseña",
-    "placeholder-password": "Ingrese su contraseña"
+    "placeholder-password": "Ingrese su contraseña",
+    "your-profile": "Tu perfil"
   },
   "dashboard": {
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "no-patients-for-today": "No hay citas para el día de hoy."
   },
   "patients": {
     "patients": "Pacientes",
@@ -33,7 +42,12 @@
     "syndrome": "Sindrome",
     "data-sheet": "Ficha de datos",
     "patient-history": "Historial del paciente",
-    "loading-patients-data": "Cargando datos del paciente"
+    "loading-patients-data": "Cargando datos del paciente",
+    "patients-data": "Datos del paciente",
+    "record": "Antecedentes",
+    "exams": "Examenes",
+    "laboratories": "Laboratorios",
+    "current-illnesses": "Enfermedades actuales"
   },
   "graph": {
     "graph": "Graficar"
