@@ -17,7 +17,8 @@
                     <patient-data-sheet-box :viewDataSheet="openDataSheetPatientDialog"/>
                </panel>
                <div class="col-span-3 row-span-3 col-start-3 row-start-3">
-                    <patient-history-log-box :data="currentPatientMedicalRecords" />
+                    <patient-history-log-box :data="currentPatientMedicalRecords" 
+                    @ver-receta="openRecipeModal"/>
                </div>
           </div>
           <MedicalRecipePanel

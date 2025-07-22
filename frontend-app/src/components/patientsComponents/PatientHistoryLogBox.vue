@@ -2,19 +2,6 @@
      <div>
           <p class="text-2xl">{{ $t('patients.patient-history') }}</p>
 
-          <!-- Lista de botones de recetas -->
-          <!-- <div class="flex flex-col gap-2 mb-6">
-               <button
-               v-for="receta in props.data"
-               :key="receta.id"
-               class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded text-left"
-               @click="$emit('ver-receta', receta)"
-               >
-               Receta de {{ isoFormatDate(receta.createdAt).longSpanishDate }}
-               </button>
-          </div>
-          -->
-
           <div
                v-for="item in paginatedData"
                :key="item.id"
