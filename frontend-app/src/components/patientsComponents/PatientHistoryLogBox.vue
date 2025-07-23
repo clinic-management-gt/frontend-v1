@@ -43,11 +43,29 @@ const props = defineProps({
      }
 });
 
+// Aplana tratamientos y recetas
+const flatRecipes = computed(() => {
+     return props.data.flatMap(treatment =>
+          (treatment.recipes || []).map(recipe => ({
+               ...recipe,
+               treatmentId: treatment.treatmentId,
+               appointmentId: treatment.appointmentId,
+               medicineId: treatment.medicineId,
+               dosis: treatment.dosis,
+               duration: treatment.duration,
+               frequency: treatment.frequency,
+               observaciones: treatment.observaciones,
+               status: treatment.status,
+               createdAt: recipe.createdAt // para orden y formato
+          }))
+     );
+});
+
 const itemsPerPage = ref(5);
 const currentPage = ref(1);
 
 const orderedData = computed(() => {
-     return [...props.data].sort((a, b) => new Date(b.date) - new Date(a.date));
+     return [...flatRecipes.value].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 });
 
 const totalPages = computed(() => {
@@ -67,4 +85,3 @@ const prevPage = () => {
      if (currentPage.value > 1) currentPage.value--;
 };
 </script>
-   
