@@ -25,17 +25,20 @@
       <div
         v-for="item in paginatedRecords"
         :key="item.id"
-        class="mb-2 cursor-pointer"
+        class="mb-3 cursor-pointer"
         @click="openRecordDetails(item)"
       >
-        <div class="bg-gray-100 hover:bg-gray-200 rounded-lg p-4 shadow-sm transition-colors duration-200">
+        <div class="bg-gray-200 hover:bg-gray-300 rounded-lg p-4 transition-colors duration-200">
           <div class="flex justify-between items-center gap-2">
             <!-- Información principal -->
             <div class="flex-1">
-              <p class="text-xl font-semibold text-gray-800">
-                {{ formatRecordDate(item.createdAt) }}
-              </p>
-              <p v-if="item.diagnosis" class="text-sm text-gray-600 mt-1">
+              <div class="flex items-center gap-2 mb-1">
+                <div class="w-3 h-3 rounded-full" style="background-color: var(--primary-color);"></div>
+                <p class="text-lg font-bold text-gray-800">
+                  {{ formatRecordDate(item.createdAt) }}
+                </p>
+              </div>
+              <p v-if="item.diagnosis" class="text-sm text-gray-600 ml-5">
                 <strong>Diagnóstico:</strong> {{ item.diagnosis }}
               </p>
             </div>
@@ -80,10 +83,7 @@
       <p class="text-gray-500 text-lg">{{ $t('patients.no-medical-records') }}</p>
     </div>
 
-    <!-- Paginación (mantener la misma que ya tienes) -->
-    <!-- ... código de paginación ... -->
-
-    <!-- Modal de detalles mejorado -->
+    <!-- Modal de detalles -->
     <consultation-details-modal
       v-if="showDetailsModal"
       :record="selectedRecord"

@@ -33,7 +33,11 @@
     "view": "Ver",
     "edit": "Editar",
     "download": "Descargar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "observations": "Observaciones",
+    "diagnosis": "Diagnóstico",
+    "appointment-type": "Tipo de cita",
+    "no-medical-records": "No hay registros médicos disponibles"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -63,13 +67,18 @@
     "current-illnesses": "Enfermedades actuales",
     "consult-detail": "Detalle de consulta",
     "evolution-note": "Nota de evolución",
-    "no-evolution-note": "Aquí va la nota de evolución",
+    "no-evolution-note": "No hay nota de evolución registrada",
     "medical-recipe": "Receta médica",
-    "no-prescription": "No hay receta seleccionada",
+    "no-prescription": "No hay receta médica registrada",
     "view-full-recipe": "Ver receta completa",
     "treatments": "Tratamientos",
     "exams": "Exámenes",
-    "patient-history": "Historial del paciente"
+    "patient-history": "Historial del paciente",
+    "no-medical-records": "No hay registros médicos disponibles",
+    "dosage": "Dosis",
+    "frequency": "Frecuencia", 
+    "duration": "Duración",
+    "result": "Resultado"
   },
   "graph": {
     "graph": "Graficar"
