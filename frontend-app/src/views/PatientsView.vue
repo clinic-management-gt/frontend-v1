@@ -16,10 +16,12 @@
                <panel class="col-span-3 col-start-3 row-start-2">
                     <patient-data-sheet-box :viewDataSheet="openDataSheetPatientDialog"/>
                </panel>
-               <div class="col-span-3 row-span-3 col-start-3 row-start-3">
-                    <patient-history-log-box :data="currentPatientMedicalRecords" 
-                    @view-recipe="openRecipeModal"/>
-               </div>
+               <panel class="col-span-3 row-span-3 col-start-3 row-start-3">
+                    <patient-history-log-box 
+                    :patient-id="currentPatientSelectedId"
+                    @view-recipe="openRecipeModal"
+                    />
+               </panel>
           </div>
           <MedicalRecipePanel
                v-if="showRecipeModal"

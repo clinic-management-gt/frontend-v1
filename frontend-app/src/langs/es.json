@@ -20,7 +20,20 @@
     "cancel": "Cancelar",
     "accept": "Aceptar",
     "insurance": "Seguro",
-    "family-pediatrician": "Pediatra de cabecera"
+    "family-pediatrician": "Pediatra de cabecera",
+    "general-info": "Información general",
+    "date": "Fecha",
+    "status": "Estado",
+    "summary": "Resumen",
+    "loading": "Cargando",
+    "error-loading-data": "Error al cargar los datos",
+    "retry": "Reintentar",
+    "show": "Mostrar",
+    "elements": "elementos",
+    "view": "Ver",
+    "edit": "Editar",
+    "download": "Descargar",
+    "close": "Cerrar"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -50,8 +63,13 @@
     "current-illnesses": "Enfermedades actuales",
     "consult-detail": "Detalle de consulta",
     "evolution-note": "Nota de evolución",
+    "no-evolution-note": "Aquí va la nota de evolución",
     "medical-recipe": "Receta médica",
-    "no-recipe-selected": "No hay receta seleccionada."
+    "no-prescription": "No hay receta seleccionada",
+    "view-full-recipe": "Ver receta completa",
+    "treatments": "Tratamientos",
+    "exams": "Exámenes",
+    "patient-history": "Historial del paciente"
   },
   "graph": {
     "graph": "Graficar"

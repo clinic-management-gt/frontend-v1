@@ -119,35 +119,97 @@ export const usePatientsStore = defineStore('patients', () => {
     }
   }
 
-// Busca la función fetchPatientMedicalRecords y modifícala para manejar mejor el error 404
+  async function fetchMedicalRecordDetails(recordId) {
+    try {
+      const response = await fetch(`http://localhost:9000/medicalrecords/${recordId}/details`)
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`)
+      }
+      
+      const data = await response.json()
+      
+      // Procesar los datos para asegurar consistencia
+      return {
+        ...data,
+        // Mapear campos si es necesario
+        evolutionNote: data.notes || data.evolutionNote,
+        recipes: data.recipes || [],
+        exams: data.exams || [],
+        treatments: data.treatments || [],
+        patient: data.patient || {}
+      }
+    } catch (error) {
+      console.error('Error al obtener detalles del registro médico:', error)
+      throw error
+    }
+  }
 
-async function fetchPatientMedicalRecords(patientId) {
-    if (!patientId) patientId = currentPatientSelectedId.value;
-    if (!patientId) return;
+  // Método alternativo usando el endpoint completo del paciente
+  async function fetchPatientMedicalRecordFull(patientId, recordId) {
+    try {
+      const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords/${recordId}/full`)
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`)
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error('Error al obtener registro médico completo:', error)
+      throw error
+    }
+  }
 
-    isLoadingMedicalRecords.value = true;
+  // Modificar fetchPatientMedicalRecords para soportar paginación
+  async function fetchPatientMedicalRecords(patientId, page = 1, limit = 20) {
+    if (!patientId) patientId = currentPatientSelectedId.value
+    if (!patientId) return
+
+    isLoadingMedicalRecords.value = true
 
     try {
-        // Cambia la URL al endpoint /medicalrecords/full
-        const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords/full`);
-        
-        if (response.status === 404) {
-            console.warn(`No hay registros médicos para el paciente ${patientId}`);
-            currentPatientMedicalRecords.value = [];
-            return;
-        }
-        if (!response.ok) {
-            throw new Error(`Error: ${response.status}`);
-        }
-        const data = await response.json();
-        currentPatientMedicalRecords.value = data;
+      const offset = (page - 1) * limit
+      const response = await fetch(
+        `http://localhost:9000/patients/${patientId}/medicalrecords?page=${page}&limit=${limit}&offset=${offset}`
+      )
+      
+      if (response.status === 404) {
+        console.warn(`No hay registros médicos para el paciente ${patientId}`)
+        currentPatientMedicalRecords.value = []
+        return
+      }
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      
+      // Procesar los datos para agregar indicadores de contenido
+      const processedRecords = data.records?.map(record => ({
+        ...record,
+        hasEvolutionNote: !!(record.evolutionNote && record.evolutionNote.trim()),
+        hasRecipes: !!(record.prescription && record.prescription.length > 0),
+        hasExams: !!(record.exams && record.exams.length > 0)
+      })) || []
+      
+      currentPatientMedicalRecords.value = processedRecords
+      
+      return {
+        records: processedRecords,
+        total: data.total || processedRecords.length,
+        page: data.page || page,
+        totalPages: data.totalPages || Math.ceil((data.total || processedRecords.length) / limit)
+      }
     } catch (error) {
-        console.error('Error al obtener medical records:', error);
-        currentPatientMedicalRecords.value = [];
+      console.error('Error al obtener medical records:', error)
+      currentPatientMedicalRecords.value = []
+      throw error
     } finally {
-        isLoadingMedicalRecords.value = false;
+      isLoadingMedicalRecords.value = false
     }
-}
+  }
 
   return {
     // state
@@ -171,6 +233,8 @@ async function fetchPatientMedicalRecords(patientId) {
     updateAppointmentStatus,
     fetchAllPatients,
     fetchPatientData,
+    fetchMedicalRecordDetails,
+    fetchPatientMedicalRecordFull,
   }
 }, {
   persist: {
