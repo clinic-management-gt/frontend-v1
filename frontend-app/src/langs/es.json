@@ -37,7 +37,10 @@
     "observations": "Observaciones",
     "diagnosis": "Diagnóstico",
     "appointment-type": "Tipo de cita",
-    "no-medical-records": "No hay registros médicos disponibles"
+    "no-medical-records": "No hay registros médicos disponibles",
+    "delete": "Eliminar",
+    "update": "Actualizar",
+    "save": "Guardar"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -75,10 +78,29 @@
     "exams": "Exámenes",
     "patient-history": "Historial del paciente",
     "no-medical-records": "No hay registros médicos disponibles",
+    "add-medical-record": "Agregar registro médico",
+    "edit-medical-record": "Editar registro médico",
+    "add-first-record": "Agregar primer registro",
+    "basic-info": "Información básica",
+    "weight": "Peso",
+    "height": "Altura",
+    "family-history": "Antecedentes familiares",
+    "evolution-notes": "Notas de evolución",
+    "add-treatment": "Agregar tratamiento",
+    "treatment": "Tratamiento",
+    "medicine": "Medicamento",
+    "medicine-type": "Tipo de medicamento",
     "dosage": "Dosis",
-    "frequency": "Frecuencia", 
     "duration": "Duración",
-    "result": "Resultado"
+    "frequency": "Frecuencia",
+    "add-exam": "Agregar examen",
+    "exam": "Examen",
+    "exam-name": "Nombre del examen",
+    "exam-description": "Descripción del examen",
+    "exam-results": "Resultados del examen",
+    "add-recipe": "Agregar receta",
+    "recipe": "Receta",
+    "prescription": "Prescripción"
   },
   "graph": {
     "graph": "Graficar"
