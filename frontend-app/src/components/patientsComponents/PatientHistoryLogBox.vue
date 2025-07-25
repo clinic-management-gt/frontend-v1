@@ -6,7 +6,7 @@
                v-for="item in paginatedData"
                :key="item.id"
                class="mb-2 cursor-pointer"
-               @click="$emit('ver-receta', item)"
+               @click="$emit('view-recipe', item)"
                >
                <div class="bg-gray-100 hover:bg-gray-300 rounded-md transition-colors duration-200">
                     <div class="flex justify-between items-center my-2 m-2">

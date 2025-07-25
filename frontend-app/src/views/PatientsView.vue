@@ -18,12 +18,12 @@
                </panel>
                <div class="col-span-3 row-span-3 col-start-3 row-start-3">
                     <patient-history-log-box :data="currentPatientMedicalRecords" 
-                    @ver-receta="openRecipeModal"/>
+                    @view-recipe="openRecipeModal"/>
                </div>
           </div>
           <MedicalRecipePanel
                v-if="showRecipeModal"
-               :receta="selectedRecipe"
+               :recipe="selectedRecipe"
                @close="closeRecipeModal"
           />
      </div>
