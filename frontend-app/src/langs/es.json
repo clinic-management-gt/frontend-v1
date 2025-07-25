@@ -47,7 +47,11 @@
     "record": "Antecedentes",
     "exams": "Examenes",
     "laboratories": "Laboratorios",
-    "current-illnesses": "Enfermedades actuales"
+    "current-illnesses": "Enfermedades actuales",
+    "consult-detail": "Detalle de consulta",
+    "evolution-note": "Nota de evolución",
+    "medical-recipe": "Receta médica",
+    "no-recipe-selected": "No hay receta seleccionada."
   },
   "graph": {
     "graph": "Graficar"
