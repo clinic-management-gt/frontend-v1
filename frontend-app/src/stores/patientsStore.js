@@ -119,35 +119,118 @@ export const usePatientsStore = defineStore('patients', () => {
     }
   }
 
-// Busca la función fetchPatientMedicalRecords y modifícala para manejar mejor el error 404
-
-async function fetchPatientMedicalRecords(patientId) {
-    if (!patientId) patientId = currentPatientSelectedId.value;
-    if (!patientId) return;
-
-    isLoadingMedicalRecords.value = true;
-
+  async function fetchPatientMedicalRecords(patientId) {
+    isLoadingMedicalRecords.value = true
     try {
-        // Cambia la URL al endpoint /medicalrecords/full
-        const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords/full`);
-        
-        if (response.status === 404) {
-            console.warn(`No hay registros médicos para el paciente ${patientId}`);
-            currentPatientMedicalRecords.value = [];
-            return;
-        }
-        if (!response.ok) {
-            throw new Error(`Error: ${response.status}`);
-        }
-        const data = await response.json();
-        currentPatientMedicalRecords.value = data;
+      const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords?page=1&limit=50`)
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      currentPatientMedicalRecords.value = data.records || []
+      
+      console.log('Registros médicos cargados:', currentPatientMedicalRecords.value)
+      return data
     } catch (error) {
-        console.error('Error al obtener medical records:', error);
-        currentPatientMedicalRecords.value = [];
+      console.error('Error al obtener registros médicos:', error)
+      currentPatientMedicalRecords.value = []
+      throw error
     } finally {
-        isLoadingMedicalRecords.value = false;
+      isLoadingMedicalRecords.value = false
     }
-}
+  }
+
+  async function createMedicalRecord(patientId, recordData) {
+    try {
+      console.log('Creando registro médico:', { patientId, recordData })
+      
+      const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(recordData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.text()
+        throw new Error(`Error ${response.status}: ${errorData}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error al crear registro médico:', error)
+      throw error
+    }
+  }
+
+  async function updateMedicalRecord(recordId, recordData) {
+    try {
+      console.log('Actualizando registro médico:', { recordId, recordData })
+      
+      // Usamos el patientId actual del store o asume 1 por defecto
+      const patientId = currentPatientSelectedId.value || 1
+      
+      const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords/${recordId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(recordData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.text()
+        throw new Error(`Error ${response.status}: ${errorData}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error al actualizar registro médico:', error)
+      throw error
+    }
+  }
+
+  async function deleteMedicalRecord(recordId) {
+    try {
+      console.log('Eliminando registro médico:', recordId)
+      
+      // Usamos el patientId actual del store o asume 1 por defecto
+      const patientId = currentPatientSelectedId.value || 1
+      
+      const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords/${recordId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const errorData = await response.text()
+        throw new Error(`Error ${response.status}: ${errorData}`)
+      }
+
+      return true
+    } catch (error) {
+      console.error('Error al eliminar registro médico:', error)
+      throw error
+    }
+  }
+
+  async function fetchMedicalRecordDetails(recordId) {
+    try {
+      const response = await fetch(`http://localhost:9000/medicalrecords/${recordId}/details`)
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error al obtener detalles del registro médico:', error)
+      throw error
+    }
+  }
 
   return {
     // state
@@ -171,6 +254,10 @@ async function fetchPatientMedicalRecords(patientId) {
     updateAppointmentStatus,
     fetchAllPatients,
     fetchPatientData,
+    createMedicalRecord,
+    updateMedicalRecord,
+    deleteMedicalRecord,
+    fetchMedicalRecordDetails,
   }
 }, {
   persist: {
