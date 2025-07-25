@@ -9,14 +9,14 @@
 
     <form @submit.prevent="onSubmit" class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm space-y-4">
       <TextInput v-model="email" class="mt-2" name="email" type="email" title="login.mail"
-        inputPlaceholder="login.placeholder-mail" required />
+        inputPlaceholder="login.placeholder-mail" inputColor="primary-color"required />
 
       <TextInput v-model="password" class="mt-2" name="password" type="password" title="login.password"
-        inputPlaceholder="login.placeholder-password" required />
+        inputPlaceholder="login.placeholder-password" inputColor="primary-color" required />
 
       <div v-if="error" class="text-red-600 text-sm">{{ error }}</div>
 
-      <PrimaryButton type="submit" :disabled="loading" class="w-full flex justify-center">
+      <PrimaryButton type="submit" :disabled="loading"  class="w-full flex justify-center">
         <span v-if="loading">{{ $t('login.entrando') }}</span>
         <span v-else>{{ $t('login.login') }}</span>
       </PrimaryButton>

@@ -18,7 +18,7 @@ const props = defineProps({
      icon: String,
      color: {
           type: String,
-          default: 'text-emerald-800'
+          default: 'text-primary-color'
      },
      size: {
           type: String,

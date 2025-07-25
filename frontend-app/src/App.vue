@@ -1,7 +1,9 @@
 <template>
-  <RouterView />
-  <patients-create-form-dialog v-if="showCreateFormDialog" @close="closeAllPatientDialog"
+  <div class="bg-gray-50 ">
+    <RouterView />
+    <patients-create-form-dialog v-if="showCreateFormDialog" @close="closeAllPatientDialog"
     :isOpen="showCreateFormDialog" />
+  </div>
 </template>
 
 <script setup>

@@ -63,8 +63,8 @@
 
         <div class="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
           <form class="grid flex-1 grid-cols-1 justify-center items-center" action="#" method="GET">
-            <combo-box-autocomplete-input :data="allPatients" v-model:currentSelected="currentPatientSelectedId"
-              @update:currentSelected="handlePatientSelection"
+            <ComboBoxAutocompleteInputSearchPatient :data="allPatients"
+              v-model:currentSelected="currentPatientSelectedId" @update:currentSelected="handlePatientSelection"
               class="col-start-1 row-start-1 block w-full bg-white pl-8 text-base text-gray-900 outline-none placeholder:text-gray-400 sm:text-sm/6"
               :placeholder="$t('general.search-patient')" />
             <MagnifyingGlassIcon class="pointer-events-none col-start-1 row-start-1 size-5 self-center text-gray-400"
@@ -131,7 +131,7 @@ import {
 } from '@headlessui/vue'
 import { ChevronDownIcon, MagnifyingGlassIcon, Bars3Icon, XMarkIcon, PlusCircleIcon } from '@heroicons/vue/20/solid'
 import NavigationBar from '@/components/navigation/NavigationBar.vue'
-import ComboBoxAutocompleteInput from '@/components/forms/ComboBoxAutocompleteInput.vue'
+import ComboBoxAutocompleteInputSearchPatient from '@components/forms/ComboBoxAutocompleteInputSearchPatient.vue'
 import { usePatientsLogicStore } from '@stores/patientsLogicStore'
 import { usePatientsStore } from '@/stores/patientsStore'
 import { useAuthStore } from '@/stores/authStore'

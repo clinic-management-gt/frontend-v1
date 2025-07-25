@@ -12,7 +12,7 @@
                               title="patients.drag-or-click-here-to-load-the-PDF-of-the-data-sheet" />
 
                     </div>
-                    <div>
+                    <div class="ml-2 sm:border-l">
                          <create-new-patients-form />
                     </div>
                </div>

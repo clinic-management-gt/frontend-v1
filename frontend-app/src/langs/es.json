@@ -22,7 +22,8 @@
     "cancel": "Cancelar",
     "accept": "Aceptar",
     "insurance": "Seguro",
-    "family-pediatrician": "Pediatra de cabecera"
+    "family-pediatrician": "Pediatra de cabecera",
+    "patient-not-found": "No se encontró el paciente"
   },
   "login": {
     "login": "Iniciar sesión",
