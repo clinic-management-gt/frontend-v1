@@ -3,6 +3,7 @@
     "patient": "Paciente",
     "first-name": "Nombre",
     "last-name": "Apellido",
+    "full-name": "Nombre completo",
     "birthdate": "Nacimiento",
     "empty": "",
     "yes": "Sí",
@@ -21,6 +22,7 @@
     "see-chart": "Ver gráfico",
     "cancel": "Cancelar",
     "accept": "Aceptar",
+    "back": "Regresar",
     "insurance": "Seguro",
     "family-pediatrician": "Pediatra de cabecera",
     "patient-not-found": "No se encontró el paciente"
@@ -68,6 +70,8 @@
     "syndrome-placeholder": "Seleccione el sindrome",
     "family-pediatrician": "Pediatra de cabecera",
     "pediatrician-placeholder": "Nombre de la pediatra de cabecera",
+    "mother": "Madre",
+    "father": "Padre",
     "mother-information": "Información de la madre",
     "father-information": "Información del padre",
     "parents-information-placeholder": "Ingrese los nombres y apellidos",
@@ -79,7 +83,8 @@
     "residence-address-placeholder": "Ingrese la dirección",
     "email-address": "Correo de contacto",
     "email-address-placeholder": "Ingrese el correo",
-    "drag-or-click-here-to-load-the-PDF-of-the-data-sheet": "Arrastra o haz click aqui para cargar el PDF de la ficha de datos"
+    "drag-or-click-here-to-load-the-PDF-of-the-data-sheet": "Arrastra o haz click aqui para cargar el PDF de la ficha de datos",
+    "revise-patients-data": "Revise la información del paciente"
   },
   "graph": {
     "graph": "Graficar"

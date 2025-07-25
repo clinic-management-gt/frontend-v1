@@ -5,8 +5,8 @@
     <div :class="{ 'mt-2': title && title !== 'general.empty' }" />
     <!-- Input -->
     <div class="relative w-full">
-      <input :id="name" :name="name" :type="type" :placeholder="$t(inputPlaceholder)" :value="modelValue"
-        @input="$emit('update:modelValue', $event.target.value)" :required="required" :class="[
+      <input :id="name" :name="name" :type="type" :placeholder="$t(inputPlaceholder)"
+        v-model="value" @blur="handleBlur" :required="required" :class="[
           'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow ring-1 ring-inset sm:text-sm sm:leading-6 px-2',
           ringColorClass,
           focusOutlineClass
@@ -16,6 +16,7 @@
 </template>
 
 <script setup>
+import { useField } from 'vee-validate'
 import { computed } from 'vue'
 import CustomLabel from './CustomLabel.vue'
 
@@ -45,7 +46,7 @@ const props = defineProps({
     default: 'font-bold'
   },
   inputColor: {
-    type: String, 
+    type: String,
     default: '[#489FB5]'
   },
   required: {
@@ -53,6 +54,9 @@ const props = defineProps({
     default: false
   }
 })
+
+const { value, errorMessage, handleChange, handleBlur } = useField(props.name)
+
 const ringColorClass = computed(() => {
   switch (props.inputColor) {
     case 'patient-page-color':
@@ -83,6 +87,4 @@ const focusOutlineClass = computed(() => {
   }
 })
 
-
-const emit = defineEmits(['update:modelValue'])
 </script>

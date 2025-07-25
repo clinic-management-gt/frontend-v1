@@ -8,17 +8,21 @@
           <template #body>
                <div class="grid grid-cols-2">
                     <div>
-                         <drag-drop-file-input @sendFiles="handleSendFiles" :data="currentIndex"
+                         <drag-drop-file-input @sendFiles="handleSendFiles"
                               title="patients.drag-or-click-here-to-load-the-PDF-of-the-data-sheet" />
 
                     </div>
                     <div class="ml-2 sm:border-l">
-                         <create-new-patients-form />
+                         <create-new-patients-form v-if="currentPage === 1"/>
+                        <review-patient-data v-if="currentPage === 2"/>
                     </div>
                </div>
           </template>
           <template #buttons>
-               <primary-button type="button" @click="back()" class="mr-2">
+               <primary-button type="button" @click="backPage()" bgColor="orange" class="mr-2">
+                    <div class="uppercase">{{ $t('general.back') }}</div>
+               </primary-button>
+               <primary-button type="button" @click="nextPage()" class="mr-2">
                     <div class="uppercase">{{ $t('general.accept') }}</div>
                </primary-button>
           </template>
@@ -33,7 +37,8 @@ import { ref, defineAsyncComponent, computed } from 'vue'
 import { storeToRefs } from "pinia"
 
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue"
-import CreateNewPatientsForm from '@components/patientsDialogsComponents/patientsForms/CreateNewPatientsForm.vue'
+import CreateNewPatientsForm from '@components/patientsDialogsComponents/patientsCreateDialogComponents/CreateNewPatientsForm.vue'
+import ReviewPatientData from '@components/patientsDialogsComponents/patientsCreateDialogComponents/ReviewPatientData.vue'
 import DragDropFileInput from '@components/forms/DragDropFileInput.vue'
 import PrimaryButton from '@components/forms/PrimaryButton.vue'
 import Panel from "@components/forms/Panel.vue"
@@ -62,17 +67,9 @@ const props = defineProps({
           default: false
      },
 })
-
+const currentPage = ref(1)
 const patientData = computed(() => currentPatientSelectedData.value)
 
-const patientInfo = computed(() => [
-     { label: 'general.first-name', value: patientData.value?.name ?? '' },
-     { label: 'general.last-name', value: patientData.value?.lastName ?? '' },
-     { label: 'general.birthdate', value: patientData.value?.birthdate ?? '' },
-     { label: 'general.insurance', value: patientData.value?.insurance ?? '' },
-     { label: 'general.family-pediatrician', value: patientData.value?.familyPediatrician ?? '' },
-     { label: 'general.sex', value: patientData.value?.gender ?? '' }
-])
 
 const showDialog = computed({
      get: () => patientsLogicStore.showDataSheetPatientDialog,
@@ -83,5 +80,11 @@ const showDialog = computed({
 
 function handleSendFiles(file) {
      console.log(file)
+}
+function nextPage() {
+  currentPage.value += 1
+}
+function backPage() {
+  currentPage.value -= 1
 }
 </script>

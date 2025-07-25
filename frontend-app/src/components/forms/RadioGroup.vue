@@ -17,15 +17,15 @@
           <div class="flex h-6 items-center">
             <input
               :id="d.id"
-              :aria-describedby="`${d.id}-description`"
               :name="name"
               type="radio"
-              :checked="d.id === 'small'"
+              v-model="selected"
+              :value="d.id"
               class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-patient-page-color checked:bg-patient-page-color focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-patient-page-color disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
             />
           </div>
           <div class="ml-3 text-sm/6">
-            <label :for="d.id" class="font-medium text-gray-900">
+            <label class="font-medium text-gray-900">
               {{ $t(d.name) }}
             </label>
           </div>
