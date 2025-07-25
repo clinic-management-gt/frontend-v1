@@ -3,7 +3,7 @@
           <p class="text-2xl">{{ $t('patients.patient-history') }}</p>
 
           <div v-for="item in paginatedData" :key="item.id" class="mb-2">
-               <div class="bg-gray-100 rounded-md">
+               <div class="bg-white shadow-md rounded-md">
                     <div class="flex justify-between items-center my-2 m-2">
                          <p class="text-xl">{{ isoFormatDate(item.createdAt).longSpanishDate }}</p>
                          <div class="flex">
@@ -32,6 +32,8 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { isoFormatDate } from '@utils/isoFormatDate';
+
+import Panel from '@components/forms/Panel.vue'
 import ActionButtonSolidIcon from '@components/forms/ActionButtonSolidIcon.vue';
 
 const props = defineProps({
@@ -65,4 +67,4 @@ const prevPage = () => {
      if (currentPage.value > 1) currentPage.value--;
 };
 </script>
-   
+

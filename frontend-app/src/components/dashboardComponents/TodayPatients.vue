@@ -11,9 +11,10 @@
     <div v-else>
       <transition-group name="fade" tag="div">
         <div v-if="appointmentsToday.length > 0" v-for="appointment in appointmentsToday" :key="appointment.id"
-          class="flex items-stretch h-32 rounded-xl overflow-hidden mb-4">
+          class="flex items-stretch h-32 rounded-xl overflow-hidden my-4">
           <!-- Info del paciente y cita -->
-          <div class="flex items-center bg-gray-200 rounded-xl w-3/4 p-4 flex-1">
+           <div class="mb-2 flex w-full">
+          <div class="flex items-center bg-white shadow-md rounded-xl w-3/4 p-4 flex-1">
             <div class="flex-1">
               <h2 class="text-3xl font-bold text-gray-800">
                 {{ appointment.patientName }}
@@ -31,11 +32,12 @@
 
           <!-- Botón de estado -->
           <div :class="[
-            'flex items-center justify-center h-full w-1/4 ml-4 rounded-xl text-white font-bold text-xl',
+            'flex items-center justify-center h-full w-1/4 ml-4 shadow-md rounded-xl text-white font-bold text-xl',
             statusClass(appointment.status)
           ]" @click="changueStatus(appointment)" style="cursor: pointer;">
             {{ appointment.status }}
           </div>
+                 </div>
         </div>
         <div v-else>
           {{ $t('dashboard.no-patients-for-today') }}
@@ -50,6 +52,7 @@ import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { usePatientsStore } from '../../stores/patientsStore'
 import BasicSpinnerLoading from '../forms/BasicSpinnerLoading.vue'
+import Panel from '@components/forms/Panel.vue'
 
 // Pinia
 const patientsStore = usePatientsStore()

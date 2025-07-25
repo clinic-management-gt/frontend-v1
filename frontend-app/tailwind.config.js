@@ -7,12 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        "primary-color": "var(--primary-color)",
-        "primary-color-variation-1": "var(--primary-color-variation-1)",
-        "primary-color-variation-2": "var(--primary-color-variation-2)",
-        "patient-page-color": "var(--patient-page-color)",
-      }
-    },
+        "primary-color": "#40D7C3",
+        "primary-color-variation-1": "#3bc0ae",
+        "primary-color-variation-2": "#1edfc5",
+        "patient-page-color": "#B300C7",
+      },
+    }
+
   },
   plugins: [],
 }

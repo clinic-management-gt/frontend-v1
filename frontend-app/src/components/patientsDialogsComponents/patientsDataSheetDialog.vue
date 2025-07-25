@@ -8,62 +8,47 @@
           <template #body>
                <div className="grid grid-cols-2 grid-rows-3 gap-4">
                     <div className="col-span-2">
-                         <!-- <panel> -->
+                         <panel>
                               <p class="font-bold">
                                    {{ $t('patients.patients-data') }}
                               </p>
                               <div class="grid grid-cols-2 gap-2 mt-2">
-                                   <div>
-                                        <p class="font-thin text-gray-600">{{ $t('general.first-name') }}</p>
-                                        <p>{{ firstName }}</p>
-                                   </div>
-                                   <div>
-                                        <p class="font-thin text-gray-600">{{ $t('general.last-name') }}</p>
-                                        <p>{{ lastName }}</p>
-                                   </div>
-                                   <div>
-                                        <p class="font-thin text-gray-600">{{ $t('general.birthdate') }}</p>
-                                        <p>{{ birthdate }}</p>
-                                   </div>
-                                   <div>
-                                        <p class="font-thin text-gray-600">{{ $t('general.insurance') }}</p>
-                                        <p>{{ insurance }}</p>
-                                   </div>
-                                   <div>
-                                        <p class="font-thin text-gray-600">{{ $t('general.family-pediatrician') }}</p>
-                                        <p>{{ familyPediatrician }}</p>
-                                   </div>
-                                   <div>
-                                        <p class="font-thin text-gray-600">{{ $t('general.sex') }}</p>
-                                        <p>{{ gender }}</p>
+                                   <div v-for="(item, index) in patientInfo" :key="index" class="flex">
+                                        <p class="font-thin text-gray-600 mr-2">{{ $t(item.label) }}:</p>
+                                        <p>{{ item.value }}</p>
                                    </div>
                               </div>
-                         <!-- </panel> -->
-                    </div>
-                    <!-- <div className="row-start-2">
-                         <panel>
-                              2
                          </panel>
                     </div>
-                    <div className="row-start-2">
+                    <div class="row-start-2">
                          <panel>
-                              3
+                              <p class="font-bold">
+                                   {{ $t('patients.record') }}
+                              </p>
                          </panel>
                     </div>
-                    <div className="row-start-3">
+                    <div class="row-start-2">
                          <panel>
-                              4
+                              <p class="font-bold">
+                                   {{ $t('patients.current-illnesses') }}
+                              </p>
                          </panel>
                     </div>
-                    <div className="row-start-3">
+                    <div class="row-start-3">
                          <panel>
-                              5
+                              <p class="font-bold">
+                                   {{ $t('patients.exams') }}
+                              </p>
                          </panel>
-                    </div> -->
+                    </div>
+                    <div class="row-start-3">
+                         <panel>
+                              <p class="font-bold">
+                                   {{ $t('patients.laboratories') }}
+                              </p>
+                         </panel>
+                    </div>
                </div>
-          </template>
-          <template #buttons>
-               av
           </template>
      </general-dialog-modal>
 </template>
@@ -103,15 +88,16 @@ const props = defineProps({
      },
 })
 
-// Computed para acceder a los datos reactivamente
-const patientData = computed(() => patientsStore.currentPatientSelectedData.value)
+const patientData = computed(() => currentPatientSelectedData.value)
 
-const firstName = computed(() => patientData.value?.name ?? '')
-const lastName = computed(() => patientData.value?.lastName ?? '')
-const insurance = computed(() => patientData.value?.insurance ?? '')
-const gender = computed(() => patientData.value?.gender ?? '')
-const familyPediatrician = computed(() => patientData.value?.familyPediatrician ?? '')
-const birthdate = computed(() => patientData.value?.birthdate ?? '')
+const patientInfo = computed(() => [
+     { label: 'general.first-name', value: patientData.value?.name ?? '' },
+     { label: 'general.last-name', value: patientData.value?.lastName ?? '' },
+     { label: 'general.birthdate', value: patientData.value?.birthdate ?? '' },
+     { label: 'general.insurance', value: patientData.value?.insurance ?? '' },
+     { label: 'general.family-pediatrician', value: patientData.value?.familyPediatrician ?? '' },
+     { label: 'general.sex', value: patientData.value?.gender ?? '' }
+])
 
 const showDialog = computed({
      get: () => patientsLogicStore.showDataSheetPatientDialog,

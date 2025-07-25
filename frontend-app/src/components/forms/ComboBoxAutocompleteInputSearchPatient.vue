@@ -1,22 +1,13 @@
 <template>
-     <!-- Componente de autocompletado reutilizable para seleccionar pacientes.
-          Muestra un input con sugerencias y permite seleccionar un paciente de la lista. -->
      <div class="w-full ">
      <Combobox v-model="selected" @update:modelValue="onSelect">
           <div class="relative">
-          <!-- Input de búsqueda con placeholder y autocompletado -->
           <ComboboxInput
                class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 bg-white placeholder:text-gray-400"
-               :displayValue="displayText"
-               :placeholder="placeholder"
-               @change="query = $event.target.value"
-               @focus="query = ''"
-               />
-          <!-- Botón para desplegar la lista de opciones -->
+               :displayValue="displayText" :placeholder="placeholder" @change="query = $event.target.value" @focus="query = ''" />
           <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
           <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
           </ComboboxButton>
-          <!-- Lista de opciones filtradas -->
           <TransitionRoot leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0"
           @after-leave="query = ''">
           <ComboboxOptions
@@ -24,8 +15,8 @@
                <!-- Mensaje si no se encuentra ningún paciente -->
                <div v-if="filteredPeople.length === 0 && query !== ''"
                class="relative cursor-default select-none px-4 py-2 text-gray-700">
-               Nothing found.
-               </div>
+              {{ $t('general.patient-not-found') }}
+              </div>
                <!-- Opciones de pacientes -->
                <ComboboxOption v-for="person in filteredPeople" as="template" :key="person.id" :value="person"
                v-slot="{ selected, active }">
@@ -48,10 +39,6 @@
 </template>
 
 <script setup>
-// Componente de autocompletado reutilizable.
-// Recibe una lista de personas (pacientes), el id seleccionado y un placeholder.
-// Permite buscar y seleccionar un paciente, emitiendo el id seleccionado al padre.
-
 import { ref, computed, watch } from 'vue'
 import { Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, ComboboxOption, TransitionRoot } from '@headlessui/vue'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
@@ -60,16 +47,20 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
 const emit = defineEmits(['update:currentSelected'])
 const props = defineProps({
      data: {
-     type: Array,
-     default: () => []
+      type: Array,
+      default: () => []
      },
      currentSelected: {
-     type: Number,
-     default: undefined
+      type: Number,
+      default: undefined
      },
      placeholder: {
-     type: String,
-     default: 'Buscar paciente'
+      type: String,
+      default: ''
+     },
+     isRequired: {
+      type: Boolean,
+      default: false
      }
 })
 
