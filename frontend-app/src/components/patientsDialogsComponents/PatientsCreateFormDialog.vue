@@ -10,6 +10,7 @@
                     <div>
                          <drag-drop-file-input @sendFiles="handleSendFiles"
                               title="patients.drag-or-click-here-to-load-the-PDF-of-the-data-sheet" />
+                        <general-i-frame v-if="file" :source="file"/>
 
                     </div>
                     <div class="ml-2 sm:border-l">
@@ -31,9 +32,8 @@
 <script setup>
 import { usePatientsLogicStore } from '@stores/patientsLogicStore.js'
 import { usePatientsStore } from "@stores/patientsStore.js"
-import { DialogTitle } from '@headlessui/vue'
-import { useForm } from 'vee-validate'
-import { ref, defineAsyncComponent, computed } from 'vue'
+import { useBlobAdapter } from '@/composables/useBlobAdapter'
+import { ref, defineAsyncComponent, computed, watchEffect } from 'vue'
 import { storeToRefs } from "pinia"
 
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue"
@@ -41,10 +41,11 @@ import CreateNewPatientsForm from '@components/patientsDialogsComponents/patient
 import ReviewPatientData from '@components/patientsDialogsComponents/patientsCreateDialogComponents/ReviewPatientData.vue'
 import DragDropFileInput from '@components/forms/DragDropFileInput.vue'
 import PrimaryButton from '@components/forms/PrimaryButton.vue'
+import GeneralIFrame from '@components/forms/GeneralIFrame.vue'
 import Panel from "@components/forms/Panel.vue"
 
 const patientsStore = usePatientsStore()
-const { currentPatientSelectedData } = storeToRefs(patientsStore)
+const { currentPatientSelectedData, newPatientData } = storeToRefs(patientsStore)
 
 const patientsLogicStore = usePatientsLogicStore()
 const { showCreateFormDialog } = storeToRefs(patientsLogicStore)
@@ -67,6 +68,9 @@ const props = defineProps({
           default: false
      },
 })
+const rawFile = ref(newPatientData.value.file ?? null)
+const file = computed(() => blobUrl.value)
+const { blobUrl, generate } = useBlobAdapter(rawFile, { mimeType: 'application/pdf' })
 const currentPage = ref(1)
 const patientData = computed(() => currentPatientSelectedData.value)
 
@@ -78,9 +82,19 @@ const showDialog = computed({
      }
 })
 
-function handleSendFiles(file) {
-     console.log(file)
+function handleSendFiles(fileReceived) {
+  rawFile.value = fileReceived
+  if (fileReceived) {
+    generate()
+    newPatientData.value.file = fileReceived
+    console.log(newPatientData.value)
+  } else {
+    blobUrl.value && URL.revokeObjectURL(blobUrl.value)
+    blobUrl.value = null
+    newPatientData.value.file = null
+  }
 }
+
 function nextPage() {
   currentPage.value += 1
 }

@@ -11,7 +11,7 @@
                          $t(title)
                          }}</a>
                     <action-button-outlined-icon v-if="filePdfUploaded" icon="CheckCircleIcon" size="h-6 w-6 mr-1" />
-                    <action-button-outlined-icon v-if="filePdfUploaded" icon="TrashIcon" size="h-6 w-6 mr-1"
+                    <action-button-outlined-icon v-if="filePdfUploaded" icon="TrashIcon" @click="deletePdf" size="h-6 w-6 mr-1"
                          color="text-red-500" />
 
                </div>
@@ -23,6 +23,7 @@ import ActionButtonSolidIcon from '@components/forms/ActionButtonSolidIcon.vue'
 import ActionButtonOutlinedIcon from '@components/forms/ActionButtonOutlinedIcon.vue'
 import { ref } from 'vue'
 
+const emit = defineEmits(['sendFiles'])
 const props = defineProps({
      data: {
           type: [String, File, Object],
@@ -51,7 +52,7 @@ const handleFilePdf = (event) => {
      const files = event.target.files;
      if (files.length > 0) {
           filePdfUploaded.value = true
-          // emit('sendFiles', files[0])
+          emit('sendFiles', files[0])
      } else {
           filePdfUploaded.value = false
      }
@@ -71,10 +72,16 @@ const onDrop = (event) => {
      if (files.length > 0) {
           filePdfUploaded.value = true
           uploadedFile.value = files[0]
-          // emit('sendFiles', uploadedFile.value)
+          emit('sendFiles', uploadedFile.value)
      } else {
           filePdfUploaded.value = false
      }
      isDragging.value = false
+}
+
+function deletePdf() {
+  uploadedFile.value = null
+  filePdfUploaded.value = false
+  emit('sendFiles', null)
 }
 </script>
