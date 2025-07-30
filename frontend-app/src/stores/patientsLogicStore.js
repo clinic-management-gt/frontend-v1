@@ -7,6 +7,7 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
      const showViewPatientRecordDialog = ref(false)
      const showEditPatientRecordDialog = ref(false)
      const showDownloadPatientRecordDialog = ref(false)
+     const showCreateFormDialog = ref(false)
 
      function openDataSheetPatientDialog() {
           showDataSheetPatientDialog.value = true
@@ -23,7 +24,11 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
      function openDownloadPatientRecordDialog() {
           showDownloadPatientRecordDialog.value = true
      }
+     function openCreateFormDialog() {
+          showCreateFormDialog.value = true
+     }
      function closeAllPatientDialog() {
+          showCreateFormDialog.value = false
           showDataSheetPatientDialog.value = false
           showCreateNewPatientRecordDialog.value = false
           showViewPatientRecordDialog.value = false
@@ -33,7 +38,9 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
 
      return {
           showDataSheetPatientDialog, showCreateNewPatientRecordDialog, showViewPatientRecordDialog, showEditPatientRecordDialog, showDownloadPatientRecordDialog,
-          openDataSheetPatientDialog, openCreateNewPatientRecordDialog, openViewPatientRecordDialog, openEditPatientRecordDialog, openDownloadPatientRecordDialog, closeAllPatientDialog
+          showCreateFormDialog,
+          openDataSheetPatientDialog, openCreateNewPatientRecordDialog, openViewPatientRecordDialog, openEditPatientRecordDialog, openDownloadPatientRecordDialog, closeAllPatientDialog,
+          openCreateFormDialog
      }
 }, {
      persist: false

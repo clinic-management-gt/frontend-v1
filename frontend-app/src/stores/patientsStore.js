@@ -5,6 +5,7 @@ export const usePatientsStore = defineStore('patients', () => {
   const appointments = ref([])
   const appointmentsToday = ref([])
   const allPatients = ref([])
+  const newPatientData = ref([])
   const currentPatientSelectedId = ref(undefined)
   const currentPatientSelectedData = ref(undefined)
 
@@ -53,7 +54,7 @@ export const usePatientsStore = defineStore('patients', () => {
     } finally {
       isLoadingAppointmentsToday.value = false
     }
-    
+
   }
 
   // patientsStore.js
@@ -119,6 +120,35 @@ export const usePatientsStore = defineStore('patients', () => {
     }
   }
 
+
+// Busca la función fetchPatientMedicalRecords y modifícala para manejar mejor el error 404
+
+async function fetchPatientMedicalRecords(patientId) {
+    if (!patientId) return;
+
+    patientId = patientId || currentPatientSelectedId.value;
+    if (!patientId) return;
+
+    isLoadingMedicalRecords.value = true;
+
+    try {
+        // Usar la URL correcta
+        const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords`);
+
+        // Manejar explícitamente el caso 404
+        if (response.status === 404) {
+            console.warn(`No hay registros médicos para el paciente ${patientId}`);
+            currentPatientMedicalRecords.value = []; // Array vacío en vez de error
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        currentPatientMedicalRecords.value = data;
+
   async function fetchPatientMedicalRecords(patientId) {
     isLoadingMedicalRecords.value = true
     try {
@@ -133,6 +163,7 @@ export const usePatientsStore = defineStore('patients', () => {
       
       console.log('Registros médicos cargados:', currentPatientMedicalRecords.value)
       return data
+
     } catch (error) {
       console.error('Error al obtener registros médicos:', error)
       currentPatientMedicalRecords.value = []
@@ -234,6 +265,7 @@ export const usePatientsStore = defineStore('patients', () => {
 
   return {
     // state
+    newPatientData,
     appointments,
     appointmentsToday,
     allPatients,
@@ -266,7 +298,8 @@ export const usePatientsStore = defineStore('patients', () => {
       'appointmentsToday',
       'allPatients',
       'currentPatientSelectedId',
-      'currentPatientSelectedData'
+      'currentPatientSelectedData',
+      'newPatientData'
     ]
   }
 })
