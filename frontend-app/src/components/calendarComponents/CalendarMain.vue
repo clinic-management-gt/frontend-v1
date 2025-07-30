@@ -1,6 +1,6 @@
 <script setup>
 import styles from './CalendarMain.module.css'
-import { ref, computed } from 'vue'
+import { ref , watch, nextTick, computed } from 'vue'
 import { onMounted } from 'vue'
 
 // Puedes cambiar esto cuando tengas tu componente real
@@ -180,6 +180,23 @@ function addActivityEvent() {
   }
 }
 
+//funcion para limitar eventos mostrados en el calendario
+
+function getLimitedEventsForDay(dayObj) {
+  if (!dayObj) return { visibleEvents: [], remainingCount: 0 }
+
+  const allEvents = events.value
+    .filter(e => e.day === dayObj.day && e.month === dayObj.month && e.year === dayObj.year)
+    .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''))
+
+  const maxVisible = 3
+  const visibleEvents = allEvents.slice(0, maxVisible)
+  const remainingCount = Math.max(0, allEvents.length - maxVisible)
+
+  return { visibleEvents, remainingCount }
+}
+
+
 function getEventsForDay(dayObj) {
   if (!dayObj) return []
   return events.value
@@ -268,8 +285,188 @@ async function fetchAppointments() {
   }
 }
 
-onMounted(() => {fetchAppointments()})
+//referencia al div del panel de la agenda
+const refDaySelectedAgenda = ref(null)
 
+watch(selectedDayObj, async (newVal) => {
+  if (newVal) {
+    await nextTick()
+    //esperar que se cargue el componente
+    setTimeout(() => {
+      if (refDaySelectedAgenda.value) {
+        refDaySelectedAgenda.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 50)
+  }
+})
+
+// Estados para el modal de edición de citas
+const showEditModal = ref(false)
+const editingAppointment = ref(null)
+const editForm = ref({
+  patientId: '',
+  patientName: '',
+  date: '',
+  time: '',
+  status: 'Pendiente',
+  notes: ''
+})
+
+// Lista de pacientes para el dropdown
+const patients = ref([])
+const filteredPatients = ref([])
+const searchPatient = ref('')
+
+// Lista de estados disponibles
+const appointmentStatuses = ['Pendiente', 'Confirmado', 'Completado', 'Cancelado']
+
+// Nuevas funciones para manejar la edición
+async function fetchPatients() {
+  try {
+    const res = await fetch('http://localhost:9000/patients')
+    if (!res.ok) throw new Error('Error al obtener pacientes')
+    const data = await res.json()
+    patients.value = data
+    filteredPatients.value = data
+  } catch (e) {
+    console.error('Error al obtener pacientes:', e)
+  }
+}
+
+const showPatientDropdown = ref(false)
+
+function onSearchFocus() {
+  showPatientDropdown.value = true
+}
+
+function onSearchBlur() {
+  // Delay para permitir click en opciones
+  setTimeout(() => {
+    showPatientDropdown.value = false
+  }, 200)
+}
+
+function selectPatient(patient) {
+  editForm.value.patientId = patient.id
+  editForm.value.patientName = patient.name
+  searchPatient.value = patient.name
+  showPatientDropdown.value = false
+}
+
+function filterPatients() {
+  if (!searchPatient.value || searchPatient.value.length < 2) {
+    filteredPatients.value = []
+    return
+  }
+  
+  filteredPatients.value = patients.value.filter(patient => 
+    patient.name.toLowerCase().includes(searchPatient.value.toLowerCase()) ||
+    patient.email.toLowerCase().includes(searchPatient.value.toLowerCase())
+  )
+}
+
+function openEditModal(appointment) {
+  editingAppointment.value = appointment
+  
+  // Llenar el formulario con los datos actuales
+  const date = new Date(appointment.date || appointment.appointment_date)
+  editForm.value = {
+    patientId: appointment.PatientID || appointment.patientId || '',
+    patientName: appointment.PatientName || appointment.patientName || '',
+    date: date.toISOString().split('T')[0],
+    time: date.toTimeString().substring(0, 5),
+    status: appointment.Status || appointment.status || 'Pendiente',
+    notes: appointment.Notes || appointment.notes || ''
+  }
+  
+  searchPatient.value = editForm.value.patientName
+  showEditModal.value = true
+}
+
+async function saveAppointment() {
+  try {
+    const appointmentData = {
+      patientId: editForm.value.patientId,
+      date: `${editForm.value.date}T${editForm.value.time}:00`,
+      status: editForm.value.status,
+      notes: editForm.value.notes
+    }
+
+    const res = await fetch(`http://localhost:9000/appointments/${editingAppointment.value.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(appointmentData)
+    })
+
+    if (!res.ok) throw new Error('Error al actualizar la cita')
+
+    // Refrescar las citas
+    await fetchAppointments()
+    closeEditModal()
+    
+    // Mostrar mensaje de éxito
+    alert('Cita actualizada exitosamente')
+  } catch (e) {
+    console.error('Error al guardar la cita:', e)
+    alert('Error al actualizar la cita')
+  }
+}
+
+async function deleteAppointment() {
+  if (!confirm('¿Estás seguro de que quieres eliminar esta cita?')) return
+
+  try {
+    const res = await fetch(`http://localhost:9000/appointments/${editingAppointment.value.id}`, {
+      method: 'DELETE'
+    })
+
+    if (!res.ok) throw new Error('Error al eliminar la cita')
+
+    // Refrescar las citas
+    await fetchAppointments()
+    closeEditModal()
+    
+    // Mostrar mensaje de éxito
+    alert('Cita eliminada exitosamente')
+  } catch (e) {
+    console.error('Error al eliminar la cita:', e)
+    alert('Error al eliminar la cita')
+  }
+}
+
+function closeEditModal() {
+  showEditModal.value = false
+  editingAppointment.value = null
+  editForm.value = {
+    patientId: '',
+    patientName: '',
+    date: '',
+    time: '',
+    status: 'Pendiente',
+    notes: ''
+  }
+  searchPatient.value = ''
+}
+
+// Modificar la función de eventos para citas para agregar función de edición
+function openAppointmentEdit(event) {
+  if (event.type === 'Cita') {
+    // Buscar la cita original en appointments
+    const appointment = appointments.value.find(app => 
+      event.text.includes(app.PatientName || app.patientName)
+    )
+    if (appointment) {
+      openEditModal(appointment)
+    }
+  }
+}
+
+onMounted(() => {
+  fetchAppointments()
+  fetchPatients()
+})
 </script>
 
 <template>
@@ -305,24 +502,42 @@ onMounted(() => {fetchAppointments()})
         >
           <span>{{ cell.day }}</span>
           <div :class="styles['calendar-events']">
+            <!--Mostrar evento limitados-->
             <div
-              v-for="(event, eventIndex) in getEventsForDay(cell)"
+              v-for="(event, eventIndex) in getLimitedEventsForDay(cell).visibleEvents"
               :key="'event-' + eventIndex"
-              :class="styles['event']"
-              :style="{ background: event.color }"
+              :class="[styles['event'], styles[`event-${event.type.toLowerCase()}`]]"
+              :style="{ backgroundColor: event.color }"
             >
-              {{ event.type === 'Paciente' ? '👤 ' : '📋 ' }}{{ event.text }}
-              <span style="font-size:0.95em;">
-                ({{ event.startTime }}<span v-if="event.endTime">-{{ event.endTime }}</span>)
-              </span>
+              <div :class="styles['event-header']">
+                <span :class="styles['event-icon']">
+                  {{ event.type === 'Paciente' ? '👤' : event.type === 'Cita' ? '🩺' : '📋' }}
+                </span>
+                <span :class="styles['event-time']">
+                  {{ event.startTime }}<span v-if="event.endTime">-{{ event.endTime }}</span>
+                </span>
+              </div>
+              <div :class="styles['event-text']">
+                {{ event.type === 'Cita' ? event.text.replace('Cita: ', '') : event.text }}
+              </div>
             </div>
+            
+            <!--Indicador de eventos adicionales-->
+            <div 
+              v-if="getLimitedEventsForDay(cell).remainingCount > 0"
+              :class="styles['more-events']"
+              @click.stop="dayClicked(cell)"
+            >
+              +{{ getLimitedEventsForDay(cell).remainingCount }} más
+            </div>
+            
           </div>
         </div>
       </div>
     </div>
 
     <!-- Panel de actividades del día seleccionado -->
-    <div v-if="selectedDayObj" :class="styles['day-agenda-panel']">
+    <div v-if="selectedDayObj" ref="refDaySelectedAgenda" :class="styles['day-agenda-panel']">
       <h3>
         Agenda para el {{ selectedDayObj.day }}/{{ selectedDayObj.month + 1 }}/{{ selectedDayObj.year }}
       </h3>
@@ -344,6 +559,7 @@ onMounted(() => {fetchAppointments()})
           <template v-else>
             <span>
               <span v-if="event.type === 'Paciente'">👤 </span>
+              <span v-else-if="event.type === 'Cita'">🩺 </span>
               <span v-else>📋 </span>
               {{ event.text }}
             </span>
@@ -351,8 +567,17 @@ onMounted(() => {fetchAppointments()})
               {{ event.startTime }}
               <template v-if="event.endTime">-{{ event.endTime }}</template>
               <span class="color-dot" :style="{ background: event.color }"></span>
-              <button @click="startEdit(i, event)">Editar</button>
-              <button @click="deleteEvent(i)" style="color: #c62828; font-weight: bold;">🗑️</button>
+              
+              <!-- Botones diferentes según el tipo de evento -->
+              <template v-if="event.type === 'Cita'">
+                <button @click="openAppointmentEdit(event)" :class="styles['edit-btn']">
+                  ✏️ Editar Cita
+                </button>
+              </template>
+              <template v-else>
+                <button @click="startEdit(i, event)" :class="styles['edit-btn']">Editar</button>
+                <button @click="deleteEvent(i)" :class="styles['delete-btn']">🗑️</button>
+              </template>
             </span>
           </template>
         </li>
@@ -379,6 +604,96 @@ onMounted(() => {fetchAppointments()})
           <input v-model="activityColor" type="color" title="Color actividad" class="color-input">
           <button type="submit">Añadir actividad</button>
         </form>
+      </div>
+    </div>
+
+    <!-- Modal de edición de citas -->
+    <div v-if="showEditModal" :class="styles['modal-overlay']" @click="closeEditModal">
+      <div :class="styles['modal-content']" @click.stop>
+        <div :class="styles['modal-header']">
+          <h3>Editar Cita Médica</h3>
+          <button @click="closeEditModal" :class="styles['close-btn']">&times;</button>
+        </div>
+
+        <div :class="styles['modal-body']">
+          <form @submit.prevent="saveAppointment">
+            <!-- Selector de paciente mejorado -->
+            <div :class="styles['form-group']">
+              <label>Paciente:</label>
+              <div :class="styles['patient-search']">
+                <input 
+                  v-model="searchPatient" 
+                  @input="filterPatients"
+                  @focus="onSearchFocus"
+                  @blur="onSearchBlur"
+                  placeholder="Escriba para buscar paciente..."
+                  :class="styles['search-input']"
+                />
+                <!-- Mostrar dropdown solo si está activo Y hay texto de búsqueda -->
+                <div v-if="showPatientDropdown && searchPatient && searchPatient.length > 2 && filteredPatients.length > 0" :class="styles['patient-dropdown']">
+                  <div 
+                    v-for="patient in filteredPatients.slice(0, 5)" 
+                    :key="patient.id"
+                    @mousedown="selectPatient(patient)"
+                    :class="styles['patient-option']"
+                  >
+                    <strong>{{ patient.name }}</strong>
+                    <span>{{ patient.email }}</span>
+                  </div>
+                  <div v-if="filteredPatients.length === 0" :class="styles['no-results']">
+                    No se encontraron pacientes
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fecha -->
+            <div :class="styles['form-group']">
+              <label>Fecha:</label>
+              <input 
+                v-model="editForm.date" 
+                type="date" 
+                required
+                :class="styles['form-input']"
+              />
+            </div>
+
+            <!-- Hora -->
+            <div :class="styles['form-group']">
+              <label>Hora:</label>
+              <input 
+                v-model="editForm.time" 
+                type="time" 
+                required
+                :class="styles['form-input']"
+              />
+            </div>
+
+            <!-- Estado -->
+            <div :class="styles['form-group']">
+              <label>Estado:</label>
+              <select v-model="editForm.status" :class="styles['form-select']">
+                <option v-for="status in appointmentStatuses" :key="status" :value="status">
+                  {{ status }}
+                </option>
+              </select>
+            </div>
+    
+
+            <!-- Botones -->
+            <div :class="styles['modal-actions']">
+              <button type="submit" :class="styles['save-btn']">
+                💾 Guardar Cambios
+              </button>
+              <button type="button" @click="deleteAppointment" :class="styles['delete-btn']">
+                🗑️ Eliminar Cita
+              </button>
+              <button type="button" @click="closeEditModal" :class="styles['cancel-btn']">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>

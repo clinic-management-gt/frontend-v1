@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1 class="text-xl font-bold text-back mb-8">
-      Pacientes para el día de hoy — {{ todayFormatted }}
+      Pacientes para hoy — {{ todayFormatted }}
     </h1>
 
     <div v-if="isLoadingAppointmentsToday" class="text-center py-6">
@@ -10,13 +10,11 @@
 
     <div v-else>
       <transition-group name="fade" tag="div">
-        <div
-          v-for="appointment in appointmentsToday"
-          :key="appointment.id"
-          class="flex items-stretch h-32 rounded-xl overflow-hidden mb-4"
-        >
+        <div v-if="appointmentsToday.length > 0" v-for="appointment in appointmentsToday" :key="appointment.id"
+          class="flex items-stretch h-32 rounded-xl overflow-hidden my-4">
           <!-- Info del paciente y cita -->
-          <div class="flex items-center bg-gray-200 rounded-xl w-3/4 p-4 flex-1">
+           <div class="mb-2 flex w-full">
+          <div class="flex items-center bg-white shadow-md rounded-xl w-3/4 p-4 flex-1">
             <div class="flex-1">
               <h2 class="text-3xl font-bold text-gray-800">
                 {{ appointment.patientName }}
@@ -33,16 +31,16 @@
           </div>
 
           <!-- Botón de estado -->
-          <div
-            :class="[
-              'flex items-center justify-center h-full w-1/4 ml-4 rounded-xl text-white font-bold text-xl',
-              statusClass(appointment.status)
-            ]"
-            @click="changueStatus(appointment)"
-            style="cursor: pointer;"
-          >
+          <div :class="[
+            'flex items-center justify-center h-full w-1/4 ml-4 shadow-md rounded-xl text-white font-bold text-xl',
+            statusClass(appointment.status)
+          ]" @click="changueStatus(appointment)" style="cursor: pointer;">
             {{ appointment.status }}
           </div>
+                 </div>
+        </div>
+        <div v-else>
+          {{ $t('dashboard.no-patients-for-today') }}
         </div>
       </transition-group>
     </div>
@@ -51,9 +49,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { storeToRefs }    from 'pinia'
+import { storeToRefs } from 'pinia'
 import { usePatientsStore } from '../../stores/patientsStore'
 import BasicSpinnerLoading from '../forms/BasicSpinnerLoading.vue'
+import Panel from '@components/forms/Panel.vue'
 
 // Pinia
 const patientsStore = usePatientsStore()
@@ -66,9 +65,9 @@ onMounted(() => {
 // Fecha de hoy formateada
 const todayFormatted = computed(() =>
   new Date().toLocaleDateString('es-GT', {
-    day:   'numeric',
+    day: 'numeric',
     month: 'long',
-    year:  'numeric'
+    year: 'numeric'
   })
 )
 
@@ -79,11 +78,11 @@ const todayFormatted = computed(() =>
 // - `class` la clase de Tailwind/CSS que quieres aplicar
 // --------------------------------------------------
 const statuses = [
-  { key: 'pendiente',  label: 'Pendiente',  class: 'bg-[#F4A261] text-yellow-900' },
-  { key: 'confirmado', label: 'Confirmado', class: 'bg-blue-500'            },
-  { key: 'completado', label: 'Completado', class: 'bg-[#48C9B0]'           },
-  { key: 'cancelado',  label: 'Cancelado',  class: 'bg-red-500'             },
-  { key: 'espera',     label: 'Espera',     class: 'bg-[#F39C12]'           },
+  { key: 'pendiente', label: 'Pendiente', class: 'bg-[#F4A261] text-yellow-900' },
+  { key: 'confirmado', label: 'Confirmado', class: 'bg-blue-500' },
+  { key: 'completado', label: 'Completado', class: 'bg-[#48C9B0]' },
+  { key: 'cancelado', label: 'Cancelado', class: 'bg-red-500' },
+  { key: 'espera', label: 'Espera', class: 'bg-[#F39C12]' },
 ]
 
 // Para buscar rápido un estado por su key
@@ -92,8 +91,8 @@ const statusMap = Object.fromEntries(statuses.map(s => [s.key, s]))
 async function changueStatus(appointment) {
   // 1) Calcula índice y nextKey
   const currKey = appointment.status.toLowerCase()
-  const idx     = statuses.findIndex(s => s.key === currKey)
-  const next    = statuses[(idx + 1) % statuses.length]
+  const idx = statuses.findIndex(s => s.key === currKey)
+  const next = statuses[(idx + 1) % statuses.length]
 
   // 2) Cambio optimista
   appointment.status = next.key
@@ -114,24 +113,12 @@ function statusClass(status) {
 
 function formatDateTime(dateString) {
   return new Date(dateString).toLocaleString('es-GT', {
-    year:   'numeric',
-    month:  'numeric',
-    day:    'numeric',
-    hour:   'numeric',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
     minute: 'numeric',
     hour12: true
   })
 }
 </script>
-
-
-<style>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
