@@ -7,17 +7,17 @@
       </h2>
     </div>
 
-    <form @submit.prevent="onSubmit" class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm space-y-4">
-      <TextInput v-model="email" class="mt-2" name="email" type="email" title="login.mail"
+    <form @submit.prevent="onSubmitLogin" class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm space-y-4">
+      <TextInput class="mt-2" name="email" type="email" title="login.mail"
         inputPlaceholder="login.placeholder-mail" inputColor="primary-color"required />
 
-      <TextInput v-model="password" class="mt-2" name="password" type="password" title="login.password"
+      <TextInput class="mt-2" name="password" type="password" title="login.password"
         inputPlaceholder="login.placeholder-password" inputColor="primary-color" required />
 
       <div v-if="error" class="text-red-600 text-sm">{{ error }}</div>
 
-      <PrimaryButton type="submit" :disabled="loading"  class="w-full flex justify-center">
-        <span v-if="loading">{{ $t('login.entrando') }}</span>
+      <PrimaryButton type="submit" :disabled="isLoadingAuthStore || !isFormValid"  class="w-full flex justify-center">
+        <basic-spinner-loading v-if="isLoadingAuthStore"/>
         <span v-else>{{ $t('login.login') }}</span>
       </PrimaryButton>
     </form>
@@ -25,34 +25,59 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
-import TextInput from '@/components/forms/TextInput.vue'
-import PrimaryButton from '@/components/forms/PrimaryButton.vue'
+import { useForm } from 'vee-validate'
+import { storeToRefs } from "pinia"
+import * as yup from 'yup';
+
+import TextInput from '@components/forms/TextInput.vue'
+import PrimaryButton from '@components/forms/PrimaryButton.vue'
+import BasicSpinnerLoading from '@components/forms/BasicSpinnerLoading.vue'
 
 const router = useRouter()
-const auth = useAuthStore()
+const authStore = useAuthStore()
+const { isLoadingAuthStore, error } = storeToRefs(authStore)
+const validationError = ref(false)
+const { handleSubmit, errors, values } = useForm({
+  validationSchema: yup.object({
+    email: yup.string().required().email(),
+    password: yup.string().required(),
+  })
+})
 
-const email = ref('')
-const password = ref('')
-const loading = ref(false)
-const error = ref(null)
+const isFormValid = computed(() => {
+  return Object.keys(errors.value).length === 0 && values.email && values.password
+})
 
-async function onSubmit() {
-  loading.value = true
-  error.value = null
-
+const onSubmitLogin = handleSubmit(async (values) => {
+  validationError.value = false
   try {
-    await auth.fetchLogin({ email: email.value, password: password.value })
-    router.push({ path: '/dashboard' })
+    await authStore.fetchLogin({
+      email: values.email,
+      password: values.password
+    })
   } catch (err) {
-    error.value =
-      err.message ||
-      err.error ||
-      'Credenciales incorrectas'
-  } finally {
-    loading.value = false
+    validationError.value = true
   }
-}
+})
+
+
+// async function onSubmit() {
+//   loading.value = true
+//   error.value = null
+
+//   try {
+//     await auth.fetchLogin({ email: email.value, password: password.value })
+//     router.push({ path: '/dashboard' })
+//   } catch (err) {
+//     error.value =
+//       err.message ||
+//       err.error ||
+//       'Credenciales incorrectas'
+//   } finally {
+//     loading.value = false
+//   }
+// }
 </script>
