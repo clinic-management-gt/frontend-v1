@@ -16,10 +16,18 @@
                <panel class="col-span-3 col-start-3 row-start-2">
                     <patient-data-sheet-box :viewDataSheet="openDataSheetPatientDialog"/>
                </panel>
-               <div class="col-span-3 row-span-3 col-start-3 row-start-3">
-                    <patient-history-log-box :data="currentPatientMedicalRecords" />
-               </div>
+               <panel class="col-span-3 row-span-3 col-start-3 row-start-3">
+                    <patient-history-log-box 
+                    :patient-id="currentPatientSelectedId"
+                    @view-recipe="openRecipeModal"
+                    />
+               </panel>
           </div>
+          <MedicalRecipePanel
+               v-if="showRecipeModal"
+               :recipe="selectedRecipe"
+               @close="closeRecipeModal"
+          />
      </div>
      <patients-data-sheet-dialog v-if="showDataSheetPatientDialog" @close="closeAllPatientDialog"
           :isOpen="showDataSheetPatientDialog" />
@@ -42,6 +50,21 @@ import PatientMainDataBox from "@components/patientsComponents/PatientMainDataBo
 
 import PatientsDataSheetDialog from '@components/patientsDialogsComponents/patientsDataSheetDialog.vue';
 import Panel from "@components/forms/Panel.vue"
+import MedicalRecipePanel from "@components/patientsComponents/MedicalRecipePanel.vue"
+
+const showRecipeModal = ref(false)
+const selectedRecipe = ref(null)
+
+function openRecipeModal(receta) {
+     selectedRecipe.value = receta
+     showRecipeModal.value = true
+}
+
+function closeRecipeModal() {
+     showRecipeModal.value = false
+     selectedRecipe.value = null
+}
+// Store y referencias
 
 const patientsStore = usePatientsStore();
 const {
