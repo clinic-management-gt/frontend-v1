@@ -81,7 +81,6 @@ export const usePatientsStore = defineStore('patients', () => {
     }
   }
 
-
   async function fetchAllPatients() {
     try {
       isLoadingAllPatients.value = true
@@ -120,47 +119,55 @@ export const usePatientsStore = defineStore('patients', () => {
     }
   }
 
-
-// Busca la función fetchPatientMedicalRecords y modifícala para manejar mejor el error 404
-
-async function fetchPatientMedicalRecords(patientId) {
-    if (!patientId) return;
-
+  // Busca la función fetchPatientMedicalRecords y modifícala para manejar mejor el error 404
+  async function fetchPatientMedicalRecords(patientId) {
     patientId = patientId || currentPatientSelectedId.value;
     if (!patientId) return;
 
     isLoadingMedicalRecords.value = true;
 
     try {
-        // Usar la URL correcta
-        const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords`);
+      const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords?page=1&limit=50`);
 
-        // Manejar explícitamente el caso 404
-        if (response.status === 404) {
-            console.warn(`No hay registros médicos para el paciente ${patientId}`);
-            currentPatientMedicalRecords.value = []; // Array vacío en vez de error
-            return;
-        }
+      if (response.status === 404) {
+        console.warn(`No hay registros médicos para el paciente ${patientId}`);
+        currentPatientMedicalRecords.value = [];
+        return;
+      }
 
-        if (!response.ok) {
-            throw new Error(`Error: ${response.status}`);
-        }
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error ${response.status}: ${errorText}`);
+      }
 
-        const data = await response.json();
-        currentPatientMedicalRecords.value = data;
+      const data = await response.json();
+      currentPatientMedicalRecords.value = data.records || [];
+
+      console.log('Registros médicos cargados:', currentPatientMedicalRecords.value);
+      return data;
+
+    } catch (error) {
+      console.error('Error al obtener registros médicos:', error);
+      currentPatientMedicalRecords.value = [];
+      throw error;
+    } finally {
+      isLoadingMedicalRecords.value = false;
+    }
+  }
+
 
   async function fetchPatientMedicalRecords(patientId) {
     isLoadingMedicalRecords.value = true
     try {
       const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords?page=1&limit=50`)
-      
+
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`)
       }
 
       const data = await response.json()
       currentPatientMedicalRecords.value = data.records || []
-      
+
       console.log('Registros médicos cargados:', currentPatientMedicalRecords.value)
       return data
 
@@ -176,7 +183,7 @@ async function fetchPatientMedicalRecords(patientId) {
   async function createMedicalRecord(patientId, recordData) {
     try {
       console.log('Creando registro médico:', { patientId, recordData })
-      
+
       const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords`, {
         method: 'POST',
         headers: {
@@ -200,10 +207,10 @@ async function fetchPatientMedicalRecords(patientId) {
   async function updateMedicalRecord(recordId, recordData) {
     try {
       console.log('Actualizando registro médico:', { recordId, recordData })
-      
+
       // Usamos el patientId actual del store o asume 1 por defecto
       const patientId = currentPatientSelectedId.value || 1
-      
+
       const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords/${recordId}`, {
         method: 'PATCH',
         headers: {
@@ -227,10 +234,10 @@ async function fetchPatientMedicalRecords(patientId) {
   async function deleteMedicalRecord(recordId) {
     try {
       console.log('Eliminando registro médico:', recordId)
-      
+
       // Usamos el patientId actual del store o asume 1 por defecto
       const patientId = currentPatientSelectedId.value || 1
-      
+
       const response = await fetch(`http://localhost:9000/patients/${patientId}/medicalrecords/${recordId}`, {
         method: 'DELETE'
       })
@@ -250,7 +257,7 @@ async function fetchPatientMedicalRecords(patientId) {
   async function fetchMedicalRecordDetails(recordId) {
     try {
       const response = await fetch(`http://localhost:9000/medicalrecords/${recordId}/details`)
-      
+
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`)
       }
@@ -303,3 +310,4 @@ async function fetchPatientMedicalRecords(patientId) {
     ]
   }
 })
+
