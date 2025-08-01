@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.17",
@@ -30,6 +32,7 @@
   },
   "devDependencies": {
     "@pinia/testing": "^1.0.2",
+    "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitest/ui": "3.2.4",
     "@vue/eslint-config-prettier": "^10.2.0",
