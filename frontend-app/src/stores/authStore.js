@@ -1,79 +1,58 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import router from "@/router"
+import instance from '@stores/axios.js'
 
 export const useAuthStore = defineStore('auth', () => {
   const user    = ref(null)
-  const token   = ref(localStorage.getItem('jwt') || '')
-  const isAuth  = ref(!!token.value)
-  const loading = ref(false)
+  const token   = ref(null)
   const error   = ref(null)
 
-  /**
-   * fetchLogin recibe un objeto { email, password },
-   * hace POST a /auth/login y guarda token + user.
-   */
+  const isAuth  = ref(false)
+  const isLoadingAuthStore = ref(false)
+
   async function fetchLogin({ email, password }) {
-    loading.value = true
-    error.value   = null
+    isLoadingAuthStore.value = true
+    error.value = null
 
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/login`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        }
-      )
-
-      if (!res.ok) {
-        // asume que el backend devuelve JSON { message: '...' } en errores 4xx
-        const errBody = await res.json()
-        throw new Error(errBody.message || 'Login fallido')
-      }
-
-      const { token: jwt, user: u } = await res.json()
-      token.value  = jwt
-      user.value   = u
+      const res = await instance.post('/auth/login', { email, password })
+      token.value = res.data.token
+      user.value = res.data.user
       isAuth.value = true
-      localStorage.setItem('jwt', jwt)
+      router.push({ path: '/dashboard' })
+
     } catch (err) {
-      error.value   = err
-      isAuth.value  = false
-      throw err     // relanza para que el componente muestre el mensaje
+      // Manejo de error con fallback de mensaje
+      const message = err.response?.data?.message || 'Login fallido'
+      error.value = new Error(message)
+      isAuth.value = false
+      throw error.value
     } finally {
-      loading.value = false
+      isLoadingAuthStore.value = false
     }
   }
+
 
   /**
    * logout: limpia todo y redirige al login
    */
   function logout() {
-    token.value  = ''
+    localStorage.clear()
+    token.value  = null
     user.value   = null
     isAuth.value = false
-    localStorage.removeItem('jwt')
-  }
-
-  /**
-   * authHeaders: helper para incluir en fetch posteriores
-   */
-  function authHeaders() {
-    return token.value
-      ? { Authorization: `Bearer ${token.value}` }
-      : {}
+    router.push('/login')
   }
 
   return {
     user,
     token,
     isAuth,
-    loading,
+    isLoadingAuthStore,
     error,
     fetchLogin,
     logout,
-    authHeaders
   }
 }, {
   persist: {

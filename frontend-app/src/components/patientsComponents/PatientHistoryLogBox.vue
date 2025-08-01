@@ -2,7 +2,7 @@
   <div>
     <div class="flex justify-between items-center mb-4">
       <p class="text-2xl font-bold">{{ $t('patients.patient-history') }}</p>
-      
+
       <!-- Botón para agregar nuevo registro -->
       <div class="flex items-center gap-4">
         <primary-button
@@ -11,12 +11,12 @@
         >
           + {{ $t('patients.add-medical-record') }}
         </primary-button>
-        
+
         <!-- Selector de elementos por página -->
         <div class="flex items-center gap-2">
           <label class="text-sm text-gray-600">{{ $t('general.show') }}:</label>
-          <select 
-            v-model="itemsPerPage" 
+          <select
+            v-model="itemsPerPage"
             @change="resetPagination"
             class="px-2 py-1 border rounded text-sm"
           >
@@ -62,37 +62,37 @@
             <!-- Botones de acción -->
             <div class="flex items-center gap-2">
               <!-- Botón ver detalles -->
-              <action-button-solid-icon 
-                icon="EyeIcon" 
-                size="h-10 w-10" 
-                color="text-patient-page-color" 
+              <action-button-solid-icon
+                icon="EyeIcon"
+                size="h-10 w-10"
+                color="text-patient-page-color"
                 @click.stop="openRecordDetails(item)"
                 :title="$t('general.view')"
               />
-              
+
               <!-- Botón editar -->
-              <action-button-solid-icon 
-                icon="PencilIcon" 
-                size="h-10 w-10" 
-                color="text-patient-page-color" 
+              <action-button-solid-icon
+                icon="PencilIcon"
+                size="h-10 w-10"
+                color="text-patient-page-color"
                 @click.stop="editRecord(item)"
                 :title="$t('general.edit')"
               />
-              
+
               <!-- Botón eliminar -->
-              <action-button-solid-icon 
-                icon="TrashIcon" 
-                size="h-10 w-10" 
-                color="text-red-600" 
+              <action-button-solid-icon
+                icon="TrashIcon"
+                size="h-10 w-10"
+                color="text-red-600"
                 @click.stop="deleteRecord(item)"
                 :title="$t('general.delete')"
               />
-              
+
               <!-- Botón descargar -->
-              <action-button-solid-icon 
-                icon="ArrowDownTrayIcon" 
-                size="h-10 w-10" 
-                color="text-patient-page-color" 
+              <action-button-solid-icon
+                icon="ArrowDownTrayIcon"
+                size="h-10 w-10"
+                color="text-patient-page-color"
                 @click.stop="downloadRecord(item)"
                 :title="$t('general.download')"
               />
@@ -157,10 +157,10 @@ const emit = defineEmits(['view-recipe'])
 
 // Store
 const patientsStore = usePatientsStore()
-const { 
-  currentPatientMedicalRecords, 
+const {
+  currentPatientMedicalRecords,
   isLoadingMedicalRecords,
-  currentPatientSelectedId 
+  currentPatientSelectedId
 } = storeToRefs(patientsStore)
 
 // Estados locales
@@ -178,7 +178,7 @@ const totalPages = computed(() => Math.ceil(totalRecords.value / itemsPerPage.va
 const paginatedRecords = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value
   const end = start + itemsPerPage.value
-  return currentPatientMedicalRecords.value?.slice(start, end) || []
+  return Object.values(currentPatientMedicalRecords.value).slice(start, end) || []
 })
 
 // Métodos para modales
@@ -205,18 +205,18 @@ function openCreateModal() {
 async function editRecord(record) {
   try {
     console.log('Editando registro:', record)
-    
+
     // Usar el registro actual directamente (ya tiene los datos necesarios)
     selectedRecordForEdit.value = record
     isEditing.value = true
     showFormModal.value = true
-    
+
     console.log('Estados del modal:', {
       showFormModal: showFormModal.value,
       isEditing: isEditing.value,
       selectedRecordForEdit: selectedRecordForEdit.value
     })
-    
+
     // Cerrar modal de detalles si está abierto
     showDetailsModal.value = false
   } catch (error) {
@@ -235,7 +235,7 @@ function closeFormModal() {
 async function handleSaveRecord(formData) {
   try {
     console.log('Guardando registro:', formData)
-    
+
     if (isEditing.value && selectedRecordForEdit.value) {
       // Actualizar registro existente
       console.log('Actualizando registro ID:', selectedRecordForEdit.value.id)
@@ -245,11 +245,11 @@ async function handleSaveRecord(formData) {
       console.log('Creando nuevo registro para paciente:', props.patientId)
       await patientsStore.createMedicalRecord(props.patientId, formData)
     }
-    
+
     // Cerrar modal y recargar datos
     closeFormModal()
     await patientsStore.fetchPatientMedicalRecords(props.patientId)
-    
+
     alert(isEditing.value ? 'Registro actualizado correctamente' : 'Registro creado correctamente')
   } catch (error) {
     console.error('Error al guardar registro:', error)
@@ -259,7 +259,7 @@ async function handleSaveRecord(formData) {
 
 async function deleteRecord(record) {
   if (!confirm('¿Estás seguro de que deseas eliminar este registro médico?')) return
-  
+
   try {
     await patientsStore.deleteMedicalRecord(record.id)
     await patientsStore.fetchPatientMedicalRecords(props.patientId)
@@ -286,7 +286,7 @@ function resetPagination() {
 
 function formatRecordDate(dateString) {
   if (!dateString) return 'Fecha no disponible'
-  
+
   try {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
