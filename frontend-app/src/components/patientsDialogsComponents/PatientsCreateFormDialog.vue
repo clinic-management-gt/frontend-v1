@@ -20,7 +20,7 @@
                </div>
           </template>
           <template #buttons>
-               <primary-button type="button" @click="backPage()" bgColor="orange" class="mr-2">
+               <primary-button v-if="currentPage === 2" type="button" @click="backPage()" bgColor="orange" class="mr-2">
                     <div class="uppercase">{{ $t('general.back') }}</div>
                </primary-button>
                <primary-button type="button" @click="nextPage()" class="mr-2">

@@ -7,6 +7,7 @@ export const usePatientsStore = defineStore('patients', () => {
   const appointmentsToday = ref([])
   const allPatients = ref([])
   const newPatientData = ref([])
+  const fullRecord = ref([])
   const currentPatientSelectedId = ref(undefined)
   const currentPatientSelectedData = ref(undefined)
 
@@ -172,7 +173,7 @@ export const usePatientsStore = defineStore('patients', () => {
     isLoadingMedicalRecords.value = false
     try {
       const res = await instance.get(`/medicalrecords/${recordId}/details`)
-      return res.data
+      fullRecord.value = res.data
     } catch (error) {
       console.error('Error al obtener detalles del registro médico:', error)
       throw error
@@ -184,6 +185,7 @@ export const usePatientsStore = defineStore('patients', () => {
 
   return {
     // state
+    fullRecord,
     newPatientData,
     appointments,
     appointmentsToday,

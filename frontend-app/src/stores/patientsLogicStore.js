@@ -8,6 +8,14 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
      const showEditPatientRecordDialog = ref(false)
      const showDownloadPatientRecordDialog = ref(false)
      const showCreateFormDialog = ref(false)
+     const showDetailsModal = ref(false)
+     const showFormModal = ref(false)
+     const isEditing = ref(false)
+
+     const selectedRecord = ref(null)
+     const selectedRecordForEdit = ref(null)
+     const fullRecord = ref(null)
+
 
      function openDataSheetPatientDialog() {
           showDataSheetPatientDialog.value = true
@@ -27,6 +35,23 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
      function openCreateFormDialog() {
           showCreateFormDialog.value = true
      }
+     function openRecordDetailsDialog(record) {
+          selectedRecord.value = record
+          console.log(selectedRecord.value)
+          showDetailsModal.value = true
+     }
+     function openCreateModal() {
+        selectedRecordForEdit.value = null
+        isEditing.value = false
+        showFormModal.value = true
+     }
+     function closeHistoryLogModals() {
+        showDetailsModal.value = false
+        selectedRecord.value = null
+        showFormModal.value = false
+        selectedRecordForEdit.value = null
+        isEditing.value = false
+     }
      function closeAllPatientDialog() {
           showCreateFormDialog.value = false
           showDataSheetPatientDialog.value = false
@@ -37,10 +62,28 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
      }
 
      return {
-          showDataSheetPatientDialog, showCreateNewPatientRecordDialog, showViewPatientRecordDialog, showEditPatientRecordDialog, showDownloadPatientRecordDialog,
+          showDataSheetPatientDialog,
+          showCreateNewPatientRecordDialog,
+          showViewPatientRecordDialog,
+          showEditPatientRecordDialog,
+          showDownloadPatientRecordDialog,
           showCreateFormDialog,
-          openDataSheetPatientDialog, openCreateNewPatientRecordDialog, openViewPatientRecordDialog, openEditPatientRecordDialog, openDownloadPatientRecordDialog, closeAllPatientDialog,
-          openCreateFormDialog
+          showFormModal,
+          showDetailsModal,
+          selectedRecord,
+          selectedRecordForEdit,
+          isEditing,
+          fullRecord,
+          openDataSheetPatientDialog,
+          openCreateNewPatientRecordDialog,
+          openViewPatientRecordDialog,
+          openEditPatientRecordDialog,
+          openDownloadPatientRecordDialog,
+          openCreateFormDialog,
+          openRecordDetailsDialog,
+          openCreateModal,
+          closeAllPatientDialog,
+          closeHistoryLogModals,
      }
 }, {
      persist: false
