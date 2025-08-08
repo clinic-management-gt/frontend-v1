@@ -14,7 +14,7 @@
       <TextInput class="mt-2" name="password" type="password" title="login.password"
         inputPlaceholder="login.placeholder-password" inputColor="primary-color" required />
 
-      <div v-if="error" class="text-red-600 text-sm">{{ error }}</div>
+      <div v-if="error !== null" class="text-red-600 text-sm">{{ error }}</div>
 
       <PrimaryButton type="submit" :disabled="isLoadingAuthStore || !isFormValid"  class="w-full flex justify-center">
         <basic-spinner-loading v-if="isLoadingAuthStore"/>
