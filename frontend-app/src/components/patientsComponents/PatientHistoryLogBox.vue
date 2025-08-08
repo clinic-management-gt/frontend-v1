@@ -137,31 +137,6 @@ const paginatedRecords = computed(() => {
   return records.slice(start, end)
 })
 
-<<<<<<< HEAD
-// Métodos para modales
-async function openRecordDetails(record) {
-  try {
-    selectedRecord.value = record
-    showDetailsModal.value = true
-  } catch (error) {
-    console.error('Error al abrir detalles del registro:', error)
-  }
-}
-
-function closeDetailsModal() {
-  showDetailsModal.value = false
-  selectedRecord.value = null
-}
-
-function openCreateModal() {
-  console.log('🚀 Abriendo modal para crear registro')
-  selectedRecordForEdit.value = null
-  isEditing.value = false
-  showFormModal.value = true
-  console.log('Modal abierto:', showFormModal.value)
-}
-=======
->>>>>>> bb7495ef7ebf5347a6f8ba1eec503be967234ae0
 
 async function editRecord(record) {
   try {
