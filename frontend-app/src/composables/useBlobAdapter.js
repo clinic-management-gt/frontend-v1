@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { FileAdapter } from '@utils/FileAdapter.js'
+import { FileAdapter } from '@utils/fileAdapter.js'
 
 export function useBlobAdapter(source, options = {}) {
   const blobUrl = ref(null)

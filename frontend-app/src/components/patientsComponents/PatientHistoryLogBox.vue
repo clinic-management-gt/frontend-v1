@@ -163,25 +163,58 @@ async function editRecord(record) {
 
 async function handleSaveRecord(formData) {
   try {
-    console.log('Guardando registro:', formData)
+    console.log('💾 Guardando registro:', formData)
+    console.log('🔍 Estado isEditing:', isEditing.value)
+    console.log('👤 Patient ID:', props.patientId)
 
-    if (isEditing.value && selectedRecordForEdit.value) {
-      // Actualizar registro existente
-      console.log('Actualizando registro ID:', selectedRecordForEdit.value.id)
-      await patientsStore.updateMedicalRecord(selectedRecordForEdit.value.id, formData)
+    // Verificar si viene en el nuevo formato (con medicalRecord y recipe separados)
+    const isNewFormat = formData.medicalRecord || formData.recipe
+    
+    if (isNewFormat) {
+      // NUEVO FORMATO: Manejar medical record y recipe por separado
+      console.log('📋 Usando nuevo formato unificado')
+      
+      // 1. Manejar Medical Record
+      if (formData.medicalRecord) {
+        if (isEditing.value && selectedRecordForEdit.value) {
+          console.log('✏️ Actualizando medical record ID:', selectedRecordForEdit.value.id)
+          await patientsStore.updateMedicalRecord(selectedRecordForEdit.value.id, formData.medicalRecord)
+        } else {
+          console.log('➕ Creando nuevo medical record para paciente:', props.patientId)
+          await patientsStore.createMedicalRecord(props.patientId, formData.medicalRecord)
+        }
+      }
+      
+      // 2. Manejar Recipe si existe
+      if (formData.recipe) {
+        console.log('💊 Procesando receta médica...')
+        // Aquí agregamos lógica para recipes cuando esté lista
+      }
+      
     } else {
-      // Crear nuevo registro
-      console.log('Creando nuevo registro para paciente:', props.patientId)
-      await patientsStore.createMedicalRecord(props.patientId, formData)
+      // FORMATO ACTUAL: Mantener compatibilidad
+      console.log('📋 Usando formato actual (solo medical record)')
+      
+      if (isEditing.value && selectedRecordForEdit.value) {
+        console.log('✏️ Actualizando registro ID:', selectedRecordForEdit.value.id)
+        await patientsStore.updateMedicalRecord(selectedRecordForEdit.value.id, formData)
+      } else {
+        console.log('➕ Creando nuevo registro para paciente:', props.patientId)
+        await patientsStore.createMedicalRecord(props.patientId, formData)
+      }
     }
 
+    console.log('✅ Registro guardado exitosamente')
+    
     // Cerrar modal y recargar datos
     closeHistoryLogModals()
     await patientsStore.fetchPatientMedicalRecords(props.patientId)
 
     alert(isEditing.value ? 'Registro actualizado correctamente' : 'Registro creado correctamente')
+    
   } catch (error) {
-    console.error('Error al guardar registro:', error)
+    console.error('❌ Error al guardar registro:', error)
+    console.error('📋 Detalles del error:', error.response?.data || error.message)
     alert('Error al guardar el registro: ' + (error.message || 'Error desconocido'))
   }
 }
