@@ -1,32 +1,27 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-      <!-- Header simple y limpio -->
-      <div class="flex justify-between items-center p-6 border-b" style="background-color: var(--primary-color);">
+  <general-dialog-modal ref="createDialog" @close-modal="handleClose" :isOpen="isOpen" dialogSize="max-w-6xl">
+    <!-- Header -->
+    <template #title>
+      <div class="flex justify-between items-center px-6 py-2 border-b">
         <div>
-          <h2 class="text-2xl font-bold text-white">{{ $t('patients.consult-detail') }}</h2>
-          <p class="text-white text-opacity-90 mt-1">{{ formatRecordDate(displayRecord?.createdAt) }}</p>
+          <h2 class="text-2xl font-bold ">{{ $t('patients.consult-detail') }}</h2>
+          <p class=" text-opacity-90 mt-1">{{ formatRecordDate(displayRecord?.createdAt) }}</p>
         </div>
-        <button 
-          @click="$emit('close')" 
-          class="text-white hover:text-gray-200 text-3xl font-bold leading-none"
-        >
-          ×
-        </button>
+        <button @click="handleClose" class="text-black hover:text-gray-400 text-3xl font-bold leading-none">×</button>
       </div>
+    </template>
 
-      <!-- Contenido scrolleable -->
+    <!-- Body -->
+    <template #body>
       <div class="overflow-y-auto max-h-[calc(90vh-160px)]">
-        <!-- Loading state simple -->
-        <div v-if="isLoading" class="flex flex-col justify-center items-center py-16">
+        <!-- Loading -->
+        <div v-if="isLoadingMedicalRecords" class="flex flex-col justify-center items-center py-16">
           <div class="animate-spin h-12 w-12 border-4 border-gray-300 border-t-[#489FB5] rounded-full"></div>
           <p class="mt-4 text-gray-600">{{ $t('general.loading') }}...</p>
         </div>
 
-        <!-- Content when loaded -->
+        <!-- Content -->
         <div v-else-if="displayRecord" class="p-6 space-y-6">
-          
-          <!-- Información general -->
           <div class="bg-gray-100 rounded-lg p-4">
             <h3 class="text-lg font-bold text-gray-800 mb-3">{{ $t('general.general-info') }}</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -36,12 +31,13 @@
               </div>
               <div v-if="displayRecord.patient">
                 <span class="text-sm text-gray-600 font-semibold">{{ $t('general.patient') }}:</span>
-                <p class="text-gray-800 font-medium">{{ displayRecord.patient.name || displayRecord.patient.firstName }} {{ displayRecord.patient.lastName }}</p>
+                <p class="text-gray-800 font-medium">
+                  {{ displayRecord.patient.name || displayRecord.patient.firstName }} {{ displayRecord.patient.lastName }}
+                </p>
               </div>
               <div>
                 <span class="text-sm text-gray-600 font-semibold">{{ $t('general.status') }}:</span>
-                <span class="inline-block px-3 py-1 text-sm font-bold rounded-full text-white" 
-                      style="background-color: #48C9B0;">
+                <span class="inline-block px-3 py-1 text-sm font-bold rounded-full text-white" style="background-color: #48C9B0;">
                   {{ displayRecord.status || 'Completado' }}
                 </span>
               </div>
@@ -59,8 +55,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Antecedentes familiares -->
           <div v-if="displayRecord.familyHistory" class="bg-gray-100 rounded-lg p-4">
             <div class="flex items-center mb-3">
               <div class="w-4 h-4 rounded-full mr-2" style="background-color: #9B59B6;"></div>
@@ -83,8 +77,8 @@
             <div v-else class="text-center py-6">
               <div class="text-gray-400 text-4xl mb-2">📝</div>
               <p class="text-gray-500">{{ $t('patients.no-evolution-note') }}</p>
-              <button 
-                @click="editRecord" 
+              <button
+                @click="editRecord"
                 class="mt-3 px-4 py-2 text-blue-600 hover:text-blue-800 font-medium"
               >
                 ✏️ {{ $t('general.edit') }}
@@ -106,7 +100,7 @@
                 <div class="bg-gray-50 rounded p-3 mb-3">
                   <pre class="text-gray-800 text-sm whitespace-pre-wrap font-mono">{{ recipe.prescription }}</pre>
                 </div>
-                <button 
+                <button
                   @click="viewFullRecipe(recipe)"
                   class="px-4 py-2 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
                   style="background-color: var(--primary-color);"
@@ -183,108 +177,67 @@
           </div>
         </div>
 
-        <!-- Error state simple -->
+        <!-- Error -->
         <div v-else-if="hasError" class="text-center py-16">
           <div class="text-red-500 text-6xl mb-4">⚠️</div>
           <h3 class="text-xl font-bold text-red-600 mb-2">{{ $t('general.error-loading-data') }}</h3>
           <p class="text-gray-600 mb-6">No se pudieron cargar los detalles de la consulta</p>
-          <button 
-            @click="loadFullRecord"
-            class="px-6 py-3 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
-            style="background-color: #489FB5;"
-          >
+          <button @click="loadFullRecord" class="px-6 py-3 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity" style="background-color: #489FB5;">
             {{ $t('general.retry') }}
           </button>
         </div>
       </div>
+    </template>
 
-      <!-- Footer simple -->
-      <div class="border-t bg-gray-50 px-6 py-4">
-        <div class="flex justify-end gap-3">
-          <button 
-            @click="editRecord" 
-            class="px-4 py-2 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
-            style="background-color: #489FB5;"
-          >
-            {{ $t('general.edit') }}
-          </button>
-          <button 
-            @click="downloadRecord" 
-            class="px-4 py-2 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
-            style="background-color: var(--primary-color);"
-          >
-            {{ $t('general.download') }}
-          </button>
-          <button 
-            @click="$emit('close')" 
-            class="px-4 py-2 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors"
-          >
-            {{ $t('general.close') }}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+    <!-- Footer -->
+    <template #buttons>
+      <primary-button @click="editRecord" class="mr-2" bgColor="orange">
+        <p class="uppercase">{{ $t('general.edit') }}</p>
+      </primary-button>
+      <primary-button @click="downloadRecord">
+        <p class="uppercase">{{ $t('general.download') }}</p>
+      </primary-button>
+    </template>
+  </general-dialog-modal>
 </template>
 
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue'
+import { onMounted, watch, computed } from 'vue'
 import { usePatientsStore } from '@stores/patientsStore'
+import { usePatientsLogicStore } from '../../stores/patientsLogicStore'
+import { storeToRefs } from 'pinia'
+
+import PrimaryButton from '@components/forms/PrimaryButton.vue'
+import GeneralDialogModal from '@components/forms/GeneralDialogModal.vue'
 
 const props = defineProps({
-  record: {
-    type: Object,
-    default: () => ({})
-  },
-  isOpen: {
-    type: Boolean,
-    default: false
-  }
+  record: Object,
+  isOpen: Boolean
 })
 
 const emit = defineEmits(['close', 'view-recipe', 'edit', 'download'])
 
-// Estados locales
-const fullRecord = ref(null)
-const isLoading = ref(false)
-const hasError = ref(false)
-
-// Store
 const patientsStore = usePatientsStore()
+const { fullRecord, isLoadingMedicalRecords, hasError } = storeToRefs(patientsStore)
 
-// Computado para decidir qué datos mostrar
-const displayRecord = computed(() => {
-  return fullRecord.value || props.record
-})
+const patientsLogicStore = usePatientsLogicStore()
+const { selectedRecord } = storeToRefs(patientsLogicStore)
+const { closeHistoryLogModals } = patientsLogicStore
 
-// Cargar datos completos cuando se abre el modal
+const handleClose = () => {
+  closeHistoryLogModals()
+}
+
+const displayRecord = computed(() => fullRecord.value)
+console.log("niger", displayRecord.value)
+// 🎯 Solo llama a la store (sin try/catch)
 async function loadFullRecord() {
-  if (!props.record?.id) {
-    // Si no hay ID, usar el record básico
-    fullRecord.value = props.record
-    return
-  }
-
-  isLoading.value = true
-  hasError.value = false
-
-  try {
-    // Intentar cargar datos detallados
-    const details = await patientsStore.fetchMedicalRecordDetails(props.record.id)
-    fullRecord.value = details
-  } catch (error) {
-    console.error('Error al cargar detalles del registro médico:', error)
-    // Si falla, usar el record básico que ya tenemos
-    fullRecord.value = props.record
-    hasError.value = false // No mostrar error si tenemos datos básicos
-  } finally {
-    isLoading.value = false
-  }
+    await patientsStore.fetchMedicalRecordDetails(selectedRecord.value.id)
 }
 
 function formatRecordDate(dateString) {
+  console.log(dateString)
   if (!dateString) return 'Fecha no disponible'
-  
   try {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
@@ -293,19 +246,9 @@ function formatRecordDate(dateString) {
       hour: '2-digit',
       minute: '2-digit'
     })
-  } catch (error) {
+  } catch {
     return 'Fecha inválida'
   }
-}
-
-function viewFullRecipe(recipe) {
-  // Emitir evento para mostrar el panel de recetas
-  emit('view-recipe', {
-    prescription: recipe.prescription,
-    createdAt: recipe.createdAt,
-    patientName: displayRecord.value?.patient?.name || displayRecord.value?.patient?.firstName + ' ' + displayRecord.value?.patient?.lastName,
-    recipeId: recipe.id
-  })
 }
 
 function editRecord() {
@@ -316,18 +259,14 @@ function downloadRecord() {
   emit('download', displayRecord.value)
 }
 
-// Observar cuando se abre el modal para cargar los datos
-watch(() => props.isOpen, (newValue) => {
-  if (newValue) {
-    loadFullRecord()
+watch(() => props.isOpen, async (newVal) => {
+  if (newVal) {
+    await loadFullRecord()
   } else {
-    // Limpiar datos cuando se cierra
-    fullRecord.value = null
-    hasError.value = false
+    patientsStore.clearFullRecord()
   }
 })
 
-// Cargar al montar si ya está abierto
 onMounted(() => {
   if (props.isOpen) {
     loadFullRecord()
