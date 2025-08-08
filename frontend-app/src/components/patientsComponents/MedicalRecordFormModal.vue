@@ -1,4 +1,9 @@
 <template>
+  <!-- DEBUG (puedes quitar esto después) -->
+  <div v-if="isOpen" class="fixed top-20 right-4 bg-green-500 text-white p-2 rounded z-[70] text-xs">
+    🟢 MedicalRecordFormModal isOpen: {{ isOpen }}
+  </div>
+  
   <general-dialog-modal
     :is-open="isOpen"
     :title="isEditing ? 'Editar registro médico' : 'Agregar registro médico'"
@@ -8,7 +13,8 @@
   >
     <div class="space-y-6 max-h-[70vh] overflow-y-auto">
       <!-- Formulario principal -->
-      <form @submit.prevent="handleSubmit" class="space-y-4">
+      <form @submit.prevent="handleSubmit" class="space-y-6">
+        
         <!-- Información básica -->
         <div class="bg-gray-50 p-4 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">Información básica</h3>
@@ -16,28 +22,41 @@
           <!-- Peso y Altura -->
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <custom-label>Peso (kg)</custom-label>
-              <text-input
-                v-model="formData.weight"
+              <label class="block text-sm font-medium text-gray-700 mb-1">Peso (kg)</label>
+              <input
+                v-model.number="formData.weight"
                 type="number"
                 step="0.1"
                 placeholder="70.5"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div>
-              <custom-label>Altura (cm)</custom-label>
-              <text-input
-                v-model="formData.height"
+              <label class="block text-sm font-medium text-gray-700 mb-1">Altura (cm)</label>
+              <input
+                v-model.number="formData.height"
                 type="number"
                 step="0.1"
                 placeholder="175.2"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
 
+          <!-- Diagnóstico -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico</label>
+            <input
+              v-model="formData.diagnosis"
+              type="text"
+              placeholder="Diagnóstico del paciente..."
+              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
           <!-- Antecedentes familiares -->
           <div class="mb-4">
-            <custom-label>Antecedentes familiares</custom-label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Antecedentes familiares</label>
             <textarea
               v-model="formData.familyHistory"
               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
@@ -48,12 +67,31 @@
 
           <!-- Notas de evolución -->
           <div>
-            <custom-label>Notas de evolución</custom-label>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Notas de evolución</label>
             <textarea
               v-model="formData.notes"
               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               rows="4"
               placeholder="Notas de evolución del paciente..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Receta médica -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h3 class="text-lg font-semibold mb-4">💊 Receta médica</h3>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Prescripción</label>
+            <textarea
+              v-model="formData.prescription"
+              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono"
+              rows="6"
+              placeholder="Escriba la prescripción médica aquí...
+
+Ejemplo:
+1. Paracetamol 500mg - Tomar 1 cada 8 horas por 3 días
+2. Ibuprofeno 400mg - Tomar 1 cada 12 horas si hay dolor
+3. Descanso por 2 días"
             ></textarea>
           </div>
         </div>
@@ -80,7 +118,7 @@
               Guardando...
             </span>
             <span v-else>
-              {{ isEditing ? 'Actualizar' : 'Guardar' }}
+              {{ isEditing ? 'Actualizar registro' : 'Guardar registro' }}
             </span>
           </button>
         </div>
@@ -90,105 +128,262 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, computed } from 'vue'
 import GeneralDialogModal from '@components/forms/GeneralDialogModal.vue'
-import CustomLabel from '@components/forms/CustomLabel.vue'
-import TextInput from '@components/forms/TextInput.vue'
 
 const props = defineProps({
-  isOpen: {
-    type: Boolean,
-    default: false
-  },
-  record: {
-    type: Object,
-    default: null
-  },
-  patientId: {
-    type: [String, Number],
-    required: true
-  },
-  isEditing: {
-    type: Boolean,
-    default: false
-  }
+  isOpen: { type: Boolean, default: false },
+  record: { type: Object, default: null },
+  patientId: { type: [String, Number], required: true },
+  isEditing: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['close', 'save'])
 
-// Estados
 const isLoading = ref(false)
+
+// Formulario unificado
 const formData = ref({
-  weight: '',
-  height: '',
+  // Medical Record fields
+  weight: null,
+  height: null,
+  diagnosis:'',
   familyHistory: '',
-  notes: ''
+  notes: '',
+  // Recipe fields
+  prescription: '',
+  // Para futuro - Exams
+  exams: []
 })
 
-// Función para cerrar el modal
-function handleClose() {
-  console.log('Cerrando modal...')
-  emit('close')
-}
-
-// Cargar datos del record cuando se abre en modo edición
-function loadRecordData() {
-  console.log('Cargando datos...', { isEditing: props.isEditing, record: props.record })
-  
-  if (props.isEditing && props.record) {
-    // Acceder a los datos según la estructura del backend
-    const record = props.record.medicalRecord || props.record
-    
-    formData.value = {
-      weight: record.weight || '',
-      height: record.height || '', 
-      familyHistory: record.familyHistory || '',
-      notes: record.notes || ''
-    }
-    
-    console.log('Datos cargados:', formData.value)
-  } else {
-    // Resetear formulario para nuevo registro
-    formData.value = {
-      weight: '',
-      height: '',
-      familyHistory: '',
-      notes: ''
-    }
-    console.log('Formulario reseteado para nuevo registro')
-  }
-}
-
-// Manejar envío del formulario
+// Lógica de envío unificada
 async function handleSubmit() {
-  console.log('Enviando formulario...', formData.value)
+  console.log('📋 Enviando consulta médica completa:', formData.value)
+  
   isLoading.value = true
   
   try {
-    // Preparar datos para enviar según la estructura del backend
-    const dataToSend = {
-      weight: parseFloat(formData.value.weight) || null,
-      height: parseFloat(formData.value.height) || null,
-      familyHistory: formData.value.familyHistory || null,
-      notes: formData.value.notes || null
+    const results = {
+      medicalRecord: null,
+      recipe: null
     }
     
-    console.log('Datos a enviar:', dataToSend)
-    emit('save', dataToSend)
+    // 1. Guardar/actualizar Medical Record si hay datos
+    if (hasMedicalRecordData()) {
+      const medicalRecordData = {
+        weight: formData.value.weight || null,
+        height: formData.value.height || null,
+        familyHistory: formData.value.familyHistory || '',
+        notes: formData.value.notes || ''
+      }
+      
+      if (props.isEditing && props.record?.id) {
+        console.log('✏️ Actualizando medical record...')
+        results.medicalRecord = await updateMedicalRecord(props.record.id, medicalRecordData)
+      } else {
+        console.log('➕ Creando medical record...')
+        results.medicalRecord = await createMedicalRecord(medicalRecordData)
+      }
+    }
+    
+    // 2. Manejar Recipe si hay prescripción
+    if (formData.value.prescription?.trim()) {
+      console.log('💊 Procesando receta médica...')
+      
+      // Buscar si ya existe una receta asociada al medical record
+      const existingRecipe = await findExistingRecipe()
+      
+      if (existingRecipe && props.isEditing) {
+        console.log('✏️ Actualizando receta existente...')
+        results.recipe = await updateRecipe(existingRecipe.id, {
+          prescription: formData.value.prescription
+        })
+      } else {
+        console.log('➕ Creando nueva receta...')
+        // Necesitamos crear un treatment básico primero
+        const treatment = await createBasicTreatment()
+        results.recipe = await createRecipe({
+          treatmentId: treatment.id,
+          prescription: formData.value.prescription
+        })
+      }
+    }
+    
+    console.log('✅ Consulta médica guardada exitosamente:', results)
+    
+    emit('save', results)
+    
   } catch (error) {
-    console.error('Error al enviar formulario:', error)
+    console.error('❌ Error al guardar consulta médica:', error)
+    alert('Error al guardar la consulta médica: ' + (error.message || 'Error desconocido'))
   } finally {
     isLoading.value = false
   }
 }
 
-// Observar cambios en props para cargar datos
-watch([() => props.isOpen, () => props.record], () => {
-  console.log('Props cambiaron:', { isOpen: props.isOpen, record: props.record })
-  if (props.isOpen) {
-    nextTick(() => {
-      loadRecordData()
+// Helper functions
+function hasMedicalRecordData() {
+  return formData.value.weight || 
+         formData.value.height || 
+         formData.value.familyHistory?.trim() || 
+         formData.value.notes?.trim()
+}
+
+async function createMedicalRecord(data) {
+  // Mapear los campos al modelo EntityFramework correcto
+  const medicalRecordData = {
+    PatientId: parseInt(props.patientId),
+    Weight: data.weight ? parseFloat(data.weight) : null,
+    Height: data.height ? parseFloat(data.height) : null,
+    FamilyHistory: data.familyHistory || null,
+    Notes: data.notes || null
+  }
+  
+  console.log('📤 Datos enviados al backend:', JSON.stringify(medicalRecordData, null, 2))
+  // ⭐ Cambiar la URL para usar MedicalRecordsController
+  console.log('📍 URL:', `${import.meta.env.VITE_API_URL}/medicalrecords`)
+  
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/medicalrecords`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(medicalRecordData)
+  })
+  
+  console.log('📥 Respuesta del servidor:', response.status, response.statusText)
+  
+  if (!response.ok) {
+    const errorText = await response.text()
+    console.error('❌ Error del servidor:', errorText)
+    throw new Error(`Error ${response.status}: ${errorText}`)
+  }
+  
+  const result = await response.json()
+  console.log('✅ Medical Record creado exitosamente:', result)
+  return result
+}
+
+
+async function updateMedicalRecord(recordId, data) {
+  const medicalRecordData = {
+    Weight: data.weight ? parseFloat(data.weight) : null,
+    Height: data.height ? parseFloat(data.height) : null,
+    FamilyHistory: data.familyHistory || null,
+    Notes: data.notes || null
+  }
+  
+  console.log('📤 Datos para actualización:', JSON.stringify(medicalRecordData, null, 2))
+  // ⭐ Usar MedicalRecordsController para updates también
+  console.log('📍 URL:', `${import.meta.env.VITE_API_URL}/medicalrecords/${recordId}`)
+  
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/medicalrecords/${recordId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(medicalRecordData)
+  })
+  
+  if (!response.ok) {
+    const errorText = await response.text()
+    console.error('❌ Error del servidor:', errorText)
+    throw new Error(`Error ${response.status}: ${errorText}`)
+  }
+  
+  return await response.json()
+}
+
+async function createBasicTreatment() {
+  // Crear una cita básica primero (si no existe)
+  const appointmentResponse = await fetch(`${import.meta.env.VITE_API_URL}/appointments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      patientId: props.patientId,
+      appointmentDate: new Date().toISOString(),
+      reason: 'Consulta médica - Registro completo',
+      status: 'Completado'
     })
+  })
+  
+  if (!appointmentResponse.ok) throw new Error('Error creando cita')
+  const appointment = await appointmentResponse.json()
+  
+  // Crear treatment básico
+  const treatmentResponse = await fetch(`${import.meta.env.VITE_API_URL}/treatments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      appointmentId: appointment.id,
+      dosis: 'Según prescripción',
+      duration: 'Según prescripción',
+      frequency: 'Según prescripción',
+      observaciones: 'Generado desde consulta médica',
+      status: 'Active'
+    })
+  })
+  
+  if (!treatmentResponse.ok) throw new Error('Error creando tratamiento')
+  return await treatmentResponse.json()
+}
+
+async function createRecipe(data) {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/recipes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  
+  if (!response.ok) throw new Error(`Error ${response.status}`)
+  return await response.json()
+}
+
+async function updateRecipe(recipeId, data) {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/recipes/${recipeId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  
+  if (!response.ok) throw new Error(`Error ${response.status}`)
+  return await response.json()
+}
+
+// Cargar datos para edición
+function loadRecordData(record) {
+  if (record) {
+    formData.value = {
+      weight: record.weight || null,
+      height: record.height || null,
+      diagnosis: record.diagnosis|| '',
+      familyHistory: record.familyHistory || '',
+      notes: record.notes || '',
+      prescription: '', // Lo cargaremos de las recetas asociadas
+      exams: []
+    }
+    
+    // Cargar receta asociada si existe
+    if (record.recipes && record.recipes.length > 0) {
+      formData.value.prescription = record.recipes[0].prescription || ''
+    }
+  } else {
+    formData.value = {
+      weight: null,
+      height: null,
+      diagnosis: '',
+      familyHistory: '',
+      notes: '',
+      prescription: '',
+      exams: []
+    }
+  }
+}
+
+function handleClose() {
+  emit('close')
+}
+
+// Observar cambios en props
+watch(() => [props.isOpen, props.record], ([isOpen, record]) => {
+  if (isOpen) {
+    loadRecordData(record)
   }
 }, { immediate: true })
 </script>
