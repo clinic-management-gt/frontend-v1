@@ -1,9 +1,12 @@
 <template>
      <general-dialog-modal ref="createDialog" @close-modal="handleClose" :isOpen="isOpen" dialogSize="max-w-6xl">
           <template #title>
-               <p class="text-xl">
-                    {{ $t('patients.fill-out-form') }}
-               </p>
+            <div class="flex justify-between items-center px-6 py-2 border-b">
+              <div>
+               <p class="text-xl">{{ $t('patients.fill-out-form') }}</p>
+               </div>
+              <!-- <button @click="handleClose" class="text-black hover:text-gray-400 text-3xl font-bold leading-none">×</button> -->
+            </div>
           </template>
           <template #body>
                <div class="grid grid-cols-2">
@@ -42,7 +45,6 @@ import ReviewPatientData from '@components/patientsDialogsComponents/patientsCre
 import DragDropFileInput from '@components/forms/DragDropFileInput.vue'
 import PrimaryButton from '@components/forms/PrimaryButton.vue'
 import GeneralIFrame from '@components/forms/GeneralIFrame.vue'
-import Panel from "@components/forms/Panel.vue"
 
 const patientsStore = usePatientsStore()
 const { currentPatientSelectedData, newPatientData } = storeToRefs(patientsStore)
@@ -87,7 +89,6 @@ function handleSendFiles(fileReceived) {
   if (fileReceived) {
     generate()
     newPatientData.value.file = fileReceived
-    console.log(newPatientData.value)
   } else {
     blobUrl.value && URL.revokeObjectURL(blobUrl.value)
     blobUrl.value = null

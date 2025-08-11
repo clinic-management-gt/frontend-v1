@@ -91,7 +91,6 @@ export const usePatientsStore = defineStore('patients', () => {
       isLoadingPatientData.value = true
       const res = await instance.get(`/patients/${currentPatientSelectedId.value}`)
       currentPatientSelectedData.value = res.data
-      console.log("DANG", currentPatientSelectedData.value)
     } catch (error) {
       console.error('Error al obtener data del paciente:', error)
     } finally {
@@ -109,7 +108,6 @@ export const usePatientsStore = defineStore('patients', () => {
     try {
       const res = await instance.get(`/patients/${patientId}/medicalrecords?page=1&limit=50`)
       currentPatientMedicalRecords.value = res.data.records || []
-      console.log('Registros médicos cargados:', currentPatientMedicalRecords.value)
       return res.data
     } catch (error) {
       if (error.response?.status === 404) {
@@ -128,7 +126,6 @@ export const usePatientsStore = defineStore('patients', () => {
   async function createMedicalRecord(patientId, recordData) {
     isLoadingMedicalRecords.value = true
     try {
-      console.log('Creando registro médico:', { patientId, recordData })
       const res = await instance.post(`/patients/${patientId}/medicalrecords`, recordData)
       return res.data
     } catch (error) {

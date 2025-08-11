@@ -201,7 +201,6 @@ watchEffect(() => {
     gmail: values.gmail,
     isFormValid: isFormValid.value
   }
-  console.log(newPatientData.value)
 })
 watchEffect(() => {
   phoneList.value.forEach((item) => {

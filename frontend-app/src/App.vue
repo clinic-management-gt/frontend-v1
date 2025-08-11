@@ -3,19 +3,23 @@
     <RouterView />
     <patients-create-form-dialog v-if="showCreateFormDialog" @close="closeAllPatientDialog"
     :isOpen="showCreateFormDialog" />
+      <notification-alert />
   </div>
 </template>
 
 <script setup>
 import { RouterView } from 'vue-router'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineAsyncComponent} from 'vue'
 import { storeToRefs } from 'pinia'
 import { usePatientsLogicStore } from '@stores/patientsLogicStore'
-import patientsCreateFormDialog from '@components/patientsDialogsComponents/PatientsCreateFormDialog.vue'
+
+const patientsCreateFormDialog = defineAsyncComponent(()=> import('@components/patientsDialogsComponents/PatientsCreateFormDialog.vue'))
+const NotificationAlert = defineAsyncComponent(() => import('@components/forms/NotificationAlert.vue'))
 
 const patientsLogicStore = usePatientsLogicStore()
 const { closeAllPatientDialog } = patientsLogicStore
 const { showCreateFormDialog } = storeToRefs(patientsLogicStore)
+
 
 // const pacientes = ref([])
 // onMounted(async () => {

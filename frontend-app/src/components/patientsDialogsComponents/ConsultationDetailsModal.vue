@@ -229,14 +229,12 @@ const handleClose = () => {
 }
 
 const displayRecord = computed(() => fullRecord.value)
-console.log("niger", displayRecord.value)
 // 🎯 Solo llama a la store (sin try/catch)
 async function loadFullRecord() {
     await patientsStore.fetchMedicalRecordDetails(selectedRecord.value.id)
 }
 
 function formatRecordDate(dateString) {
-  console.log(dateString)
   if (!dateString) return 'Fecha no disponible'
   try {
     return new Date(dateString).toLocaleDateString('es-ES', {
