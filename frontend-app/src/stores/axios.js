@@ -1,6 +1,7 @@
 import axios from 'axios'
-import { useAuthStore } from '@/stores/authStore.js'
+import { useAuthStore } from '@stores/authStore.js'
 import { storeToRefs } from 'pinia'
+import { handleHttpError } from '@utils/errorHandler'
 
 const instance = axios.create({
      baseURL: `${import.meta.env.VITE_API_URL}`,
@@ -22,21 +23,11 @@ instance.interceptors.request.use(
 instance.defaults.headers.common['Content-Type'] = 'application/json'
 
 instance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const authStore = useAuthStore()
-
-    if (error.response?.status === 401) {
-      console.warn('Token expirado o no autorizado')
-      authStore.logout()
-    }
-
-    if (error.response?.status === 500) {
-      console.error('Error del servidor (500):', error.response.data?.message || '')
-    }
-
-    return Promise.reject(error)
-  }
+     response => response,
+     error => {
+          handleHttpError(error)
+          return Promise.reject(error)
+     }
 )
 
 export default instance

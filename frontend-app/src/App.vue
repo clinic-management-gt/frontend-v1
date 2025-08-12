@@ -3,7 +3,7 @@
     <RouterView />
     <patients-create-form-dialog v-if="showCreateFormDialog" @close="closeAllPatientDialog"
     :isOpen="showCreateFormDialog" />
-      <notification-alert />
+    <notification-alert />
   </div>
 </template>
 
