@@ -77,11 +77,11 @@ const todayFormatted = computed(() =>
 // - `class` la clase de Tailwind/CSS que quieres aplicar
 // --------------------------------------------------
 const statuses = [
-  { key: 'pendiente', label: 's', class: 'bg-[#F4A261] text-yellow-900' },
-  { key: 'confirmado', label: 's', class: 'bg-blue-500' },
-  { key: 'completado', label: 's', class: 'bg-[#48C9B0]' },
-  { key: 'cancelado', label: 's', class: 'bg-red-500' },
-  { key: 'espera', label: 's', class: 'bg-[#F39C12]' },
+  { key: 'pendiente', label: 'Pendiente', class: 'bg-[#F4A261] text-yellow-900' },
+  { key: 'confirmado', label: 'Confirmado', class: 'bg-blue-500' },
+  { key: 'completado', label: 'Completado', class: 'bg-[#48C9B0]' },
+  { key: 'cancelado', label: 'Cancelado', class: 'bg-red-500' },
+  { key: 'espera', label: 'Espera', class: 'bg-[#F39C12]' },
 ]
 
 // Para buscar rápido un estado por su key

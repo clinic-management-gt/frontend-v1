@@ -4,7 +4,6 @@ import i18n from "@/langs";
 
 export function handleHttpError(error) {
      const notificationStore = useNotificationStore();
-     console.log(error)
      let type = 'error'
      if (axios.isAxiosError(error)) {
           if (error.response.data.message) {

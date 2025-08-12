@@ -5,7 +5,6 @@
               <div>
                <p class="text-xl">{{ $t('patients.fill-out-form') }}</p>
                </div>
-              <!-- <button @click="handleClose" class="text-black hover:text-gray-400 text-3xl font-bold leading-none">×</button> -->
             </div>
           </template>
           <template #body>
