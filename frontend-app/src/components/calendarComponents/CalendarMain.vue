@@ -463,6 +463,85 @@ function openAppointmentEdit(event) {
   }
 }
 
+// Añade estos estados al script setup
+const showCreateModal = ref(false)
+const createForm = ref({
+  patientId: '',
+  patientName: '',
+  date: '',
+  time: '',
+  status: 'Pendiente',
+  notes: '',
+  duration: 60 // Duración predeterminada en minutos
+})
+
+// Función para abrir el modal de creación
+function openCreateAppointmentModal() {
+  // Establecer la fecha actual como valor predeterminado
+  const today = new Date()
+  createForm.value = {
+    patientId: '',
+    patientName: '',
+    date: today.toISOString().split('T')[0],
+    time: '',
+    status: 'Pendiente',
+    notes: '',
+    duration: 30
+  }
+  searchPatient.value = ''
+  showCreateModal.value = true
+}
+
+// Función para cerrar el modal
+function closeCreateModal() {
+  showCreateModal.value = false
+}
+
+async function createAppointment() {
+  // Validaciones básicas
+  if (!createForm.value.patientId) {
+    alert('Debe seleccionar un paciente');
+    return;
+  }
+
+  try {
+    const appointmentData = {
+      patientId: createForm.value.patientId,
+      date: `${createForm.value.date}T${createForm.value.time}:00`,
+      duration: parseInt(createForm.value.duration),
+      status: createForm.value.status,
+      notes: createForm.value.notes
+    };
+
+    // Llamada al backend
+    const res = await fetch('http://localhost:9000/appointments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(appointmentData)
+    });
+
+    if (!res.ok) {
+      // Si hay un conflicto de horario, manejarlo específicamente
+      if (res.status === 409) {
+        const errorData = await res.json();
+        alert(`Error: ${errorData.message || 'Conflicto de horarios detectado'}`);
+        return;
+      }
+      throw new Error('Error al crear la cita');
+    }
+
+    // Respuesta exitosa
+    await fetchAppointments(); // Refrescar las citas
+    closeCreateModal();
+    alert('Cita creada exitosamente');
+  } catch (e) {
+    console.error('Error al crear la cita:', e);
+    alert('Error al crear la cita');
+  }
+}
+
 onMounted(() => {
   fetchAppointments()
   fetchPatients()
@@ -536,12 +615,25 @@ onMounted(() => {
       </div>
     </div>
 
+
+ 
+
     <!-- Panel de actividades del día seleccionado -->
     <div v-if="selectedDayObj" ref="refDaySelectedAgenda" :class="styles['day-agenda-panel']">
-      <h3>
-        Agenda para el {{ selectedDayObj.day }}/{{ selectedDayObj.month + 1 }}/{{ selectedDayObj.year }}
-      </h3>
+      <div class="flex justify-between items-center mb-4">
+        
+        <h3>
+          Agenda para el {{ selectedDayObj.day }}/{{ selectedDayObj.month + 1 }}/{{ selectedDayObj.year }}
+        </h3>
 
+        <button 
+          @click="openCreateAppointmentModal" 
+            class="px-4 py-2  bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Crear Nueva Cita
+        </button>
+
+      </div>
       <ul>
         <li v-for="(event, i) in getEventsForDay(selectedDayObj)" :key="i">
           <template v-if="editingIndex === i">
@@ -586,8 +678,7 @@ onMounted(() => {
         </li>
       </ul>
 
-      <div :class="styles['agenda-forms']">
-        <!-- Pacientes fila -->
+      <!-- <div :class="styles['agenda-forms']">
         <form @submit.prevent="addPatientEvent" :class="styles['agenda-form']">
           <input v-model="selectedPatient" placeholder="Buscar o seleccionar paciente" required>
           <input v-model="patientStartTime" type="time" required>
@@ -596,7 +687,6 @@ onMounted(() => {
           <button type="submit">Añadir paciente</button>
         </form>
 
-        <!-- Actividad fila -->
         <form @submit.prevent="addActivityEvent" :class="styles['agenda-form']">
           <input v-model="activityText" placeholder="Actividad" required>
           <input v-model="activityStartTime" type="time" required>
@@ -604,7 +694,7 @@ onMounted(() => {
           <input v-model="activityColor" type="color" title="Color actividad" class="color-input">
           <button type="submit">Añadir actividad</button>
         </form>
-      </div>
+      </div> -->
     </div>
 
     <!-- Modal de edición de citas -->
@@ -689,6 +779,93 @@ onMounted(() => {
                 🗑️ Eliminar Cita
               </button>
               <button type="button" @click="closeEditModal" :class="styles['cancel-btn']">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para crear nueva cita -->
+    <div v-if="showCreateModal" :class="styles['modal-overlay']" @click="closeCreateModal">
+      <div :class="styles['modal-content']" @click.stop>
+        <div :class="styles['modal-header']">
+          <h3>Crear Nueva Cita</h3>
+          <button @click="closeCreateModal" :class="styles['close-btn']">&times;</button>
+        </div>
+
+        <div :class="styles['modal-body']">
+          <form @submit.prevent="saveAppointment">
+            <!-- Selector de paciente mejorado -->
+            <div :class="styles['form-group']">
+              <label>Paciente:</label>
+              <div :class="styles['patient-search']">
+                <input 
+                  v-model="searchPatient" 
+                  @input="filterPatients"
+                  @focus="onSearchFocus"
+                  @blur="onSearchBlur"
+                  placeholder="Escriba para buscar paciente..."
+                  :class="styles['search-input']"
+                />
+                <!-- Mostrar dropdown solo si está activo Y hay texto de búsqueda -->
+                <div v-if="showPatientDropdown && searchPatient && searchPatient.length > 2 && filteredPatients.length > 0" :class="styles['patient-dropdown']">
+                  <div 
+                    v-for="patient in filteredPatients.slice(0, 5)" 
+                    :key="patient.id"
+                    @mousedown="selectPatient(patient)"
+                    :class="styles['patient-option']"
+                  >
+                    <strong>{{ patient.name }}</strong>
+                    <span>{{ patient.email }}</span>
+                  </div>
+                  <div v-if="filteredPatients.length === 0" :class="styles['no-results']">
+                    No se encontraron pacientes
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fecha -->
+            <div :class="styles['form-group']">
+              <label>Fecha:</label>
+              <input 
+                v-model="createForm.date" 
+                type="date" 
+                required
+                :class="styles['form-input']"
+              />
+            </div>
+
+            <!-- Hora -->
+            <div :class="styles['form-group']">
+              <label>Hora:</label>
+              <input 
+                v-model="createForm.time" 
+                type="time" 
+                required
+                :class="styles['form-input']"
+              />
+            </div>
+
+            <!-- Estado -->
+            <div :class="styles['form-group']">
+              <label>Estado:</label>
+              <select v-model="createForm.status" :class="styles['form-select']">
+                <option v-for="status in appointmentStatuses" :key="status" :value="status">
+                  {{ status }}
+                </option>
+              </select>
+            </div>
+    
+
+            <!-- Botones -->
+            <div :class="styles['modal-actions']">
+              <button type="submit" :class="styles['save-btn']">
+                💾 Crear Cita
+              </button>
+              <button type="button" @click="closeCreateModal" :class="styles['cancel-btn']">
                 Cancelar
               </button>
             </div>
