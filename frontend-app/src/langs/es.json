@@ -45,7 +45,12 @@
     "no-medical-records": "No hay registros médicos disponibles",
     "delete": "Eliminar",
     "update": "Actualizar",
-    "save": "Guardar"
+    "save": "Guardar",
+    "confirmed": "Confirmado",
+    "completed": "Completado",
+    "pending": "Pendiente",
+    "canceled": "Cancelado",
+    "waiting": "En espera"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -164,5 +169,9 @@
   },
   "vee-validate": {
     "required-input": "Este campo es obligatorio"
+  },
+  "http-errors": {
+    "unknown-error": "Error desconocido",
+    "unknown-error-message": "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo."
   }
 }

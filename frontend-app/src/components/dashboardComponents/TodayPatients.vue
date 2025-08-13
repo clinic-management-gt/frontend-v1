@@ -32,9 +32,8 @@
 
           <!-- Botón de estado -->
           <div :class="[
-            'flex items-center justify-center h-full w-1/4 ml-4 shadow-md rounded-xl text-white font-bold text-xl',
-            statusClass(appointment.status)
-          ]" @click="changueStatus(appointment)" style="cursor: pointer;">
+            'flex items-center justify-center h-full w-1/4 ml-4 shadow-md rounded-xl text-white font-bold text-xl capitalize',
+            statusClass(appointment.status)]" @click="changueStatus(appointment)" style="cursor: pointer;">
             {{ appointment.status }}
           </div>
                  </div>

@@ -37,7 +37,6 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
      }
      function openRecordDetailsDialog(record) {
           selectedRecord.value = record
-          console.log(selectedRecord.value)
           showDetailsModal.value = true
      }
      function openCreateModal() {

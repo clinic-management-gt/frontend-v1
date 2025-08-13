@@ -27,24 +27,20 @@ export const usePatientsStore = defineStore('patients', () => {
   }
 
   async function fetchAppointments() {
+    isLoadingAppointments.value = true
     try {
-      isLoadingAppointments.value = true
       const res = await instance.get('/appointments')
       appointments.value = res.data
-    } catch (error) {
-      console.error('Error al obtener citas:', error)
     } finally {
       isLoadingAppointments.value = false
     }
   }
 
   async function fetchAppointmentsToday() {
+    isLoadingAppointmentsToday.value = true
     try {
-      isLoadingAppointmentsToday.value = true
       const res = await  instance.get('/appointments/today')
       appointmentsToday.value = res.data
-    } catch (error) {
-      console.error('Error al obtener citas de hoy:', error)
     } finally {
       isLoadingAppointmentsToday.value = false
     }
@@ -75,25 +71,20 @@ export const usePatientsStore = defineStore('patients', () => {
     try {
       const res = await instance.get('/patients')
       allPatients.value = res.data
-    } catch (error) {
-      console.error('Error al obtener pacientes:', error)
     } finally {
       isLoadingAllPatients.value = false
     }
   }
 
   async function fetchPatientData() {
+    isLoadingPatientData.value = true
     if (!currentPatientSelectedId.value) {
       console.warn('ID de paciente no definido')
       return
     }
     try {
-      isLoadingPatientData.value = true
       const res = await instance.get(`/patients/${currentPatientSelectedId.value}`)
       currentPatientSelectedData.value = res.data
-      console.log("DANG", currentPatientSelectedData.value)
-    } catch (error) {
-      console.error('Error al obtener data del paciente:', error)
     } finally {
       isLoadingPatientData.value = false
     }
@@ -101,25 +92,13 @@ export const usePatientsStore = defineStore('patients', () => {
 
   // Busca la función fetchPatientMedicalRecords y modifícala para manejar mejor el error 404
   async function fetchPatientMedicalRecords(patientId) {
+    isLoadingMedicalRecords.value = true;
     patientId = patientId || currentPatientSelectedId.value;
     if (!patientId) return;
-
-    isLoadingMedicalRecords.value = true;
-
     try {
       const res = await instance.get(`/patients/${patientId}/medicalrecords?page=1&limit=50`)
       currentPatientMedicalRecords.value = res.data.records || []
-      console.log('Registros médicos cargados:', currentPatientMedicalRecords.value)
       return res.data
-    } catch (error) {
-      if (error.response?.status === 404) {
-        console.warn(`No hay registros médicos para el paciente ${patientId}`)
-        currentPatientMedicalRecords.value = []
-        return
-      }
-      console.error('Error al obtener registros médicos:', error)
-      currentPatientMedicalRecords.value = []
-      throw error
     } finally {
       isLoadingMedicalRecords.value = false
     }
@@ -128,12 +107,8 @@ export const usePatientsStore = defineStore('patients', () => {
   async function createMedicalRecord(patientId, recordData) {
     isLoadingMedicalRecords.value = true
     try {
-      console.log('Creando registro médico:', { patientId, recordData })
       const res = await instance.post(`/patients/${patientId}/medicalrecords`, recordData)
       return res.data
-    } catch (error) {
-      console.error('Error al crear registro médico:', error)
-      throw error
     } finally {
       isLoadingMedicalRecords.value = false
     }
@@ -146,9 +121,6 @@ export const usePatientsStore = defineStore('patients', () => {
       const patientId = currentPatientSelectedId.value || 1
       const res = await instance.patch(`/patients/${patientId}/medicalrecords/${recordId}`, recordData)
       return res.data
-    } catch (error) {
-      console.error('Error al actualizar registro médico:', error)
-      throw error
     } finally {
       isLoadingMedicalRecords.value = false
     }
@@ -161,9 +133,6 @@ export const usePatientsStore = defineStore('patients', () => {
       const patientId = currentPatientSelectedId.value || 1
       await instance.delete(`/patients/${patientId}/medicalrecords/${recordId}`)
       return true
-    } catch (error) {
-      console.error('Error al eliminar registro médico:', error)
-      throw error
     } finally {
       isLoadingMedicalRecords.value = false
     }
@@ -174,9 +143,6 @@ export const usePatientsStore = defineStore('patients', () => {
     try {
       const res = await instance.get(`/medicalrecords/${recordId}/details`)
       fullRecord.value = res.data
-    } catch (error) {
-      console.error('Error al obtener detalles del registro médico:', error)
-      throw error
     } finally {
       isLoadingMedicalRecords.value = false
     }

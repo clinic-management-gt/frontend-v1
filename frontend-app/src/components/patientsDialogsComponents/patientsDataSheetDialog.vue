@@ -1,13 +1,16 @@
 <template>
      <general-dialog-modal ref="createDialog" @close-modal="handleClose" :isOpen="isOpen" dialogSize="max-w-6xl">
           <template #title>
-               <p class="text-xl">
-                    {{ $t('patients.data-sheet') }}
-               </p>
+            <div class="flex justify-between items-center px-6 py-2 border-b">
+               <div>
+                <p class="text-xl">{{ $t('patients.data-sheet') }}</p>
+               </div>
+              <button @click="handleClose" class="text-black hover:text-gray-400 text-3xl font-bold leading-none">×</button>
+            </div>
           </template>
           <template #body>
-               <div className="grid grid-cols-2 grid-rows-3 gap-4">
-                    <div className="col-span-2">
+               <div class="grid grid-cols-2 grid-rows-3 gap-4">
+                    <div class="col-span-2">
                          <panel>
                               <p class="font-bold">
                                    {{ $t('patients.patients-data') }}

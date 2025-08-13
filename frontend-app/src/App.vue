@@ -3,30 +3,22 @@
     <RouterView />
     <patients-create-form-dialog v-if="showCreateFormDialog" @close="closeAllPatientDialog"
     :isOpen="showCreateFormDialog" />
+    <notification-alert />
   </div>
 </template>
 
 <script setup>
 import { RouterView } from 'vue-router'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineAsyncComponent} from 'vue'
 import { storeToRefs } from 'pinia'
 import { usePatientsLogicStore } from '@stores/patientsLogicStore'
-import patientsCreateFormDialog from '@components/patientsDialogsComponents/PatientsCreateFormDialog.vue'
+
+const patientsCreateFormDialog = defineAsyncComponent(()=> import('@components/patientsDialogsComponents/PatientsCreateFormDialog.vue'))
+const NotificationAlert = defineAsyncComponent(() => import('@components/forms/NotificationAlert.vue'))
 
 const patientsLogicStore = usePatientsLogicStore()
 const { closeAllPatientDialog } = patientsLogicStore
 const { showCreateFormDialog } = storeToRefs(patientsLogicStore)
-
-// const pacientes = ref([])
-// onMounted(async () => {
-//   try {
-//     const res = await fetch(import.meta.env.VITE_API_URL + '/pacientes')
-//     pacientes.value = await res.json()
-//   } catch (error) {
-//     console.error('Error al conectar con el backend:', error)
-//   }
-// })
-
 
 // Considering in case we want that every certain amount of time, the page will logout for security reasons
 // This includes no intervention of the user on the screen during x amount of time.

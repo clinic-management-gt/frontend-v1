@@ -318,7 +318,7 @@ const filteredPatients = ref([])
 const searchPatient = ref('')
 
 // Lista de estados disponibles
-const appointmentStatuses = ['Pendiente', 'Confirmado', 'Completado', 'Cancelado']
+const appointmentStatuses = ['general.pending', 'general.confirmed', 'general.completed', 'general.canceled']
 
 // Nuevas funciones para manejar la edición
 async function fetchPatients() {
@@ -358,8 +358,8 @@ function filterPatients() {
     filteredPatients.value = []
     return
   }
-  
-  filteredPatients.value = patients.value.filter(patient => 
+
+  filteredPatients.value = patients.value.filter(patient =>
     patient.name.toLowerCase().includes(searchPatient.value.toLowerCase()) ||
     patient.email.toLowerCase().includes(searchPatient.value.toLowerCase())
   )
@@ -367,7 +367,7 @@ function filterPatients() {
 
 function openEditModal(appointment) {
   editingAppointment.value = appointment
-  
+
   // Llenar el formulario con los datos actuales
   const date = new Date(appointment.date || appointment.appointment_date)
   editForm.value = {
@@ -378,7 +378,7 @@ function openEditModal(appointment) {
     status: appointment.Status || appointment.status || 'Pendiente',
     notes: appointment.Notes || appointment.notes || ''
   }
-  
+
   searchPatient.value = editForm.value.patientName
   showEditModal.value = true
 }
@@ -405,7 +405,7 @@ async function saveAppointment() {
     // Refrescar las citas
     await fetchAppointments()
     closeEditModal()
-    
+
     // Mostrar mensaje de éxito
     alert('Cita actualizada exitosamente')
   } catch (e) {
@@ -427,7 +427,7 @@ async function deleteAppointment() {
     // Refrescar las citas
     await fetchAppointments()
     closeEditModal()
-    
+
     // Mostrar mensaje de éxito
     alert('Cita eliminada exitosamente')
   } catch (e) {
@@ -454,7 +454,7 @@ function closeEditModal() {
 function openAppointmentEdit(event) {
   if (event.type === 'Cita') {
     // Buscar la cita original en appointments
-    const appointment = appointments.value.find(app => 
+    const appointment = appointments.value.find(app =>
       event.text.includes(app.PatientName || app.patientName)
     )
     if (appointment) {
@@ -521,16 +521,16 @@ onMounted(() => {
                 {{ event.type === 'Cita' ? event.text.replace('Cita: ', '') : event.text }}
               </div>
             </div>
-            
+
             <!--Indicador de eventos adicionales-->
-            <div 
+            <div
               v-if="getLimitedEventsForDay(cell).remainingCount > 0"
               :class="styles['more-events']"
               @click.stop="dayClicked(cell)"
             >
               +{{ getLimitedEventsForDay(cell).remainingCount }} más
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -567,7 +567,7 @@ onMounted(() => {
               {{ event.startTime }}
               <template v-if="event.endTime">-{{ event.endTime }}</template>
               <span class="color-dot" :style="{ background: event.color }"></span>
-              
+
               <!-- Botones diferentes según el tipo de evento -->
               <template v-if="event.type === 'Cita'">
                 <button @click="openAppointmentEdit(event)" :class="styles['edit-btn']">
@@ -621,8 +621,8 @@ onMounted(() => {
             <div :class="styles['form-group']">
               <label>Paciente:</label>
               <div :class="styles['patient-search']">
-                <input 
-                  v-model="searchPatient" 
+                <input
+                  v-model="searchPatient"
                   @input="filterPatients"
                   @focus="onSearchFocus"
                   @blur="onSearchBlur"
@@ -631,8 +631,8 @@ onMounted(() => {
                 />
                 <!-- Mostrar dropdown solo si está activo Y hay texto de búsqueda -->
                 <div v-if="showPatientDropdown && searchPatient && searchPatient.length > 2 && filteredPatients.length > 0" :class="styles['patient-dropdown']">
-                  <div 
-                    v-for="patient in filteredPatients.slice(0, 5)" 
+                  <div
+                    v-for="patient in filteredPatients.slice(0, 5)"
                     :key="patient.id"
                     @mousedown="selectPatient(patient)"
                     :class="styles['patient-option']"
@@ -650,9 +650,9 @@ onMounted(() => {
             <!-- Fecha -->
             <div :class="styles['form-group']">
               <label>Fecha:</label>
-              <input 
-                v-model="editForm.date" 
-                type="date" 
+              <input
+                v-model="editForm.date"
+                type="date"
                 required
                 :class="styles['form-input']"
               />
@@ -661,9 +661,9 @@ onMounted(() => {
             <!-- Hora -->
             <div :class="styles['form-group']">
               <label>Hora:</label>
-              <input 
-                v-model="editForm.time" 
-                type="time" 
+              <input
+                v-model="editForm.time"
+                type="time"
                 required
                 :class="styles['form-input']"
               />
@@ -678,7 +678,7 @@ onMounted(() => {
                 </option>
               </select>
             </div>
-    
+
 
             <!-- Botones -->
             <div :class="styles['modal-actions']">

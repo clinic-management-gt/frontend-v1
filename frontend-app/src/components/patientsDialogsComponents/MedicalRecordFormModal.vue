@@ -107,8 +107,6 @@ function handleClose() {
 
 // Cargar datos del record cuando se abre en modo edición
 function loadRecordData() {
-  console.log('Cargando datos...', { isEditing: props.isEditing, record: props.record })
-
   if (props.isEditing && props.record) {
     // Acceder a los datos según la estructura del backend
     const record = props.record.medicalRecord || props.record
@@ -120,7 +118,6 @@ function loadRecordData() {
       notes: record.notes || ''
     }
 
-    console.log('Datos cargados:', formData.value)
   } else {
     // Resetear formulario para nuevo registro
     formData.value = {
@@ -129,13 +126,11 @@ function loadRecordData() {
       familyHistory: '',
       notes: ''
     }
-    console.log('Formulario reseteado para nuevo registro')
   }
 }
 
 // Manejar envío del formulario
 async function handleSubmit() {
-  console.log('Enviando formulario...', formData.value)
   isLoading.value = true
 
   try {
@@ -147,7 +142,6 @@ async function handleSubmit() {
       notes: formData.value.notes || null
     }
 
-    console.log('Datos a enviar:', dataToSend)
     emit('save', dataToSend)
   } catch (error) {
     console.error('Error al enviar formulario:', error)
@@ -158,7 +152,6 @@ async function handleSubmit() {
 
 // Observar cambios en props para cargar datos
 watch([() => props.isOpen, () => props.record], () => {
-  console.log('Props cambiaron:', { isOpen: props.isOpen, record: props.record })
   if (props.isOpen) {
     nextTick(() => {
       loadRecordData()
