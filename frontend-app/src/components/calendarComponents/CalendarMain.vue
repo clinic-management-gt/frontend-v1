@@ -1,7 +1,32 @@
 <script setup>
 import styles from './CalendarMain.module.css'
-import { ref , watch, nextTick, computed } from 'vue'
-import { onMounted } from 'vue'
+import { ref , watch, nextTick, computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import ComboBoxAutocompleteInputSearchPatient from '@/components/forms/ComboBoxAutocompleteInputSearchPatient.vue'
+import { usePatientsStore } from '@/stores/patientsStore'
+
+// Store para pacientes
+const patientsStore = usePatientsStore()
+const { allPatients } = storeToRefs(patientsStore)
+
+// Estado local para el paciente seleccionado
+const selectedPatientId = ref(null)
+
+// Función para manejar la selección de paciente
+function handlePatientSelection(patientId) {
+  selectedPatientId.value = patientId
+  if (patientId) {
+    // Aquí puedes agregar lógica adicional si necesitas hacer algo cuando se selecciona un paciente
+    console.log('Paciente seleccionado:', patientId)
+  }
+}
+
+// Cargar todos los pacientes al montar el componente
+onMounted(() => {
+  if (!allPatients.value || allPatients.value.length === 0) {
+    patientsStore.fetchAllPatients()
+  }
+})
 
 // Puedes cambiar esto cuando tengas tu componente real
 const PatientSearch = {
@@ -468,6 +493,8 @@ const showCreateModal = ref(false)
 const createForm = ref({
   patientId: '',
   patientName: '',
+  doctorId: '',
+  doctorName: '',
   date: '',
   time: '',
   status: 'Pendiente',
@@ -482,12 +509,16 @@ function openCreateAppointmentModal() {
   createForm.value = {
     patientId: '',
     patientName: '',
+    doctorId: '',
+    doctorName: '',
     date: today.toISOString().split('T')[0],
     time: '',
     status: 'Pendiente',
     notes: '',
     duration: 30
   }
+  selectedPatientId.value = null
+  selectedDoctorId.value = null
   searchPatient.value = ''
   showCreateModal.value = true
 }
@@ -497,6 +528,56 @@ function closeCreateModal() {
   showCreateModal.value = false
 }
 
+// Función para manejar la selección de paciente en el modal de creación
+function handlePatientSelectionCreate(patientId) {
+  selectedPatientId.value = patientId
+  if (patientId) {
+    // Buscar el paciente seleccionado en la lista
+    const patient = allPatients.value.find(p => p.id === patientId)
+    if (patient) {
+      createForm.value.patientId = patient.id
+      createForm.value.patientName = patient.name || `${patient.first_name} ${patient.last_name}`
+      console.log('Paciente seleccionado para cita:', patient)
+    }
+  }
+}
+
+// Añadir estados para doctores
+const doctors = ref([])
+const selectedDoctorId = ref(null)
+
+// Función para obtener doctores
+async function fetchDoctors() {
+  try {
+    const res = await fetch('http://localhost:9000/doctors')
+    if (!res.ok) throw new Error('Error al obtener doctores')
+    const data = await res.json()
+    doctors.value = data
+  } catch (e) {
+    console.error('Error al obtener doctores:', e)
+    // Datos de ejemplo en caso de error
+    doctors.value = [
+      { id: 1, name: 'Dr. Juan Pérez', specialty: 'Cardiología' },
+      { id: 2, name: 'Dra. María García', specialty: 'Pediatría' },
+      { id: 3, name: 'Dr. Carlos Rodríguez', specialty: 'Neurología' }
+    ]
+  }
+}
+
+// Función para manejar la selección de doctor
+function handleDoctorSelection(doctorId) {
+  selectedDoctorId.value = doctorId
+  if (doctorId) {
+    const doctor = doctors.value.find(d => d.id === doctorId)
+    if (doctor) {
+      createForm.value.doctorId = doctor.id
+      createForm.value.doctorName = doctor.name
+      console.log('Doctor seleccionado:', doctor)
+    }
+  }
+}
+
+// Función createAppointment actualizada
 async function createAppointment() {
   // Validaciones básicas
   if (!createForm.value.patientId) {
@@ -504,9 +585,20 @@ async function createAppointment() {
     return;
   }
 
+  if (!createForm.value.doctorId) {
+    alert('Debe seleccionar un doctor');
+    return;
+  }
+
+  if (!createForm.value.date || !createForm.value.time) {
+    alert('Debe seleccionar fecha y hora');
+    return;
+  }
+
   try {
     const appointmentData = {
       patientId: createForm.value.patientId,
+      doctorId: createForm.value.doctorId,
       date: `${createForm.value.date}T${createForm.value.time}:00`,
       duration: parseInt(createForm.value.duration),
       status: createForm.value.status,
@@ -545,6 +637,7 @@ async function createAppointment() {
 onMounted(() => {
   fetchAppointments()
   fetchPatients()
+  fetchDoctors()
 })
 </script>
 
@@ -796,34 +889,47 @@ onMounted(() => {
         </div>
 
         <div :class="styles['modal-body']">
-          <form @submit.prevent="saveAppointment">
-            <!-- Selector de paciente mejorado -->
+          <form @submit.prevent="createAppointment">
+            <!-- Selector de paciente -->
             <div :class="styles['form-group']">
               <label>Paciente:</label>
-              <div :class="styles['patient-search']">
-                <input 
-                  v-model="searchPatient" 
-                  @input="filterPatients"
-                  @focus="onSearchFocus"
-                  @blur="onSearchBlur"
-                  placeholder="Escriba para buscar paciente..."
-                  :class="styles['search-input']"
+              <div :class="styles['form-input-wrapper']">
+                <ComboBoxAutocompleteInputSearchPatient 
+                  :data="allPatients"
+                  v-model:currentSelected="selectedPatientId"
+                  @update:currentSelected="handlePatientSelectionCreate"
+                  placeholder="Buscar paciente..."
+                  :class="styles['form-input']"
+                  class="w-full"
                 />
-                <!-- Mostrar dropdown solo si está activo Y hay texto de búsqueda -->
-                <div v-if="showPatientDropdown && searchPatient && searchPatient.length > 2 && filteredPatients.length > 0" :class="styles['patient-dropdown']">
-                  <div 
-                    v-for="patient in filteredPatients.slice(0, 5)" 
-                    :key="patient.id"
-                    @mousedown="selectPatient(patient)"
-                    :class="styles['patient-option']"
-                  >
-                    <strong>{{ patient.name }}</strong>
-                    <span>{{ patient.email }}</span>
-                  </div>
-                  <div v-if="filteredPatients.length === 0" :class="styles['no-results']">
-                    No se encontraron pacientes
-                  </div>
-                </div>
+              </div>
+              <!-- Mostrar el paciente seleccionado -->
+              <div v-if="createForm.patientName" class="mt-2 text-sm text-gray-600">
+                Paciente seleccionado: <strong>{{ createForm.patientName }}</strong>
+              </div>
+            </div>
+
+            <!-- Selector de doctor -->
+            <div :class="styles['form-group']">
+              <label>Doctor:</label>
+              <select 
+                v-model="createForm.doctorId" 
+                @change="handleDoctorSelection(createForm.doctorId)"
+                :class="styles['form-select']"
+                required
+              >
+                <option value="">Seleccione un doctor...</option>
+                <option 
+                  v-for="doctor in doctors" 
+                  :key="doctor.id" 
+                  :value="doctor.id"
+                >
+                  {{ doctor.name }} - {{ doctor.specialty || 'Medicina General' }}
+                </option>
+              </select>
+              <!-- Mostrar el doctor seleccionado -->
+              <div v-if="createForm.doctorName" class="mt-2 text-sm text-gray-600">
+                Doctor seleccionado: <strong>{{ createForm.doctorName }}</strong>
               </div>
             </div>
 
@@ -849,6 +955,22 @@ onMounted(() => {
               />
             </div>
 
+            <!-- Duración -->
+            <div :class="styles['form-group']">
+              <label>Duración (minutos):</label>
+              <select 
+                v-model="createForm.duration" 
+                :class="styles['form-select']"
+              >
+                <option value="15">15 minutos</option>
+                <option value="30">30 minutos</option>
+                <option value="45">45 minutos</option>
+                <option value="60">1 hora</option>
+                <option value="90">1.5 horas</option>
+                <option value="120">2 horas</option>
+              </select>
+            </div>
+
             <!-- Estado -->
             <div :class="styles['form-group']">
               <label>Estado:</label>
@@ -859,6 +981,17 @@ onMounted(() => {
               </select>
             </div>
     
+
+            <!-- Notas -->
+            <div :class="styles['form-group']">
+              <label>Notas:</label>
+              <textarea 
+                v-model="createForm.notes" 
+                :class="styles['form-input']"
+                rows="3"
+                placeholder="Notas adicionales..."
+              ></textarea>
+            </div>
 
             <!-- Botones -->
             <div :class="styles['modal-actions']">
