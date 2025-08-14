@@ -1,7 +1,32 @@
 <script setup>
 import styles from './CalendarMain.module.css'
-import { ref , watch, nextTick, computed } from 'vue'
-import { onMounted } from 'vue'
+import { ref , watch, nextTick, computed, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import ComboBoxAutocompleteInputSearchPatient from '@/components/forms/ComboBoxAutocompleteInputSearchPatient.vue'
+import { usePatientsStore } from '@/stores/patientsStore'
+
+// Store para pacientes
+const patientsStore = usePatientsStore()
+const { allPatients } = storeToRefs(patientsStore)
+
+// Estado local para el paciente seleccionado
+const selectedPatientId = ref(null)
+
+// Función para manejar la selección de paciente
+function handlePatientSelection(patientId) {
+  selectedPatientId.value = patientId
+  if (patientId) {
+    // Aquí puedes agregar lógica adicional si necesitas hacer algo cuando se selecciona un paciente
+    console.log('Paciente seleccionado:', patientId)
+  }
+}
+
+// Cargar todos los pacientes al montar el componente
+onMounted(() => {
+  if (!allPatients.value || allPatients.value.length === 0) {
+    patientsStore.fetchAllPatients()
+  }
+})
 
 // Puedes cambiar esto cuando tengas tu componente real
 const PatientSearch = {
@@ -463,9 +488,156 @@ function openAppointmentEdit(event) {
   }
 }
 
+// Añade estos estados al script setup
+const showCreateModal = ref(false)
+const createForm = ref({
+  patientId: '',
+  patientName: '',
+  doctorId: '',
+  doctorName: '',
+  date: '',
+  time: '',
+  status: 'Pendiente',
+  notes: '',
+  duration: 60 // Duración predeterminada en minutos
+})
+
+// Función para abrir el modal de creación
+function openCreateAppointmentModal() {
+  // Establecer la fecha actual como valor predeterminado
+  const today = new Date()
+  createForm.value = {
+    patientId: '',
+    patientName: '',
+    doctorId: '',
+    doctorName: '',
+    date: today.toISOString().split('T')[0],
+    time: '',
+    status: 'Pendiente',
+    notes: '',
+    duration: 30
+  }
+  selectedPatientId.value = null
+  selectedDoctorId.value = null
+  searchPatient.value = ''
+  showCreateModal.value = true
+}
+
+// Función para cerrar el modal
+function closeCreateModal() {
+  showCreateModal.value = false
+}
+
+// Función para manejar la selección de paciente en el modal de creación
+function handlePatientSelectionCreate(patientId) {
+  selectedPatientId.value = patientId
+  if (patientId) {
+    // Buscar el paciente seleccionado en la lista
+    const patient = allPatients.value.find(p => p.id === patientId)
+    if (patient) {
+      createForm.value.patientId = patient.id
+      createForm.value.patientName = patient.name || `${patient.first_name} ${patient.last_name}`
+      console.log('Paciente seleccionado para cita:', patient)
+    }
+  }
+}
+
+// Añadir estados para doctores
+const doctors = ref([])
+const selectedDoctorId = ref(null)
+
+// Función para obtener doctores
+async function fetchDoctors() {
+  try {
+    const res = await fetch('http://localhost:9000/doctors')
+    if (!res.ok) throw new Error('Error al obtener doctores')
+    const data = await res.json()
+    doctors.value = data
+  } catch (e) {
+    console.error('Error al obtener doctores:', e)
+    // Datos de ejemplo en caso de error
+    doctors.value = [
+      { id: 1, name: 'Dr. Juan Pérez', specialty: 'Cardiología' },
+      { id: 2, name: 'Dra. María García', specialty: 'Pediatría' },
+      { id: 3, name: 'Dr. Carlos Rodríguez', specialty: 'Neurología' }
+    ]
+  }
+}
+
+// Función para manejar la selección de doctor
+function handleDoctorSelection(doctorId) {
+  selectedDoctorId.value = doctorId
+  if (doctorId) {
+    const doctor = doctors.value.find(d => d.id === doctorId)
+    if (doctor) {
+      createForm.value.doctorId = doctor.id
+      createForm.value.doctorName = doctor.name
+      console.log('Doctor seleccionado:', doctor)
+    }
+  }
+}
+
+// Función createAppointment actualizada
+async function createAppointment() {
+  // Validaciones básicas
+  if (!createForm.value.patientId) {
+    alert('Debe seleccionar un paciente');
+    return;
+  }
+
+  if (!createForm.value.doctorId) {
+    alert('Debe seleccionar un doctor');
+    return;
+  }
+
+  if (!createForm.value.date || !createForm.value.time) {
+    alert('Debe seleccionar fecha y hora');
+    return;
+  }
+
+  try {
+    const appointmentData = {
+      patientId: createForm.value.patientId,
+      doctorId: createForm.value.doctorId,
+      date: `${createForm.value.date}T${createForm.value.time}:00`,
+      duration: parseInt(createForm.value.duration),
+      status: createForm.value.status,
+      notes: createForm.value.notes
+    };
+
+    // Llamada al backend
+    const res = await fetch('http://localhost:9000/appointments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(appointmentData)
+    });
+
+    if (!res.ok) {
+      // Si hay un conflicto de horario, manejarlo específicamente
+      if (res.status === 409) {
+        const errorData = await res.json();
+        alert(`Error: ${errorData.message || 'Conflicto de horarios detectado'}`);
+        return;
+      }
+      throw new Error('Error al crear la cita');
+    }
+
+    // Respuesta exitosa
+    await fetchAppointments(); // Refrescar las citas
+    closeCreateModal();
+    alert('Cita creada exitosamente');
+  } catch (e) {
+    console.error('Error al crear la cita:', e);
+    alert('Error al crear la cita');
+  }
+}
+
 onMounted(() => {
   fetchAppointments()
   fetchPatients()
+  fetchDoctors()
 })
 </script>
 
@@ -536,12 +708,25 @@ onMounted(() => {
       </div>
     </div>
 
+
+ 
+
     <!-- Panel de actividades del día seleccionado -->
     <div v-if="selectedDayObj" ref="refDaySelectedAgenda" :class="styles['day-agenda-panel']">
-      <h3>
-        Agenda para el {{ selectedDayObj.day }}/{{ selectedDayObj.month + 1 }}/{{ selectedDayObj.year }}
-      </h3>
+      <div class="flex justify-between items-center mb-4">
+        
+        <h3>
+          Agenda para el {{ selectedDayObj.day }}/{{ selectedDayObj.month + 1 }}/{{ selectedDayObj.year }}
+        </h3>
 
+        <button 
+          @click="openCreateAppointmentModal" 
+            class="px-4 py-2  bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Crear Nueva Cita
+        </button>
+
+      </div>
       <ul>
         <li v-for="(event, i) in getEventsForDay(selectedDayObj)" :key="i">
           <template v-if="editingIndex === i">
@@ -586,8 +771,7 @@ onMounted(() => {
         </li>
       </ul>
 
-      <div :class="styles['agenda-forms']">
-        <!-- Pacientes fila -->
+      <!-- <div :class="styles['agenda-forms']">
         <form @submit.prevent="addPatientEvent" :class="styles['agenda-form']">
           <input v-model="selectedPatient" placeholder="Buscar o seleccionar paciente" required>
           <input v-model="patientStartTime" type="time" required>
@@ -596,7 +780,6 @@ onMounted(() => {
           <button type="submit">Añadir paciente</button>
         </form>
 
-        <!-- Actividad fila -->
         <form @submit.prevent="addActivityEvent" :class="styles['agenda-form']">
           <input v-model="activityText" placeholder="Actividad" required>
           <input v-model="activityStartTime" type="time" required>
@@ -604,7 +787,7 @@ onMounted(() => {
           <input v-model="activityColor" type="color" title="Color actividad" class="color-input">
           <button type="submit">Añadir actividad</button>
         </form>
-      </div>
+      </div> -->
     </div>
 
     <!-- Modal de edición de citas -->
@@ -689,6 +872,133 @@ onMounted(() => {
                 🗑️ Eliminar Cita
               </button>
               <button type="button" @click="closeEditModal" :class="styles['cancel-btn']">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para crear nueva cita -->
+    <div v-if="showCreateModal" :class="styles['modal-overlay']" @click="closeCreateModal">
+      <div :class="styles['modal-content']" @click.stop>
+        <div :class="styles['modal-header']">
+          <h3>Crear Nueva Cita</h3>
+          <button @click="closeCreateModal" :class="styles['close-btn']">&times;</button>
+        </div>
+
+        <div :class="styles['modal-body']">
+          <form @submit.prevent="createAppointment">
+            <!-- Selector de paciente -->
+            <div :class="styles['form-group']">
+              <label>Paciente:</label>
+              <div :class="styles['form-input-wrapper']">
+                <ComboBoxAutocompleteInputSearchPatient 
+                  :data="allPatients"
+                  v-model:currentSelected="selectedPatientId"
+                  @update:currentSelected="handlePatientSelectionCreate"
+                  placeholder="Buscar paciente..."
+                  :class="styles['form-input']"
+                  class="w-full"
+                />
+              </div>
+              <!-- Mostrar el paciente seleccionado -->
+              <div v-if="createForm.patientName" class="mt-2 text-sm text-gray-600">
+                Paciente seleccionado: <strong>{{ createForm.patientName }}</strong>
+              </div>
+            </div>
+
+            <!-- Selector de doctor -->
+            <div :class="styles['form-group']">
+              <label>Doctor:</label>
+              <select 
+                v-model="createForm.doctorId" 
+                @change="handleDoctorSelection(createForm.doctorId)"
+                :class="styles['form-select']"
+                required
+              >
+                <option value="">Seleccione un doctor...</option>
+                <option 
+                  v-for="doctor in doctors" 
+                  :key="doctor.id" 
+                  :value="doctor.id"
+                >
+                  {{ doctor.name }} - {{ doctor.specialty || 'Medicina General' }}
+                </option>
+              </select>
+              <!-- Mostrar el doctor seleccionado -->
+              <div v-if="createForm.doctorName" class="mt-2 text-sm text-gray-600">
+                Doctor seleccionado: <strong>{{ createForm.doctorName }}</strong>
+              </div>
+            </div>
+
+            <!-- Fecha -->
+            <div :class="styles['form-group']">
+              <label>Fecha:</label>
+              <input 
+                v-model="createForm.date" 
+                type="date" 
+                required
+                :class="styles['form-input']"
+              />
+            </div>
+
+            <!-- Hora -->
+            <div :class="styles['form-group']">
+              <label>Hora:</label>
+              <input 
+                v-model="createForm.time" 
+                type="time" 
+                required
+                :class="styles['form-input']"
+              />
+            </div>
+
+            <!-- Duración -->
+            <div :class="styles['form-group']">
+              <label>Duración (minutos):</label>
+              <select 
+                v-model="createForm.duration" 
+                :class="styles['form-select']"
+              >
+                <option value="15">15 minutos</option>
+                <option value="30">30 minutos</option>
+                <option value="45">45 minutos</option>
+                <option value="60">1 hora</option>
+                <option value="90">1.5 horas</option>
+                <option value="120">2 horas</option>
+              </select>
+            </div>
+
+            <!-- Estado -->
+            <div :class="styles['form-group']">
+              <label>Estado:</label>
+              <select v-model="createForm.status" :class="styles['form-select']">
+                <option v-for="status in appointmentStatuses" :key="status" :value="status">
+                  {{ status }}
+                </option>
+              </select>
+            </div>
+    
+
+            <!-- Notas -->
+            <div :class="styles['form-group']">
+              <label>Notas:</label>
+              <textarea 
+                v-model="createForm.notes" 
+                :class="styles['form-input']"
+                rows="3"
+                placeholder="Notas adicionales..."
+              ></textarea>
+            </div>
+
+            <!-- Botones -->
+            <div :class="styles['modal-actions']">
+              <button type="submit" :class="styles['save-btn']">
+                💾 Crear Cita
+              </button>
+              <button type="button" @click="closeCreateModal" :class="styles['cancel-btn']">
                 Cancelar
               </button>
             </div>
