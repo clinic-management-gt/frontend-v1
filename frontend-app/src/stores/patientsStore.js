@@ -107,8 +107,15 @@ export const usePatientsStore = defineStore('patients', () => {
   async function createMedicalRecord(patientId, recordData) {
     isLoadingMedicalRecords.value = true
     try {
-      const res = await instance.post(`/patients/${patientId}/medicalrecords`, recordData)
+      console.log(`➕ Creando medical record para paciente ${patientId} con datos:`, recordData)
+      // Asegurar que el PatientId esté en los datos (backend espera PascalCase)
+      const dataToSend = { ...recordData, PatientId: patientId }
+      const res = await instance.post(`/medicalrecords`, dataToSend)
+      console.log('✅ Medical record creado:', res.data)
       return res.data
+    } catch (error) {
+      console.error('❌ Error en createMedicalRecord:', error.response?.data || error.message)
+      throw error
     } finally {
       isLoadingMedicalRecords.value = false
     }
@@ -118,9 +125,20 @@ export const usePatientsStore = defineStore('patients', () => {
   async function updateMedicalRecord(recordId, recordData) {
     isLoadingMedicalRecords.value = true
     try {
-      const patientId = currentPatientSelectedId.value || 1
-      const res = await instance.patch(`/patients/${patientId}/medicalrecords/${recordId}`, recordData)
+      console.log(`🔄 Actualizando medical record ${recordId} con datos:`, recordData)
+      console.log('🔍 URL de la petición:', `/medicalrecords/${recordId}`)
+      console.log('🔍 Tipo de petición: PATCH')
+      const res = await instance.patch(`/medicalrecords/${recordId}`, recordData)
+      console.log('✅ Respuesta del servidor:', res.data)
       return res.data
+    } catch (error) {
+      console.error('❌ Error en updateMedicalRecord:', error.response?.data || error.message)
+      console.error('❌ Status del error:', error.response?.status)
+      console.error('❌ Config de axios:', error.config)
+      if (error.response?.data?.errors) {
+        console.error('❌ Validation errors detallados:', error.response.data.errors)
+      }
+      throw error
     } finally {
       isLoadingMedicalRecords.value = false
     }
@@ -130,9 +148,13 @@ export const usePatientsStore = defineStore('patients', () => {
   async function deleteMedicalRecord(recordId) {
     isLoadingMedicalRecords.value = true
     try {
-      const patientId = currentPatientSelectedId.value || 1
-      await instance.delete(`/patients/${patientId}/medicalrecords/${recordId}`)
+      console.log(`🗑️ Eliminando medical record ${recordId}`)
+      await instance.delete(`/medicalrecords/${recordId}`)
+      console.log('✅ Medical record eliminado')
       return true
+    } catch (error) {
+      console.error('❌ Error en deleteMedicalRecord:', error.response?.data || error.message)
+      throw error
     } finally {
       isLoadingMedicalRecords.value = false
     }
@@ -146,6 +168,45 @@ export const usePatientsStore = defineStore('patients', () => {
     } finally {
       isLoadingMedicalRecords.value = false
     }
+  }
+
+  // === FUNCIONES PARA RECETAS ===
+  async function fetchRecipe(recipeId) {
+    isLoadingMedicalRecords.value = true
+    try {
+      const res = await instance.get(`/recipes/${recipeId}`)
+      return res.data
+    } finally {
+      isLoadingMedicalRecords.value = false
+    }
+  }
+
+  async function updateRecipe(recipeId, recipeData) {
+    isLoadingMedicalRecords.value = true
+    try {
+      const res = await instance.patch(`/recipes/${recipeId}`, recipeData)
+      return res.data
+    } finally {
+      isLoadingMedicalRecords.value = false
+    }
+  }
+
+  async function createRecipe(recipeData) {
+    isLoadingMedicalRecords.value = true
+    try {
+      const res = await instance.post(`/recipes`, recipeData)
+      return res.data
+    } finally {
+      isLoadingMedicalRecords.value = false
+    }
+  }
+
+  function clearFullRecord() {
+    fullRecord.value = null
+  }
+
+  function clearFullRecord() {
+    fullRecord.value = null
   }
 
 
@@ -178,6 +239,11 @@ export const usePatientsStore = defineStore('patients', () => {
     updateMedicalRecord,
     deleteMedicalRecord,
     fetchMedicalRecordDetails,
+    // recipe actions
+    fetchRecipe,
+    updateRecipe,
+    createRecipe,
+    clearFullRecord,
   }
 }, {
   persist: {

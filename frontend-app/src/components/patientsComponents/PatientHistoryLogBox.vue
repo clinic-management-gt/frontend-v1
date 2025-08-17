@@ -87,8 +87,25 @@
       @close="closeHistoryLogModals" @view-recipe="handleViewRecipe" @edit="editRecord" />
 
     <!-- Modal de formulario -->
-    <medical-record-form-modal v-if="showFormModal" :is-open="showFormModal"
-      :patient-id="currentPatientSelectedId || props.patientId"  @close="closeHistoryLogModals" @save="handleSaveRecord" />
+    <medical-record-form-modal 
+      v-if="showFormModal" 
+      :is-open="showFormModal"
+      :patient-id="currentPatientSelectedId || props.patientId"
+      :record="selectedRecordForEdit"
+      :is-editing="isEditing"
+      @close="closeHistoryLogModals" 
+      @save="handleSaveRecord" 
+    />
+
+    <!-- Modal de formulario de recetas -->
+    <recipe-form-modal 
+      v-if="showRecipeFormModal" 
+      :is-open="showRecipeFormModal"
+      :recipe="selectedRecipeForEdit"
+      :is-editing="isEditingRecipe"
+      @close="closeHistoryLogModals" 
+      @save="handleSaveRecipe" 
+    />
   </div>
 </template>
 
@@ -105,6 +122,7 @@ import PrimaryButton from '@components/forms/PrimaryButton.vue'
 import Panel from '@components/forms/Panel.vue'
 import ConsultationDetailsModal from '../patientsDialogsComponents/ConsultationDetailsModal.vue'
 import MedicalRecordFormModal from '../patientsDialogsComponents/MedicalRecordFormModal.vue'
+import RecipeFormModal from '../patientsDialogsComponents/RecipeFormModal.vue'
 
 const props = defineProps({
   patientId: {
@@ -119,7 +137,7 @@ const emit = defineEmits(['view-recipe'])
 const patientsStore = usePatientsStore()
 const { currentPatientMedicalRecords, isLoadingMedicalRecords, currentPatientSelectedId } = storeToRefs(patientsStore)
 const patientsLogicStore = usePatientsLogicStore()
-const {showFormModal, showDetailsModal, selectedRecord, selectedRecordForEdit, isEditing} = storeToRefs(patientsLogicStore)
+const {showFormModal, showDetailsModal, showRecipeFormModal, selectedRecord, selectedRecordForEdit, selectedRecipeForEdit, isEditing, isEditingRecipe} = storeToRefs(patientsLogicStore)
 const { openRecordDetailsDialog, openCreateModal, closeHistoryLogModals } = patientsLogicStore
 // Estados locales
 const itemsPerPage = ref(10)
@@ -140,14 +158,14 @@ const paginatedRecords = computed(() => {
 
 async function editRecord(record) {
   try {
-    console.log('Editando registro:', record)
+    console.log('✏️ Editando registro:', record)
 
     // Usar el registro actual directamente (ya tiene los datos necesarios)
     selectedRecordForEdit.value = record
     isEditing.value = true
     showFormModal.value = true
 
-    console.log('Estados del modal:', {
+    console.log('📋 Estados del modal:', {
       showFormModal: showFormModal.value,
       isEditing: isEditing.value,
       selectedRecordForEdit: selectedRecordForEdit.value
@@ -156,7 +174,7 @@ async function editRecord(record) {
     // Cerrar modal de detalles si está abierto
     showDetailsModal.value = false
   } catch (error) {
-    console.error('Error al preparar edición:', error)
+    console.error('❌ Error al preparar edición:', error)
     alert('Error al abrir el formulario de edición')
   }
 }
@@ -216,6 +234,28 @@ async function handleSaveRecord(formData) {
     console.error('❌ Error al guardar registro:', error)
     console.error('📋 Detalles del error:', error.response?.data || error.message)
     alert('Error al guardar el registro: ' + (error.message || 'Error desconocido'))
+  }
+}
+
+async function handleSaveRecipe(recipeData) {
+  try {
+    console.log('💊 Guardando receta:', recipeData)
+    
+    if (isEditingRecipe.value && selectedRecipeForEdit.value) {
+      await patientsStore.updateRecipe(selectedRecipeForEdit.value.id, recipeData)
+      alert('Receta actualizada correctamente')
+    } else {
+      await patientsStore.createRecipe(recipeData)
+      alert('Receta creada correctamente')
+    }
+    
+    // Cerrar modal y recargar datos
+    closeHistoryLogModals()
+    await patientsStore.fetchPatientMedicalRecords(props.patientId)
+    
+  } catch (error) {
+    console.error('❌ Error al guardar receta:', error)
+    alert('Error al guardar la receta: ' + (error.message || 'Error desconocido'))
   }
 }
 

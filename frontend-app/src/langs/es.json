@@ -50,7 +50,11 @@
     "completed": "Completado",
     "pending": "Pendiente",
     "canceled": "Cancelado",
-    "waiting": "En espera"
+    "waiting": "En espera",
+    "Éxito": "Éxito",
+    "Advertencia": "Advertencia",
+    "Registro médico actualizado exitosamente": "Registro médico actualizado exitosamente",
+    "Registro médico creado exitosamente": "Registro médico creado exitosamente"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -140,7 +144,15 @@
     "exam-results": "Resultados del examen",
     "add-recipe": "Agregar receta",
     "recipe": "Receta",
-    "prescription": "Prescripción"
+    "prescription": "Prescripción",
+    "weight-kg": "Peso (kg)",
+    "height-cm": "Altura (cm)",
+    "family-background": "Antecedentes familiares",
+    "evolution-note-detail": "Notas de evolución",
+    "Peso (kg)": "Peso (kg)",
+    "Altura (cm)": "Altura (cm)",
+    "Antecedentes familiares": "Antecedentes familiares",
+    "Notas de evolución": "Notas de evolución"
   },
   "graph": {
     "graph": "Graficar"
@@ -173,5 +185,15 @@
   "http-errors": {
     "unknown-error": "Error desconocido",
     "unknown-error-message": "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo."
+  },
+  "notifications": {
+    "Error": "Error",
+    "Error al actualizar el registro": "Error al actualizar el registro",
+    "Registro actualizado exitosamente": "Registro actualizado exitosamente",
+    "Error al crear el registro": "Error al crear el registro",
+    "Registro creado exitosamente": "Registro creado exitosamente",
+    "Éxito": "Éxito",
+    "Registro médico actualizado exitosamente": "Registro médico actualizado exitosamente",
+    "Registro médico creado exitosamente": "Registro médico creado exitosamente"
   }
 }

@@ -6,7 +6,7 @@
     <!-- Input -->
     <div class="relative w-full">
       <input :id="name" :name="name" :type="type" :placeholder="$t(inputPlaceholder)"
-        v-model="value" @blur="handleBlur" :required="required" :class="[
+        :value="modelValue" @input="handleInput" @blur="handleBlur" :required="required" :class="[
           'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow ring-1 ring-inset sm:text-sm sm:leading-6 px-2',
           ringColorClass,
           focusOutlineClass
@@ -22,7 +22,7 @@ import CustomLabel from './CustomLabel.vue'
 
 const props = defineProps({
   modelValue: {
-    type: String,
+    type: [String, Number],
     default: ''
   },
   name: {
@@ -55,7 +55,14 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['update:modelValue'])
+
 const { value, errorMessage, handleChange, handleBlur } = useField(props.name)
+
+const handleInput = (event) => {
+  const inputValue = event.target.value
+  emit('update:modelValue', inputValue)
+}
 
 const ringColorClass = computed(() => {
   switch (props.inputColor) {

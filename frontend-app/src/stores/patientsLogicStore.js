@@ -10,10 +10,13 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
      const showCreateFormDialog = ref(false)
      const showDetailsModal = ref(false)
      const showFormModal = ref(false)
+     const showRecipeFormModal = ref(false)
      const isEditing = ref(false)
+     const isEditingRecipe = ref(false)
 
      const selectedRecord = ref(null)
      const selectedRecordForEdit = ref(null)
+     const selectedRecipeForEdit = ref(null)
      const fullRecord = ref(null)
 
 
@@ -44,12 +47,28 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
         isEditing.value = false
         showFormModal.value = true
      }
+     
+     function openEditModal(record) {
+        selectedRecordForEdit.value = record
+        isEditing.value = true
+        showFormModal.value = true
+     }
+
+     function openRecipeFormModal(recipe = null) {
+        selectedRecipeForEdit.value = recipe
+        isEditingRecipe.value = !!recipe
+        showRecipeFormModal.value = true
+     }
+
      function closeHistoryLogModals() {
         showDetailsModal.value = false
         selectedRecord.value = null
         showFormModal.value = false
         selectedRecordForEdit.value = null
         isEditing.value = false
+        showRecipeFormModal.value = false
+        selectedRecipeForEdit.value = null
+        isEditingRecipe.value = false
      }
      function closeAllPatientDialog() {
           showCreateFormDialog.value = false
@@ -69,9 +88,12 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
           showCreateFormDialog,
           showFormModal,
           showDetailsModal,
+          showRecipeFormModal,
           selectedRecord,
           selectedRecordForEdit,
+          selectedRecipeForEdit,
           isEditing,
+          isEditingRecipe,
           fullRecord,
           openDataSheetPatientDialog,
           openCreateNewPatientRecordDialog,
@@ -81,6 +103,8 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
           openCreateFormDialog,
           openRecordDetailsDialog,
           openCreateModal,
+          openEditModal,
+          openRecipeFormModal,
           closeAllPatientDialog,
           closeHistoryLogModals,
      }
