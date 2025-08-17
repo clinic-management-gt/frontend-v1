@@ -227,7 +227,7 @@ import { usePatientsStore } from '@stores/patientsStore'
 import { usePatientsLogicStore } from '../../stores/patientsLogicStore'
 import { storeToRefs } from 'pinia'
 
-import { formatDate } from '@/utils/dateUtils.js'
+import { formatDate } from '@/utils/isoFormatDate.js'
 
 import PrimaryButton from '@components/forms/PrimaryButton.vue'
 import GeneralDialogModal from '@components/forms/GeneralDialogModal.vue'
