@@ -119,7 +119,6 @@ function loadRecipeData() {
 // Manejar envío del formulario
 async function handleSubmit() {
   if (!formData.value.prescription.trim()) {
-    notificationStore.addNotification('error', 'Error', 'La prescripción es requerida')
     return
   }
 
@@ -145,11 +144,7 @@ async function handleSubmit() {
     handleClose()
   } catch (error) {
     console.error('Error al procesar receta:', error)
-    notificationStore.addNotification(
-      'error',
-      'Error',
-      props.isEditing ? 'Error al actualizar la receta' : 'Error al crear la receta'
-    )
+    // Las notificaciones de error las maneja axios interceptor
   } finally {
     isLoading.value = false
   }
