@@ -136,11 +136,6 @@ async function handleSubmit() {
       result = await updateRecipe(props.recipe.id, dataToSend)
       notificationStore.addNotification('success', 'Éxito', 'Receta actualizada exitosamente')
     } else {
-      // Crear nueva receta (necesitaríamos el treatmentId)
-      if (!props.treatmentId) {
-        notificationStore.addNotification('error', 'Error', 'ID de tratamiento requerido para crear receta')
-        return
-      }
       dataToSend.treatmentId = props.treatmentId
       result = await createRecipe(dataToSend)
       notificationStore.addNotification('success', 'Éxito', 'Receta creada exitosamente')

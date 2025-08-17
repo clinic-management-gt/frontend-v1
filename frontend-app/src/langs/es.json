@@ -51,10 +51,10 @@
     "pending": "Pendiente",
     "canceled": "Cancelado",
     "waiting": "En espera",
-    "Éxito": "Éxito",
-    "Advertencia": "Advertencia",
-    "Registro médico actualizado exitosamente": "Registro médico actualizado exitosamente",
-    "Registro médico creado exitosamente": "Registro médico creado exitosamente"
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "medical-record-updated-successfully": "Registro médico actualizado exitosamente",
+    "medical-record-created-successfully": "Registro médico creado exitosamente"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -149,10 +149,10 @@
     "height-cm": "Altura (cm)",
     "family-background": "Antecedentes familiares",
     "evolution-note-detail": "Notas de evolución",
-    "Peso (kg)": "Peso (kg)",
-    "Altura (cm)": "Altura (cm)",
-    "Antecedentes familiares": "Antecedentes familiares",
-    "Notas de evolución": "Notas de evolución"
+    "weight-kg-label": "Peso (kg)",
+    "height-cm-label": "Altura (cm)",
+    "family-background-label": "Antecedentes familiares",
+    "evolution-notes-label": "Notas de evolución"
   },
   "graph": {
     "graph": "Graficar"
@@ -187,13 +187,13 @@
     "unknown-error-message": "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo."
   },
   "notifications": {
-    "Error": "Error",
-    "Error al actualizar el registro": "Error al actualizar el registro",
-    "Registro actualizado exitosamente": "Registro actualizado exitosamente",
-    "Error al crear el registro": "Error al crear el registro",
-    "Registro creado exitosamente": "Registro creado exitosamente",
-    "Éxito": "Éxito",
-    "Registro médico actualizado exitosamente": "Registro médico actualizado exitosamente",
-    "Registro médico creado exitosamente": "Registro médico creado exitosamente"
+    "error": "Error",
+    "error-updating-record": "Error al actualizar el registro",
+    "record-updated-successfully": "Registro actualizado exitosamente",
+    "error-creating-record": "Error al crear el registro",
+    "record-created-successfully": "Registro creado exitosamente",
+    "success": "Éxito",
+    "medical-record-updated-successfully": "Registro médico actualizado exitosamente",
+    "medical-record-created-successfully": "Registro médico creado exitosamente"
   }
 }

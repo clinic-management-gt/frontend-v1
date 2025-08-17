@@ -5,7 +5,7 @@
       <div class="flex justify-between items-center px-6 py-2 border-b">
         <div>
           <h2 class="text-2xl font-bold ">{{ $t('patients.consult-detail') }}</h2>
-          <p class=" text-opacity-90 mt-1">{{ formatRecordDate(displayRecord?.createdAt) }}</p>
+          <p class=" text-opacity-90 mt-1">{{ formatDate(displayRecord?.createdAt) }}</p>
         </div>
         <button @click="handleClose" class="text-black hover:text-gray-400 text-3xl font-bold leading-none">×</button>
       </div>
@@ -27,7 +27,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <span class="text-sm text-gray-600 font-semibold">{{ $t('general.date') }}:</span>
-                <p class="text-gray-800 font-medium">{{ formatRecordDate(displayRecord.createdAt) }}</p>
+                <p class="text-gray-800 font-medium">{{ formatDate(displayRecord.createdAt) }}</p>
               </div>
               <div v-if="displayRecord.patient">
                 <span class="text-sm text-gray-600 font-semibold">{{ $t('general.patient') }}:</span>
@@ -108,14 +108,14 @@
             <div v-if="displayRecord.recipes && displayRecord.recipes.length > 0" class="space-y-3">
               <div v-for="recipe in displayRecord.recipes" :key="recipe.id" class="bg-white rounded-lg p-4 border relative">
                 <button
-                  @click="editRecipe(recipe)"
+                  @click="openRecipeFormModal(recipe)"
                   class="absolute top-3 right-3 px-2 py-1 text-green-600 hover:text-green-800 text-sm font-medium rounded flex items-center gap-1"
                   title="Editar receta"
                 >
                   ✏️ Editar
                 </button>
                 <div class="text-sm text-gray-600 mb-2 font-semibold pr-16">
-                  📅 {{ formatRecordDate(recipe.createdAt) }}
+                  📅 {{ formatDate(recipe.createdAt) }}
                 </div>
                 <div class="bg-gray-50 rounded p-3 mb-3">
                   <pre class="text-gray-800 text-sm whitespace-pre-wrap font-mono">{{ recipe.prescription }}</pre>
@@ -146,7 +146,7 @@
                 <div class="flex justify-between items-start mb-2">
                   <h4 class="font-bold text-gray-800">{{ exam.exam?.name || exam.name || 'Examen' }}</h4>
                   <span class="text-xs px-2 py-1 rounded-full text-white font-semibold" style="background-color: #F4A261;">
-                    {{ formatRecordDate(exam.createdAt) }}
+                    {{ formatDate(exam.createdAt) }}
                   </span>
                 </div>
                 <div v-if="exam.exam?.description" class="text-sm text-gray-600 mb-2">
@@ -171,7 +171,7 @@
                 <div class="flex justify-between items-start mb-2">
                   <h4 class="font-bold text-gray-800">{{ treatment.medicine?.name || 'Medicamento' }}</h4>
                   <span class="text-xs px-2 py-1 rounded-full text-white font-semibold" style="background-color: #48C9B0;">
-                    {{ formatRecordDate(treatment.createdAt) }}
+                    {{ formatDate(treatment.createdAt) }}
                   </span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-2">
@@ -227,6 +227,8 @@ import { usePatientsStore } from '@stores/patientsStore'
 import { usePatientsLogicStore } from '../../stores/patientsLogicStore'
 import { storeToRefs } from 'pinia'
 
+import { formatDate } from '@/utils/dateUtils.js'
+
 import PrimaryButton from '@components/forms/PrimaryButton.vue'
 import GeneralDialogModal from '@components/forms/GeneralDialogModal.vue'
 
@@ -242,7 +244,7 @@ const { fullRecord, isLoadingMedicalRecords, hasError } = storeToRefs(patientsSt
 
 const patientsLogicStore = usePatientsLogicStore()
 const { selectedRecord } = storeToRefs(patientsLogicStore)
-const { closeHistoryLogModals, openEditModal, openRecipeFormModal } = patientsLogicStore
+const { closeHistoryLogModals, openMedicalRecordEditModal, openRecipeFormModal } = patientsLogicStore
 
 const handleClose = () => {
   closeHistoryLogModals()
@@ -278,13 +280,8 @@ function editEvolutionNote() {
   handleClose()
   // Luego abrir modal de edición de medical record
   nextTick(() => {
-    openEditModal(displayRecord.value)
+    openMedicalRecordEditModal(displayRecord.value)
   })
-}
-
-function editRecipe(recipe) {
-  // Abrir modal de edición de receta
-  openRecipeFormModal(recipe)
 }
 
 function viewFullRecipe(recipe) {
