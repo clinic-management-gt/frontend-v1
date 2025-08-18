@@ -20,7 +20,7 @@
               <div class="flex items-center gap-2 mb-1">
                 <div class="w-3 h-3 rounded-full" style="background-color: var(--primary-color);"></div>
                 <p class="text-lg font-bold text-gray-800">
-                  {{ formatRecordDate(item.createdAt) }}
+                  {{ formatDateShort(item.createdAt) }}
                 </p>
               </div>
               <p v-if="item.diagnosis" class="text-sm text-gray-600 ml-5">
@@ -34,7 +34,7 @@
                 @click.stop="openRecordDetailsDialog(item)"  />
 
               <action-button-solid-icon icon="PencilIcon" size="h-8 w-8"  color="text-patient-page-color"
-                @click.stop="editRecord(item)"  />
+                @click.stop="openMedicalRecordEditModal(item)"  />
 
               <action-button-solid-icon icon="TrashIcon" size="h-8 w-8"  color="text-red-600"
                 @click.stop="deleteRecord(item)"  />
@@ -84,11 +84,28 @@
     <!-- Modal de detalles -->
     <consultation-details-modal
       v-if="showDetailsModal" :record="selectedRecord" :is-open="showDetailsModal"
-      @close="closeHistoryLogModals" @view-recipe="handleViewRecipe" @edit="editRecord" />
+      @close="closeHistoryLogModals" @view-recipe="handleViewRecipe" @edit="openMedicalRecordEditModal" />
 
     <!-- Modal de formulario -->
-    <medical-record-form-modal v-if="showFormModal" :is-open="showFormModal"
-      :patient-id="currentPatientSelectedId || props.patientId"  @close="closeHistoryLogModals" @save="handleSaveRecord" />
+    <medical-record-form-modal 
+      v-if="showFormModal" 
+      :is-open="showFormModal"
+      :patient-id="currentPatientSelectedId || props.patientId"
+      :record="selectedRecordForEdit"
+      :is-editing="isEditing"
+      @close="closeHistoryLogModals" 
+      @save="(formData) => handleMedicalRecordSave(formData, props.patientId)" 
+    />
+
+    <!-- Modal de formulario de recetas -->
+    <recipe-form-modal 
+      v-if="showRecipeFormModal" 
+      :is-open="showRecipeFormModal"
+      :recipe="selectedRecipeForEdit"
+      :is-editing="isEditingRecipe"
+      @close="closeHistoryLogModals" 
+      @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)" 
+    />
   </div>
 </template>
 
@@ -105,6 +122,7 @@ import PrimaryButton from '@components/forms/PrimaryButton.vue'
 import Panel from '@components/forms/Panel.vue'
 import ConsultationDetailsModal from '../patientsDialogsComponents/ConsultationDetailsModal.vue'
 import MedicalRecordFormModal from '../patientsDialogsComponents/MedicalRecordFormModal.vue'
+import { formatDateShort } from '@/utils/isoFormatDate.js'
 
 const props = defineProps({
   patientId: {
@@ -119,8 +137,8 @@ const emit = defineEmits(['view-recipe'])
 const patientsStore = usePatientsStore()
 const { currentPatientMedicalRecords, isLoadingMedicalRecords, currentPatientSelectedId } = storeToRefs(patientsStore)
 const patientsLogicStore = usePatientsLogicStore()
-const {showFormModal, showDetailsModal, selectedRecord, selectedRecordForEdit, isEditing} = storeToRefs(patientsLogicStore)
-const { openRecordDetailsDialog, openCreateModal, closeHistoryLogModals } = patientsLogicStore
+const {showFormModal, showDetailsModal, showRecipeFormModal, selectedRecord, selectedRecordForEdit, selectedRecipeForEdit, isEditing, isEditingRecipe} = storeToRefs(patientsLogicStore)
+const { openRecordDetailsDialog, openCreateModal, closeHistoryLogModals, openMedicalRecordEditModal, handleMedicalRecordSave, handleRecipeSave } = patientsLogicStore
 // Estados locales
 const itemsPerPage = ref(10)
 const currentPage = ref(1)
@@ -137,87 +155,6 @@ const paginatedRecords = computed(() => {
   return records.slice(start, end)
 })
 
-
-async function editRecord(record) {
-  try {
-    console.log('Editando registro:', record)
-
-    // Usar el registro actual directamente (ya tiene los datos necesarios)
-    selectedRecordForEdit.value = record
-    isEditing.value = true
-    showFormModal.value = true
-
-    console.log('Estados del modal:', {
-      showFormModal: showFormModal.value,
-      isEditing: isEditing.value,
-      selectedRecordForEdit: selectedRecordForEdit.value
-    })
-
-    // Cerrar modal de detalles si está abierto
-    showDetailsModal.value = false
-  } catch (error) {
-    console.error('Error al preparar edición:', error)
-    alert('Error al abrir el formulario de edición')
-  }
-}
-
-async function handleSaveRecord(formData) {
-  try {
-    console.log('💾 Guardando registro:', formData)
-    console.log('🔍 Estado isEditing:', isEditing.value)
-    console.log('👤 Patient ID:', props.patientId)
-
-    // Verificar si viene en el nuevo formato (con medicalRecord y recipe separados)
-    const isNewFormat = formData.medicalRecord || formData.recipe
-    
-    if (isNewFormat) {
-      // NUEVO FORMATO: Manejar medical record y recipe por separado
-      console.log('📋 Usando nuevo formato unificado')
-      
-      // 1. Manejar Medical Record
-      if (formData.medicalRecord) {
-        if (isEditing.value && selectedRecordForEdit.value) {
-          console.log('✏️ Actualizando medical record ID:', selectedRecordForEdit.value.id)
-          await patientsStore.updateMedicalRecord(selectedRecordForEdit.value.id, formData.medicalRecord)
-        } else {
-          console.log('➕ Creando nuevo medical record para paciente:', props.patientId)
-          await patientsStore.createMedicalRecord(props.patientId, formData.medicalRecord)
-        }
-      }
-      
-      // 2. Manejar Recipe si existe
-      if (formData.recipe) {
-        console.log('💊 Procesando receta médica...')
-        // Aquí agregamos lógica para recipes cuando esté lista
-      }
-      
-    } else {
-      // FORMATO ACTUAL: Mantener compatibilidad
-      console.log('📋 Usando formato actual (solo medical record)')
-      
-      if (isEditing.value && selectedRecordForEdit.value) {
-        console.log('✏️ Actualizando registro ID:', selectedRecordForEdit.value.id)
-        await patientsStore.updateMedicalRecord(selectedRecordForEdit.value.id, formData)
-      } else {
-        console.log('➕ Creando nuevo registro para paciente:', props.patientId)
-        await patientsStore.createMedicalRecord(props.patientId, formData)
-      }
-    }
-
-    console.log('✅ Registro guardado exitosamente')
-    
-    // Cerrar modal y recargar datos
-    closeHistoryLogModals()
-    await patientsStore.fetchPatientMedicalRecords(props.patientId)
-
-    alert(isEditing.value ? 'Registro actualizado correctamente' : 'Registro creado correctamente')
-    
-  } catch (error) {
-    console.error('❌ Error al guardar registro:', error)
-    console.error('📋 Detalles del error:', error.response?.data || error.message)
-    alert('Error al guardar el registro: ' + (error.message || 'Error desconocido'))
-  }
-}
 
 async function deleteRecord(record) {
   if (!confirm('¿Estás seguro de que deseas eliminar este registro médico?')) return
@@ -250,20 +187,6 @@ function goToPreviousPage() {
 }
 function goToNextPage() {
   if (currentPage.value < totalPages.value) currentPage.value++
-}
-
-function formatRecordDate(dateString) {
-  if (!dateString) return 'Fecha no disponible'
-
-  try {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  } catch (error) {
-    return 'Fecha inválida'
-  }
 }
 
 // Cargar datos al montar el componente

@@ -5,7 +5,7 @@
       <div class="flex justify-between items-center px-6 py-2 border-b">
         <div>
           <h2 class="text-2xl font-bold ">{{ $t('patients.consult-detail') }}</h2>
-          <p class=" text-opacity-90 mt-1">{{ formatRecordDate(displayRecord?.createdAt) }}</p>
+          <p class=" text-opacity-90 mt-1">{{ formatDate(displayRecord?.createdAt) }}</p>
         </div>
         <button @click="handleClose" class="text-black hover:text-gray-400 text-3xl font-bold leading-none">×</button>
       </div>
@@ -27,7 +27,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <span class="text-sm text-gray-600 font-semibold">{{ $t('general.date') }}:</span>
-                <p class="text-gray-800 font-medium">{{ formatRecordDate(displayRecord.createdAt) }}</p>
+                <p class="text-gray-800 font-medium">{{ formatDate(displayRecord.createdAt) }}</p>
               </div>
               <div v-if="displayRecord.patient">
                 <span class="text-sm text-gray-600 font-semibold">{{ $t('general.patient') }}:</span>
@@ -67,18 +67,29 @@
 
           <!-- Nota de evolución -->
           <div class="bg-gray-100 rounded-lg p-4">
-            <div class="flex items-center mb-3">
-              <div class="w-4 h-4 rounded-full mr-2" style="background-color: #489FB5;"></div>
-              <h3 class="text-lg font-bold text-gray-800">{{ $t('patients.evolution-note') }}</h3>
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center">
+                <div class="w-4 h-4 rounded-full mr-2" style="background-color: #489FB5;"></div>
+                <h3 class="text-lg font-bold text-gray-800">{{ $t('patients.evolution-note') }}</h3>
+              </div>
+              <button
+                @click="editEvolutionNote"
+                class="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm font-medium rounded flex items-center gap-1"
+              >
+                ✏️ {{ $t('general.edit') }}
+              </button>
             </div>
             <div v-if="displayRecord.notes && displayRecord.notes.trim()" class="bg-white rounded p-3 border-l-4" style="border-color: #489FB5;">
               <p class="text-gray-800 whitespace-pre-line">{{ displayRecord.notes }}</p>
+            </div>
+            <div v-else-if="displayRecord.medicalRecord?.notes && displayRecord.medicalRecord.notes.trim()" class="bg-white rounded p-3 border-l-4" style="border-color: #489FB5;">
+              <p class="text-gray-800 whitespace-pre-line">{{ displayRecord.medicalRecord.notes }}</p>
             </div>
             <div v-else class="text-center py-6">
               <div class="text-gray-400 text-4xl mb-2">📝</div>
               <p class="text-gray-500">{{ $t('patients.no-evolution-note') }}</p>
               <button
-                @click="editRecord"
+                @click="editEvolutionNote"
                 class="mt-3 px-4 py-2 text-blue-600 hover:text-blue-800 font-medium"
               >
                 ✏️ {{ $t('general.edit') }}
@@ -88,14 +99,23 @@
 
           <!-- Recetas médicas -->
           <div class="bg-gray-100 rounded-lg p-4">
-            <div class="flex items-center mb-3">
-              <div class="w-4 h-4 rounded-full mr-2" style="background-color: var(--primary-color);"></div>
-              <h3 class="text-lg font-bold text-gray-800">{{ $t('patients.medical-recipe') }}</h3>
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center">
+                <div class="w-4 h-4 rounded-full mr-2" style="background-color: var(--primary-color);"></div>
+                <h3 class="text-lg font-bold text-gray-800">{{ $t('patients.medical-recipe') }}</h3>
+              </div>
             </div>
             <div v-if="displayRecord.recipes && displayRecord.recipes.length > 0" class="space-y-3">
-              <div v-for="recipe in displayRecord.recipes" :key="recipe.id" class="bg-white rounded-lg p-4 border">
-                <div class="text-sm text-gray-600 mb-2 font-semibold">
-                  📅 {{ formatRecordDate(recipe.createdAt) }}
+              <div v-for="recipe in displayRecord.recipes" :key="recipe.id" class="bg-white rounded-lg p-4 border relative">
+                <button
+                  @click="openRecipeFormModal(recipe)"
+                  class="absolute top-3 right-3 px-2 py-1 text-green-600 hover:text-green-800 text-sm font-medium rounded flex items-center gap-1"
+                  title="Editar receta"
+                >
+                  ✏️ Editar
+                </button>
+                <div class="text-sm text-gray-600 mb-2 font-semibold pr-16">
+                  📅 {{ formatDate(recipe.createdAt) }}
                 </div>
                 <div class="bg-gray-50 rounded p-3 mb-3">
                   <pre class="text-gray-800 text-sm whitespace-pre-wrap font-mono">{{ recipe.prescription }}</pre>
@@ -126,7 +146,7 @@
                 <div class="flex justify-between items-start mb-2">
                   <h4 class="font-bold text-gray-800">{{ exam.exam?.name || exam.name || 'Examen' }}</h4>
                   <span class="text-xs px-2 py-1 rounded-full text-white font-semibold" style="background-color: #F4A261;">
-                    {{ formatRecordDate(exam.createdAt) }}
+                    {{ formatDate(exam.createdAt) }}
                   </span>
                 </div>
                 <div v-if="exam.exam?.description" class="text-sm text-gray-600 mb-2">
@@ -151,7 +171,7 @@
                 <div class="flex justify-between items-start mb-2">
                   <h4 class="font-bold text-gray-800">{{ treatment.medicine?.name || 'Medicamento' }}</h4>
                   <span class="text-xs px-2 py-1 rounded-full text-white font-semibold" style="background-color: #48C9B0;">
-                    {{ formatRecordDate(treatment.createdAt) }}
+                    {{ formatDate(treatment.createdAt) }}
                   </span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-2">
@@ -202,10 +222,12 @@
 </template>
 
 <script setup>
-import { onMounted, watch, computed } from 'vue'
+import { onMounted, watch, computed, nextTick } from 'vue'
 import { usePatientsStore } from '@stores/patientsStore'
 import { usePatientsLogicStore } from '../../stores/patientsLogicStore'
 import { storeToRefs } from 'pinia'
+
+import { formatDate } from '@/utils/isoFormatDate.js'
 
 import PrimaryButton from '@components/forms/PrimaryButton.vue'
 import GeneralDialogModal from '@components/forms/GeneralDialogModal.vue'
@@ -222,7 +244,7 @@ const { fullRecord, isLoadingMedicalRecords, hasError } = storeToRefs(patientsSt
 
 const patientsLogicStore = usePatientsLogicStore()
 const { selectedRecord } = storeToRefs(patientsLogicStore)
-const { closeHistoryLogModals } = patientsLogicStore
+const { closeHistoryLogModals, openMedicalRecordEditModal, openRecipeFormModal } = patientsLogicStore
 
 const handleClose = () => {
   closeHistoryLogModals()
@@ -251,6 +273,19 @@ function formatRecordDate(dateString) {
 
 function editRecord() {
   emit('edit', displayRecord.value)
+}
+
+function editEvolutionNote() {
+  // Cerrar el modal actual primero
+  handleClose()
+  // Luego abrir modal de edición de medical record
+  nextTick(() => {
+    openMedicalRecordEditModal(displayRecord.value)
+  })
+}
+
+function viewFullRecipe(recipe) {
+  emit('view-recipe', recipe)
 }
 
 function downloadRecord() {
