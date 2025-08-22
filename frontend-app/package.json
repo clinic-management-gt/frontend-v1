@@ -8,7 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "PWDEBUG=1 playwright test"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.17",
@@ -32,6 +36,7 @@
   },
   "devDependencies": {
     "@pinia/testing": "^1.0.2",
+    "@playwright/test": "^1.55.0",
     "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitest/ui": "3.2.4",
