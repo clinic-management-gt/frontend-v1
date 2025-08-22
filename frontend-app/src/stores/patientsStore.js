@@ -148,6 +148,24 @@ export const usePatientsStore = defineStore('patients', () => {
     }
   }
 
+  async function uploadFile(file, patientId) {
+    isLoadingMedicalRecords.value = true
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await instance.post(`/files/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+
+      return res.data
+    } finally {
+      isLoadingMedicalRecords.value = false
+    }
+  }
+
 
   return {
     // state
@@ -178,6 +196,7 @@ export const usePatientsStore = defineStore('patients', () => {
     updateMedicalRecord,
     deleteMedicalRecord,
     fetchMedicalRecordDetails,
+    uploadFile,
   }
 }, {
   persist: {

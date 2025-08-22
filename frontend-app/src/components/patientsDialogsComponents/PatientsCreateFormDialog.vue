@@ -85,6 +85,8 @@ const showDialog = computed({
 
 function handleSendFiles(fileReceived) {
   rawFile.value = fileReceived
+  console.log('fileReceived', fileReceived)
+  patientsStore.uploadFile(fileReceived)
   if (fileReceived) {
     generate()
     newPatientData.value.file = fileReceived

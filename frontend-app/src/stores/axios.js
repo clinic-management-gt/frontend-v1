@@ -6,6 +6,7 @@ import { handleHttpError } from '@utils/errorHandler'
 const instance = axios.create({
      baseURL: `${import.meta.env.VITE_API_URL}`,
      timeout: 10000,
+     withCredentials: false,
 })
 
 instance.interceptors.request.use(
