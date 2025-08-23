@@ -44,10 +44,18 @@
                <span class="text-md ml-2 text-white font-bold">{{ $t('general.exit') }}</span>
           </button>
      </ul>
+<!-- NavigationBar.vue -->
+  <RouterLink to="/dashboard" data-testid="nav-dashboard"></RouterLink>
+  <RouterLink to="/patients"  data-testid="nav-patients"></RouterLink>
+  <RouterLink to="/graph"     data-testid="nav-graph"></RouterLink>
+  <RouterLink to="/calendar"  data-testid="nav-calendar"></RouterLink>
+
+
 </template>
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { HomeIcon, UserIcon, ChartBarIcon, CalendarIcon, XCircleIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
 
