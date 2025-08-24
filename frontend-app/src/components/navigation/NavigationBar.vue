@@ -40,7 +40,15 @@
         </li>
       </ul>
     </li>
-    <!-- botón logout… -->
+    <div class="relative">
+      <div class="absolute inset-0 flex items-center" aria-hidden="true">
+          <div class="w-full border-t border-primary-color-variation-1" />
+      </div>
+    </div>
+    <button @click="logout" class="flex justify-start">
+      <x-circle-icon class="h-6 w-6 shrink-0 text-white"></x-circle-icon>
+      <span class="text-md ml-2 text-white font-bold">{{ $t('general.exit') }}</span>
+    </button>
   </ul>
 </template>
 
@@ -53,7 +61,6 @@ import { HomeIcon, UserIcon, ChartBarIcon, CalendarIcon, ChevronRightIcon, XCirc
 const authStore = useAuthStore()
 const logout = () => authStore.logout()
 
-// Usa `to` en vez de `href`
 const navigationObject = {
   dashboard: { name: 'dashboard.dashboard', to: '/dashboard', icon: HomeIcon, current: false },
   patients:  { name: 'patients.patients',   to: '/patients',  icon: UserIcon, current: false },

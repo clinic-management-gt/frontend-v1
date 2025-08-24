@@ -3,7 +3,7 @@
     <div class="sm:mx-auto sm:w-full sm:max-w-sm text-center">
       <img class="mx-auto" src="/logo-gastro.png" width="250" height="250" />
       <h2 class="mt-10 text-2xl font-bold leading-9 tracking-tight text-gray-900">
-        {{ $t('login.login') }}dsa
+        {{ $t('login.login') }}
       </h2>
     </div>
     <form @submit.prevent="onSubmitLogin" class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm space-y-4">
