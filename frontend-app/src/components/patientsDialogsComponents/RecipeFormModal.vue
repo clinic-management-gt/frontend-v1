@@ -29,6 +29,18 @@
             <!-- Prescripción -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Prescripción médica</label>
+              
+              <!-- Mostrar fecha de creación actual como referencia -->
+              <div v-if="props.isEditing && originalValues.createdAt" class="mb-3 text-xs text-gray-500 bg-gray-50 p-3 rounded border">
+                <div class="flex items-center justify-between">
+                  <span>📅 <strong>Fecha de creación:</strong> {{ formatDate(originalValues.createdAt) }}</span>
+                  <span v-if="originalValues.updatedAt" class="ml-4">✏️ <strong>Última edición:</strong> {{ formatDate(originalValues.updatedAt) }}</span>
+                </div>
+                <div v-if="originalValues.treatmentId" class="mt-1">
+                  🔗 <strong>ID de tratamiento:</strong> {{ originalValues.treatmentId }}
+                </div>
+              </div>
+              
               <textarea 
                 v-model="formData.prescription" 
                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" 
@@ -37,13 +49,6 @@
                 tabindex="0"
                 required
               ></textarea>
-            </div>
-
-            <!-- Información adicional (solo para mostrar) -->
-            <div v-if="recipe && recipe.createdAt" class="mt-4 text-sm text-gray-500">
-              <p><strong>📅 Fecha de creación:</strong> {{ formatDate(recipe.createdAt) }}</p>
-              <p v-if="recipe.updatedAt"><strong>✏️ Última edición:</strong> {{ formatDate(recipe.updatedAt) }}</p>
-              <p v-if="recipe.treatmentId"><strong>ID de tratamiento:</strong> {{ recipe.treatmentId }}</p>
             </div>
           </div>
         </form>
@@ -115,6 +120,13 @@ const formData = ref({
   prescription: ''
 })
 
+// Valores originales para mostrar como referencia
+const originalValues = ref({
+  createdAt: '',
+  updatedAt: '',
+  treatmentId: ''
+})
+
 // Función para cerrar el modal
 function handleClose() {
   closeHistoryLogModals()
@@ -124,11 +136,24 @@ function handleClose() {
 // Cargar datos de la receta cuando se abre en modo edición
 function loadRecipeData() {
   if (props.isEditing && props.recipe) {
+    // Guardar valores originales para mostrar como referencia
+    originalValues.value = {
+      createdAt: props.recipe.createdAt || '',
+      updatedAt: props.recipe.updatedAt || '',
+      treatmentId: props.recipe.treatmentId || ''
+    }
+
     formData.value = {
       prescription: props.recipe.prescription || ''
     }
   } else {
-    // Resetear formulario para nueva receta
+    // Resetear valores para nueva receta
+    originalValues.value = {
+      createdAt: '',
+      updatedAt: '',
+      treatmentId: ''
+    }
+    
     formData.value = {
       prescription: ''
     }
@@ -148,23 +173,29 @@ async function handleSubmit() {
       prescription: formData.value.prescription.trim()
     }
 
-    console.log('📝 Enviando receta:', dataToSend)
-    console.log('🔍 Props:', { isEditing: props.isEditing, recipe: props.recipe, treatmentId: props.treatmentId })
-
     let result
     if (props.isEditing && props.recipe?.id) {
       // Actualizar receta existente
-      console.log('✏️ Actualizando receta ID:', props.recipe.id)
       result = await updateRecipe(props.recipe.id, dataToSend)
+      
+      // Actualizar la fecha de última edición con la fecha actual
+      const now = new Date().toISOString()
+      
+      // Forzar reactividad creando un nuevo objeto
+      originalValues.value = {
+        ...originalValues.value,
+        updatedAt: now
+      }
+      
+      // Asegurar que Vue detecte el cambio
+      await nextTick()
+      
       alert('Receta actualizada exitosamente')
     } else {
       // Crear nueva receta
-      console.log('➕ Creando nueva receta')
       if (props.treatmentId) {
         dataToSend.treatmentId = props.treatmentId
-        console.log('🔗 Con treatmentId:', props.treatmentId)
       } else {
-        console.warn('⚠️ No hay treatmentId disponible')
         alert('No se puede crear la receta: falta treatmentId')
         return
       }
@@ -175,7 +206,6 @@ async function handleSubmit() {
     emit('save', result)
     handleClose()
   } catch (error) {
-    console.error('Error al procesar receta:', error)
     alert('Error al guardar la receta: ' + (error.message || 'Error desconocido'))
   } finally {
     isLoading.value = false
@@ -187,9 +217,10 @@ function formatDate(dateString) {
   if (!dateString) return 'Fecha no disponible'
   
   try {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('es-ES', {
       year: 'numeric',
-      month: 'long',
+      month: 'long', 
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -217,16 +248,6 @@ watch([() => props.isOpen, () => props.recipe], () => {
           textarea.focus()
           textarea.click()
           textarea.focus()
-          console.log('🎯 Textarea enfocado y clickeado')
-          
-          // Verificar si realmente tiene el foco
-          setTimeout(() => {
-            if (document.activeElement === textarea) {
-              console.log('✅ Textarea tiene el foco correctamente')
-            } else {
-              console.log('❌ Textarea NO tiene el foco, elemento activo:', document.activeElement)
-            }
-          }, 100)
         }
       }, 500) // Aumenté el delay a 500ms
     })
