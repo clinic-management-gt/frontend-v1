@@ -35,7 +35,7 @@ export default defineConfig({
     // 2) navegadores que usan la sesión si el archivo existe
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'], ...(hasStorage ? { storageState: STORAGE_PATH } : {}) },
+      use: { ...devices['Desktop Chrome'], ...(hasStorage ? { storageState: STORAGE_PATH } : {}) ,  viewport: { width: 1280, height: 800 }},
       dependencies: ['setup']
     },
     {
