@@ -108,7 +108,7 @@
             <div v-if="displayRecord.recipes && displayRecord.recipes.length > 0" class="space-y-3">
               <div v-for="recipe in displayRecord.recipes" :key="recipe.id" class="bg-white rounded-lg p-4 border relative">
                 <button
-                  @click="editRecipe(recipe)"
+                  @click="openRecipeFormModal(recipe)"
                   class="absolute top-3 right-3 px-2 py-1 text-green-600 hover:text-green-800 text-sm font-medium rounded flex items-center gap-1"
                   title="Editar receta"
                 >
@@ -133,7 +133,7 @@
               <div class="text-gray-400 text-4xl mb-2">💊</div>
               <p class="text-gray-500">{{ $t('patients.no-prescription') }}</p>
               <button
-                @click="editRecipe()"
+                @click="openRecipeFormModal()"
                 class="mt-3 px-4 py-2 text-blue-600 hover:text-blue-800 font-medium"
               >
                 ✏️ {{ $t('general.edit') }}
@@ -251,12 +251,6 @@ const { fullRecord, isLoadingMedicalRecords, hasError } = storeToRefs(patientsSt
 const patientsLogicStore = usePatientsLogicStore()
 const { selectedRecord } = storeToRefs(patientsLogicStore)
 const { closeHistoryLogModals, openMedicalRecordEditModal, openRecipeFormModal } = patientsLogicStore
-
-// Función para editar recetas que NO cierra el modal
-function editRecipe(recipe = null) {
-  // Llamar a openRecipeFormModal sin cerrar este modal
-  openRecipeFormModal(recipe)
-}
 
 function getFirstTreatmentId() {
   // Si estamos editando una receta existente, usar su treatmentId

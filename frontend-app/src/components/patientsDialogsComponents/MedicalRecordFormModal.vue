@@ -2,7 +2,7 @@
   <general-dialog-modal :is-open="isOpen" dialogSize="max-w-4xl" @close-modal="handleClose">
     <template #title>
       <p class="text-xl">
-        {{ isEditing ? 'Editar registro médico' : 'Agregar registro médico' }}
+        {{ $t(isEditing ? 'medical-records.edit-record' : 'medical-records.add-record') }}
       </p>
     </template>
     <template #body>
@@ -11,35 +11,35 @@
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <!-- Información básica -->
           <div class="bg-gray-50 p-4 rounded-lg">
-            <h3 class="text-lg font-semibold mb-4">Información básica</h3>
+            <h3 class="text-lg font-semibold mb-4">{{ $t('medical-records.basic-info') }}</h3>
 
             <!-- Peso y Altura -->
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Peso (kg)</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('medical-records.weight') }}</label>
                 <!-- Mostrar valor actual como referencia -->
                 <div v-if="props.isEditing && originalValues.weight" class="mb-2 text-xs text-gray-500 bg-gray-50 p-2 rounded border">
-                  📊 Valor actual: {{ originalValues.weight }} kg
+                  📊 {{ $t('medical-records.current-value') }}: {{ originalValues.weight }} kg
                 </div>
                 <input 
                   v-model="formData.weight" 
                   type="number" 
                   step="0.1" 
-                  placeholder="Ingrese nuevo peso..." 
+                  :placeholder="$t('medical-records.weight-placeholder')" 
                   class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm sm:leading-6"
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Altura (cm)</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('medical-records.height') }}</label>
                 <!-- Mostrar valor actual como referencia -->
                 <div v-if="props.isEditing && originalValues.height" class="mb-2 text-xs text-gray-500 bg-gray-50 p-2 rounded border">
-                  📊 Valor actual: {{ originalValues.height }} cm
+                  📊 {{ $t('medical-records.current-value') }}: {{ originalValues.height }} cm
                 </div>
                 <input 
                   v-model="formData.height" 
                   type="number" 
                   step="0.1" 
-                  placeholder="Ingrese nueva altura..." 
+                  :placeholder="$t('medical-records.height-placeholder')" 
                   class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm sm:leading-6"
                 />
               </div>
@@ -47,14 +47,14 @@
 
             <!-- Antecedentes familiares -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Antecedentes familiares</label>
-              <textarea v-model="formData.familyHistory" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="3" placeholder="Antecedentes familiares del paciente..."></textarea>
+              <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('medical-records.family-history') }}</label>
+              <textarea v-model="formData.familyHistory" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="3" :placeholder="$t('medical-records.family-history-placeholder')"></textarea>
             </div>
 
             <!-- Notas de evolución -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Notas de evolución</label>
-              <textarea v-model="formData.notes" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="4" placeholder="Notas de evolución del paciente..."></textarea>
+              <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('medical-records.evolution-notes') }}</label>
+              <textarea v-model="formData.notes" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="4" :placeholder="$t('medical-records.evolution-notes-placeholder')"></textarea>
             </div>
           </div>
         </form>
@@ -69,7 +69,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          Guardando...
+          {{ $t('medical-records.saving') }}
         </span>
       </primary-button>
       <primary-button v-else @click="handleSubmit" :disabled="isLoading">
@@ -82,6 +82,7 @@
 </template>
 <script setup>
 import { ref, watch, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { usePatientsLogicStore } from '@stores/patientsLogicStore.js'
 import { usePatientsStore } from '@stores/patientsStore.js'
 import { useNotificationStore } from '@stores/notificationStore.js'
@@ -111,6 +112,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'save'])
 
+const { t } = useI18n()
 const patientsLogicStore = usePatientsLogicStore()
 const patientsStore = usePatientsStore()
 const notificationStore = useNotificationStore()

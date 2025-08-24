@@ -217,5 +217,20 @@
     "date-not-available": "Fecha no disponible",
     "invalid-date": "Fecha inválida",
     "unknown-error": "Error desconocido"
+  },
+  "medical-records": {
+    "edit-record": "Editar registro médico",
+    "add-record": "Agregar registro médico",
+    "basic-info": "Información básica",
+    "weight": "Peso (kg)",
+    "height": "Altura (cm)",
+    "current-value": "Valor actual",
+    "weight-placeholder": "Ingrese nuevo peso...",
+    "height-placeholder": "Ingrese nueva altura...",
+    "family-history": "Antecedentes familiares",
+    "family-history-placeholder": "Antecedentes familiares del paciente...",
+    "evolution-notes": "Notas de evolución",
+    "evolution-notes-placeholder": "Notas de evolución del paciente...",
+    "saving": "Guardando..."
   }
 }
