@@ -1,3 +1,6 @@
+# environment files
+.env
+
 # Logs
 logs
 *.log
@@ -13,6 +16,7 @@ dist-ssr
 *.local
 
 # Editor directories and files
+.auth/*
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -28,4 +32,3 @@ dist-ssr
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-.auth/*
