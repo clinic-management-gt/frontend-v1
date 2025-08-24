@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { usePatientsStore } from './patientsStore.js'
+import { useNotificationStore } from './notificationStore.js'
 
 export const usePatientsLogicStore = defineStore('patientsLogic', () => {
      const showDataSheetPatientDialog = ref(false)
@@ -79,9 +80,7 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
 
      async function handleMedicalRecordSave(formData, patientId) {
         try {
-          console.log('💾 Guardando registro:', formData)
-          console.log('🔍 Estado isEditing:', isEditing.value)
-          console.log('👤 Patient ID:', patientId)
+          console.log('💾 Guardando registro médico...')
 
           const patientsStore = usePatientsStore()
 
@@ -90,15 +89,14 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
           
           if (isNewFormat) {
             // NUEVO FORMATO: Manejar medical record y recipe por separado
-            console.log('📋 Usando nuevo formato unificado')
             
             // 1. Manejar Medical Record
             if (formData.medicalRecord) {
               if (isEditing.value && selectedRecordForEdit.value) {
-                console.log('✏️ Actualizando medical record ID:', selectedRecordForEdit.value.id)
-                await patientsStore.updateMedicalRecord(selectedRecordForEdit.value.id, formData.medicalRecord)
+                // Obtener el ID correcto del medical record
+                const recordId = selectedRecordForEdit.value.medicalRecord?.id || selectedRecordForEdit.value.id
+                await patientsStore.updateMedicalRecord(recordId, formData.medicalRecord)
               } else {
-                console.log('➕ Creando nuevo medical record para paciente:', patientId)
                 await patientsStore.createMedicalRecord(patientId, formData.medicalRecord)
               }
             }
@@ -111,13 +109,12 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
             
           } else {
             // FORMATO ACTUAL: Mantener compatibilidad
-            console.log('📋 Usando formato actual (solo medical record)')
             
             if (isEditing.value && selectedRecordForEdit.value) {
-              console.log('✏️ Actualizando registro ID:', selectedRecordForEdit.value.id)
-              await patientsStore.updateMedicalRecord(selectedRecordForEdit.value.id, formData)
+              // Obtener el ID correcto del medical record
+              const recordId = selectedRecordForEdit.value.medicalRecord?.id || selectedRecordForEdit.value.id
+              await patientsStore.updateMedicalRecord(recordId, formData)
             } else {
-              console.log('➕ Creando nuevo registro para paciente:', patientId)
               await patientsStore.createMedicalRecord(patientId, formData)
             }
           }
@@ -128,12 +125,24 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
           closeHistoryLogModals()
           await patientsStore.fetchPatientMedicalRecords(patientId)
 
-          alert(isEditing.value ? 'Registro actualizado correctamente' : 'Registro creado correctamente')
+          // Usar notification store en lugar de alert
+          const notificationStore = useNotificationStore()
+          notificationStore.addNotification(
+            'success', 
+            'general.success', 
+            isEditing.value ? 'general.record-updated-successfully' : 'general.record-created-successfully'
+          )
           
         } catch (error) {
           console.error('❌ Error al guardar registro:', error)
-          console.error('📋 Detalles del error:', error.response?.data || error.message)
-          alert('Error al guardar el registro: ' + (error.message || 'Error desconocido'))
+          
+          // Usar notification store en lugar de alert
+          const notificationStore = useNotificationStore()
+          notificationStore.addNotification(
+            'error', 
+            'general.error', 
+            'Error al guardar el registro: ' + (error.message || 'Error desconocido')
+          )
         }
      }
 
@@ -143,15 +152,16 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
           console.log('👤 Patient ID:', patientId)
           
           const patientsStore = usePatientsStore()
+          const notificationStore = useNotificationStore()
           
           if (isEditingRecipe.value && selectedRecipeForEdit.value) {
             console.log('✏️ Actualizando receta ID:', selectedRecipeForEdit.value.id)
             await patientsStore.updateRecipe(selectedRecipeForEdit.value.id, recipeData)
-            alert('Receta actualizada correctamente')
+            notificationStore.addNotification('success', 'general.success', 'Receta actualizada correctamente')
           } else {
             console.log('➕ Creando nueva receta')
             await patientsStore.createRecipe(recipeData)
-            alert('Receta creada correctamente')
+            notificationStore.addNotification('success', 'general.success', 'Receta creada correctamente')
           }
           
           // Cerrar modal y recargar datos
@@ -169,7 +179,8 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
           
         } catch (error) {
           console.error('❌ Error al guardar receta:', error)
-          alert('Error al guardar la receta: ' + (error.message || 'Error desconocido'))
+          const notificationStore = useNotificationStore()
+          notificationStore.addNotification('error', 'general.error', 'Error al guardar la receta: ' + (error.message || 'Error desconocido'))
         }
      }
      function closeAllPatientDialog() {

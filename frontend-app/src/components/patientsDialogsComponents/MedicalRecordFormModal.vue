@@ -1,5 +1,5 @@
 <template>
-  <general-dialog-modal :is-open="isOpen"   dialogSize="max-w-4xl" @close-modal="handleClose">
+  <general-dialog-modal :is-open="isOpen" dialogSize="max-w-4xl" @close-modal="handleClose">
     <template #title>
       <p class="text-xl">
         {{ isEditing ? 'Editar registro médico' : 'Agregar registro médico' }}
@@ -16,24 +16,44 @@
             <!-- Peso y Altura -->
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <custom-label :title="$t('patients.weight-kg')" />
-                <text-input v-model="formData.weight" type="number" step="0.1" placeholder="70.5" />
+                <label class="block text-sm font-medium text-gray-700 mb-1">Peso (kg)</label>
+                <!-- Mostrar valor actual como referencia -->
+                <div v-if="props.isEditing && originalValues.weight" class="mb-2 text-xs text-gray-500 bg-gray-50 p-2 rounded border">
+                  📊 Valor actual: {{ originalValues.weight }} kg
+                </div>
+                <input 
+                  v-model="formData.weight" 
+                  type="number" 
+                  step="0.1" 
+                  placeholder="Ingrese nuevo peso..." 
+                  class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm sm:leading-6"
+                />
               </div>
               <div>
-                <custom-label :title="$t('patients.height-cm')" />
-                <text-input v-model="formData.height" type="number" step="0.1" placeholder="175.2" />
+                <label class="block text-sm font-medium text-gray-700 mb-1">Altura (cm)</label>
+                <!-- Mostrar valor actual como referencia -->
+                <div v-if="props.isEditing && originalValues.height" class="mb-2 text-xs text-gray-500 bg-gray-50 p-2 rounded border">
+                  📊 Valor actual: {{ originalValues.height }} cm
+                </div>
+                <input 
+                  v-model="formData.height" 
+                  type="number" 
+                  step="0.1" 
+                  placeholder="Ingrese nueva altura..." 
+                  class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm sm:leading-6"
+                />
               </div>
             </div>
 
             <!-- Antecedentes familiares -->
             <div class="mb-4">
-              <custom-label :title="$t('patients.family-background')" />
+              <label class="block text-sm font-medium text-gray-700 mb-1">Antecedentes familiares</label>
               <textarea v-model="formData.familyHistory" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="3" placeholder="Antecedentes familiares del paciente..."></textarea>
             </div>
 
             <!-- Notas de evolución -->
             <div>
-              <custom-label :title="$t('patients.evolution-note-detail')" />
+              <label class="block text-sm font-medium text-gray-700 mb-1">Notas de evolución</label>
               <textarea v-model="formData.notes" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="4" placeholder="Notas de evolución del paciente..."></textarea>
             </div>
           </div>
@@ -68,8 +88,6 @@ import { useNotificationStore } from '@stores/notificationStore.js'
 
 import GeneralDialogModal from '@components/forms/GeneralDialogModal.vue'
 import PrimaryButton from '@components/forms/PrimaryButton.vue'
-import CustomLabel from '@components/forms/CustomLabel.vue'
-import TextInput from '@components/forms/TextInput.vue'
 import { storeToRefs } from 'pinia'
 
 const props = defineProps({
@@ -99,11 +117,18 @@ const notificationStore = useNotificationStore()
 
 const { selectedRecordForEdit, isEditing } = storeToRefs(patientsLogicStore)
 const { closeHistoryLogModals } = patientsLogicStore
-const { updateMedicalRecord, createMedicalRecord, fetchPatientMedicalRecords } = patientsStore
 
 // Estados
 const isLoading = ref(false)
 const formData = ref({
+  weight: '',
+  height: '',
+  familyHistory: '',
+  notes: ''
+})
+
+// Valores originales para mostrar como referencia
+const originalValues = ref({
   weight: '',
   height: '',
   familyHistory: '',
@@ -121,14 +146,30 @@ function loadRecordData() {
     // Acceder a los datos según la estructura del backend
     const record = props.record.medicalRecord || props.record
 
-    formData.value = {
+    // Guardar valores originales para mostrar como referencia
+    originalValues.value = {
       weight: record.weight ? String(record.weight) : '',
       height: record.height ? String(record.height) : '',
       familyHistory: record.familyHistory || '',
       notes: record.notes || ''
     }
+
+    // Para peso y altura: dejar campos en blanco para nuevos valores
+    // Para texto: mantener valores actuales para editarlos
+    formData.value = {
+      weight: '', // Campo en blanco para nuevo peso
+      height: '', // Campo en blanco para nueva altura  
+      familyHistory: record.familyHistory || '', // Mantener para editar
+      notes: record.notes || '' // Mantener para editar
+    }
   } else {
     // Resetear formulario para nuevo registro
+    originalValues.value = {
+      weight: '',
+      height: '',
+      familyHistory: '',
+      notes: ''
+    }
     formData.value = {
       weight: '',
       height: '',
@@ -140,74 +181,59 @@ function loadRecordData() {
 
 // Manejar envío del formulario
 async function handleSubmit() {
-  console.log('🚀 handleSubmit llamado!')
   isLoading.value = true
 
   try {
     // Preparar datos para enviar según la estructura del backend
+    // Si se ingresa nuevo valor, usar ese; si no, mantener el original (si existe)
+    let weightToSend = null
+    let heightToSend = null
+
+    // Para peso: usar nuevo valor si se ingresó, sino mantener original
+    if (formData.value.weight !== '' && formData.value.weight !== null && formData.value.weight !== undefined) {
+      weightToSend = parseFloat(formData.value.weight)
+    } else if (props.isEditing && originalValues.value.weight) {
+      weightToSend = parseFloat(originalValues.value.weight)
+    }
+
+    // Para altura: usar nuevo valor si se ingresó, sino mantener original  
+    if (formData.value.height !== '' && formData.value.height !== null && formData.value.height !== undefined) {
+      heightToSend = parseFloat(formData.value.height)
+    } else if (props.isEditing && originalValues.value.height) {
+      heightToSend = parseFloat(originalValues.value.height)
+    }
+
     const dataToSend = {
-      Weight: parseFloat(formData.value.weight) || null,
-      Height: parseFloat(formData.value.height) || null,
+      Weight: weightToSend,
+      Height: heightToSend,
       FamilyHistory: formData.value.familyHistory || null,
       Notes: formData.value.notes || null
     }
 
-    console.log('📝 Datos del formulario:', formData.value)
-    console.log('📤 Datos a enviar:', dataToSend)
-    console.log('🔍 Modo edición:', props.isEditing)
-    console.log('📋 Record actual:', props.record)
-
     // Validar que tenemos los datos mínimos necesarios
-    if (!formData.value.weight && !formData.value.height && !formData.value.familyHistory && !formData.value.notes) {
-      console.warn('⚠️ Formulario vacío - no se puede procesar')
-      notificationStore.addNotification('warning', 'Advertencia', 'Por favor completa al menos un campo')
+    if (!dataToSend.Weight && !dataToSend.Height && !dataToSend.FamilyHistory && !dataToSend.Notes) {
+      notificationStore.addNotification('warning', 'general.warning', 'Por favor completa al menos un campo')
       return
     }
 
     if (props.isEditing && props.record) {
-      // Actualizar registro existente
-      const recordId = props.record.medicalRecord?.id || props.record.id
-      console.log(`✏️ Actualizando record ID: ${recordId}`)
-      await updateMedicalRecord(recordId, dataToSend)
-      notificationStore.addNotification('success', 'Éxito', 'Registro médico actualizado exitosamente')
+      // Actualizar registro existente - usar el store de lógica
+      await patientsLogicStore.handleMedicalRecordSave(dataToSend, props.patientId)
     } else if (!props.isEditing && props.patientId) {
-      // Crear nuevo registro solo si estamos en modo creación y tenemos patientId
-      console.log(`➕ Creando nuevo record para paciente: ${props.patientId}`)
-      dataToSend.PatientId = props.patientId
-      await createMedicalRecord(props.patientId, dataToSend)
-      notificationStore.addNotification('success', 'Éxito', 'Registro médico creado exitosamente')
+      // Crear nuevo registro usando el store de lógica
+      await patientsLogicStore.handleMedicalRecordSave(dataToSend, props.patientId)
     } else {
       // No hacer nada si no hay condiciones válidas
-      console.warn('⚠️ No se puede procesar: condiciones inválidas')
-      console.warn(`isEditing: ${props.isEditing}, patientId: ${props.patientId}, record:`, props.record)
-      notificationStore.addNotification('warning', 'Advertencia', 'No se puede procesar la solicitud')
+      notificationStore.addNotification('warning', 'general.warning', 'No se puede procesar la solicitud')
       return
     }
 
-    // Recargar los datos del paciente
-    await fetchPatientMedicalRecords(props.patientId)
-    
-    // Cerrar modal y emitir evento
-    closeHistoryLogModals()
+    // El store de lógica ya maneja el cierre del modal y recarga de datos
     emit('save', dataToSend)
   } catch (error) {
-    console.error('❌ Error al enviar formulario:', error)
-    console.error('📋 Detalles del error:', error.response?.data || error.message)
-    console.log('🔍 Status del error:', error.response?.status)
-    console.log('🔍 Headers del error:', error.response?.headers)
-    console.log('🔍 Config de la petición:', error.config)
-    
-    // Log detallado de validation errors si existen
-    if (error.response?.data?.errors) {
-      console.log('❌ Errores de validación:', error.response.data.errors)
-      Object.keys(error.response.data.errors).forEach(field => {
-        console.log(`❌ Campo ${field}:`, error.response.data.errors[field])
-      })
-    }
-    
     notificationStore.addNotification(
       'error', 
-      'Error', 
+      'general.error', 
       props.isEditing ? 'Error al actualizar el registro' : 'Error al crear el registro'
     )
   } finally {
@@ -218,11 +244,6 @@ async function handleSubmit() {
 // Observar cambios en props para cargar datos
 watch([() => props.isOpen, () => props.record, () => props.isEditing], () => {
   if (props.isOpen) {
-    console.log('🔄 Modal abierto - Loading data with:', {
-      isOpen: props.isOpen,
-      isEditing: props.isEditing,
-      record: props.record
-    })
     nextTick(() => {
       loadRecordData()
     })
