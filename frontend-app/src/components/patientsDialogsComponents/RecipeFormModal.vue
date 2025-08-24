@@ -2,7 +2,7 @@
   <general-dialog-modal :is-open="isOpen" dialogSize="max-w-2xl" @close-modal="handleClose">
     <template #title>
       <p class="text-xl">
-        {{ isEditing ? 'Editar receta médica' : 'Crear receta médica' }}
+        {{ $t(isEditing ? 'recipes.edit-recipe' : 'recipes.create-recipe') }}
       </p>
     </template>
     <template #body>
@@ -14,9 +14,9 @@
             <div class="flex items-center">
               <div class="text-yellow-400 text-lg mr-2">⚠️</div>
               <div>
-                <h4 class="text-yellow-800 font-semibold">Advertencia</h4>
+                <h4 class="text-yellow-800 font-semibold">{{ $t('recipes.warning') }}</h4>
                 <p class="text-yellow-700 text-sm">
-                  No se encontró un tratamiento asociado. Para crear una receta, primero debe haber un tratamiento registrado en esta consulta.
+                  {{ $t('recipes.warning-no-treatment') }}
                 </p>
               </div>
             </div>
@@ -28,16 +28,16 @@
 
             <!-- Prescripción -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Prescripción médica</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">{{ $t('recipes.prescription') }}</label>
               
               <!-- Mostrar fecha de creación actual como referencia -->
               <div v-if="props.isEditing && originalValues.createdAt" class="mb-3 text-xs text-gray-500 bg-gray-50 p-3 rounded border">
                 <div class="flex items-center justify-between">
-                  <span>📅 <strong>Fecha de creación:</strong> {{ formatDate(originalValues.createdAt) }}</span>
-                  <span v-if="originalValues.updatedAt" class="ml-4">✏️ <strong>Última edición:</strong> {{ formatDate(originalValues.updatedAt) }}</span>
+                  <span>📅 <strong>{{ $t('recipes.creation-date') }}:</strong> {{ formatDate(originalValues.createdAt) }}</span>
+                  <span v-if="originalValues.updatedAt" class="ml-4">✏️ <strong>{{ $t('recipes.last-edit') }}:</strong> {{ formatDate(originalValues.updatedAt) }}</span>
                 </div>
                 <div v-if="originalValues.treatmentId" class="mt-1">
-                  🔗 <strong>ID de tratamiento:</strong> {{ originalValues.treatmentId }}
+                  🔗 <strong>{{ $t('recipes.treatment-id') }}:</strong> {{ originalValues.treatmentId }}
                 </div>
               </div>
               
@@ -45,7 +45,7 @@
                 v-model="formData.prescription" 
                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" 
                 rows="8" 
-                placeholder="Escriba aquí la prescripción médica completa..."
+                :placeholder="$t('recipes.prescription-placeholder')"
                 tabindex="0"
                 required
               ></textarea>
@@ -63,12 +63,12 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          Guardando...
+          {{ $t('recipes.saving') }}
         </span>
       </primary-button>
       <primary-button v-else @click="handleSubmit" :disabled="isLoading || !formData.prescription.trim()">
         <p class="uppercase">
-          {{ isEditing ? 'Actualizar' : 'Guardar' }}
+          {{ $t(isEditing ? 'general.update' : 'general.save') }}
         </p>
       </primary-button>
     </template>
@@ -77,9 +77,11 @@
 
 <script setup>
 import { ref, watch, nextTick, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { usePatientsStore } from '@stores/patientsStore.js'
 import { usePatientsLogicStore } from '@stores/patientsLogicStore.js'
 import { useNotificationStore } from '@stores/notificationStore.js'
+import { formatDate } from '@utils/isoFormatDate.js'
 
 import GeneralDialogModal from '@components/forms/GeneralDialogModal.vue'
 import PrimaryButton from '@components/forms/PrimaryButton.vue'
@@ -107,6 +109,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'save'])
 
+const { t } = useI18n()
 const patientsStore = usePatientsStore()
 const patientsLogicStore = usePatientsLogicStore()
 const notificationStore = useNotificationStore()
@@ -190,43 +193,25 @@ async function handleSubmit() {
       // Asegurar que Vue detecte el cambio
       await nextTick()
       
-      alert('Receta actualizada exitosamente')
+      alert(t('recipes.recipe-updated'))
     } else {
       // Crear nueva receta
       if (props.treatmentId) {
         dataToSend.treatmentId = props.treatmentId
       } else {
-        alert('No se puede crear la receta: falta treatmentId')
+        alert(t('recipes.error-no-treatment'))
         return
       }
       result = await createRecipe(dataToSend)
-      alert('Receta creada exitosamente')
+      alert(t('recipes.recipe-created'))
     }
 
     emit('save', result)
     handleClose()
   } catch (error) {
-    alert('Error al guardar la receta: ' + (error.message || 'Error desconocido'))
+    alert(t('recipes.error-saving') + ': ' + (error.message || t('recipes.unknown-error')))
   } finally {
     isLoading.value = false
-  }
-}
-
-// Formatear fecha
-function formatDate(dateString) {
-  if (!dateString) return 'Fecha no disponible'
-  
-  try {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  } catch (error) {
-    return 'Fecha inválida'
   }
 }
 

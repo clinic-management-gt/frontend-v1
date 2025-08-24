@@ -254,7 +254,6 @@ const { closeHistoryLogModals, openMedicalRecordEditModal, openRecipeFormModal }
 
 // Función para editar recetas que NO cierra el modal
 function editRecipe(recipe = null) {
-  console.log('📝 Editando receta:', recipe)
   // Llamar a openRecipeFormModal sin cerrar este modal
   openRecipeFormModal(recipe)
 }
