@@ -9,25 +9,40 @@
       <div class="space-y-6 max-h-[70vh] overflow-y-auto">
         <!-- Formulario principal -->
         <form @submit.prevent="handleSubmit" class="space-y-4">
+          <!-- Alerta si no hay treatmentId -->
+          <div v-if="!props.isEditing && !props.treatmentId" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div class="flex items-center">
+              <div class="text-yellow-400 text-lg mr-2">⚠️</div>
+              <div>
+                <h4 class="text-yellow-800 font-semibold">Advertencia</h4>
+                <p class="text-yellow-700 text-sm">
+                  No se encontró un tratamiento asociado. Para crear una receta, primero debe haber un tratamiento registrado en esta consulta.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <!-- Información de la receta -->
           <div class="bg-gray-50 p-4 rounded-lg">
             <h3 class="text-lg font-semibold mb-4">Receta médica</h3>
 
             <!-- Prescripción -->
             <div>
-              <custom-label title="Prescripción médica" />
+              <label class="block text-sm font-medium text-gray-700 mb-2">Prescripción médica</label>
               <textarea 
                 v-model="formData.prescription" 
                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" 
                 rows="8" 
                 placeholder="Escriba aquí la prescripción médica completa..."
+                tabindex="0"
                 required
               ></textarea>
             </div>
 
             <!-- Información adicional (solo para mostrar) -->
             <div v-if="recipe && recipe.createdAt" class="mt-4 text-sm text-gray-500">
-              <p><strong>Fecha de creación:</strong> {{ formatDate(recipe.createdAt) }}</p>
+              <p><strong>📅 Fecha de creación:</strong> {{ formatDate(recipe.createdAt) }}</p>
+              <p v-if="recipe.updatedAt"><strong>✏️ Última edición:</strong> {{ formatDate(recipe.updatedAt) }}</p>
               <p v-if="recipe.treatmentId"><strong>ID de tratamiento:</strong> {{ recipe.treatmentId }}</p>
             </div>
           </div>
@@ -78,6 +93,10 @@ const props = defineProps({
   isEditing: {
     type: Boolean,
     default: false
+  },
+  treatmentId: {
+    type: [Number, String],
+    default: null
   }
 })
 
@@ -129,22 +148,35 @@ async function handleSubmit() {
       prescription: formData.value.prescription.trim()
     }
 
+    console.log('📝 Enviando receta:', dataToSend)
+    console.log('🔍 Props:', { isEditing: props.isEditing, recipe: props.recipe, treatmentId: props.treatmentId })
+
     let result
     if (props.isEditing && props.recipe?.id) {
       // Actualizar receta existente
+      console.log('✏️ Actualizando receta ID:', props.recipe.id)
       result = await updateRecipe(props.recipe.id, dataToSend)
-      notificationStore.addNotification('success', 'Éxito', 'Receta actualizada exitosamente')
+      alert('Receta actualizada exitosamente')
     } else {
-      dataToSend.treatmentId = props.treatmentId
+      // Crear nueva receta
+      console.log('➕ Creando nueva receta')
+      if (props.treatmentId) {
+        dataToSend.treatmentId = props.treatmentId
+        console.log('🔗 Con treatmentId:', props.treatmentId)
+      } else {
+        console.warn('⚠️ No hay treatmentId disponible')
+        alert('No se puede crear la receta: falta treatmentId')
+        return
+      }
       result = await createRecipe(dataToSend)
-      notificationStore.addNotification('success', 'Éxito', 'Receta creada exitosamente')
+      alert('Receta creada exitosamente')
     }
 
     emit('save', result)
     handleClose()
   } catch (error) {
     console.error('Error al procesar receta:', error)
-    // Las notificaciones de error las maneja axios interceptor
+    alert('Error al guardar la receta: ' + (error.message || 'Error desconocido'))
   } finally {
     isLoading.value = false
   }
@@ -172,6 +204,31 @@ watch([() => props.isOpen, () => props.recipe], () => {
   if (props.isOpen) {
     nextTick(() => {
       loadRecipeData()
+      // Intentar enfocar el textarea después de que se cargue
+      setTimeout(() => {
+        // Quitar el foco del elemento actual
+        if (document.activeElement) {
+          document.activeElement.blur()
+        }
+        
+        const textarea = document.querySelector('textarea[placeholder*="prescripción"]')
+        if (textarea) {
+          // Forzar el enfoque múltiples veces para asegurar que funcione
+          textarea.focus()
+          textarea.click()
+          textarea.focus()
+          console.log('🎯 Textarea enfocado y clickeado')
+          
+          // Verificar si realmente tiene el foco
+          setTimeout(() => {
+            if (document.activeElement === textarea) {
+              console.log('✅ Textarea tiene el foco correctamente')
+            } else {
+              console.log('❌ Textarea NO tiene el foco, elemento activo:', document.activeElement)
+            }
+          }, 100)
+        }
+      }, 500) // Aumenté el delay a 500ms
     })
   }
 }, { immediate: true })

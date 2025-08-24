@@ -103,6 +103,7 @@
       :is-open="showRecipeFormModal"
       :recipe="selectedRecipeForEdit"
       :is-editing="isEditingRecipe"
+      :treatment-id="1"
       @close="closeHistoryLogModals" 
       @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)" 
     />
@@ -122,6 +123,7 @@ import PrimaryButton from '@components/forms/PrimaryButton.vue'
 import Panel from '@components/forms/Panel.vue'
 import ConsultationDetailsModal from '../patientsDialogsComponents/ConsultationDetailsModal.vue'
 import MedicalRecordFormModal from '../patientsDialogsComponents/MedicalRecordFormModal.vue'
+import RecipeFormModal from '../patientsDialogsComponents/RecipeFormModal.vue'
 import { formatDateShort } from '@/utils/isoFormatDate.js'
 
 const props = defineProps({

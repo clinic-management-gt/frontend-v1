@@ -140,20 +140,32 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
      async function handleRecipeSave(recipeData, patientId) {
         try {
           console.log('💊 Guardando receta:', recipeData)
+          console.log('👤 Patient ID:', patientId)
           
           const patientsStore = usePatientsStore()
           
           if (isEditingRecipe.value && selectedRecipeForEdit.value) {
+            console.log('✏️ Actualizando receta ID:', selectedRecipeForEdit.value.id)
             await patientsStore.updateRecipe(selectedRecipeForEdit.value.id, recipeData)
             alert('Receta actualizada correctamente')
           } else {
+            console.log('➕ Creando nueva receta')
             await patientsStore.createRecipe(recipeData)
             alert('Receta creada correctamente')
           }
           
           // Cerrar modal y recargar datos
           closeHistoryLogModals()
-          await patientsStore.fetchPatientMedicalRecords(patientId)
+          
+          // Recargar los detalles del medical record si hay uno seleccionado
+          if (selectedRecord.value?.id) {
+            await patientsStore.fetchMedicalRecordDetails(selectedRecord.value.id)
+          }
+          
+          // También recargar la lista de medical records del paciente
+          if (patientId) {
+            await patientsStore.fetchPatientMedicalRecords(patientId)
+          }
           
         } catch (error) {
           console.error('❌ Error al guardar receta:', error)
