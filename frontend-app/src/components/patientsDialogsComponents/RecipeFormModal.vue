@@ -193,23 +193,27 @@ async function handleSubmit() {
       // Asegurar que Vue detecte el cambio
       await nextTick()
       
-      alert(t('recipes.recipe-updated'))
+      notificationStore.addNotification('success', 'notifications.success', t('recipes.recipe-updated'))
     } else {
       // Crear nueva receta
       if (props.treatmentId) {
         dataToSend.treatmentId = props.treatmentId
       } else {
-        alert(t('recipes.error-no-treatment'))
+        notificationStore.addNotification('warning', 'general.warning', t('recipes.error-no-treatment'))
         return
       }
       result = await createRecipe(dataToSend)
-      alert(t('recipes.recipe-created'))
+      notificationStore.addNotification('success', 'notifications.success', t('recipes.recipe-created'))
     }
 
     emit('save', result)
     handleClose()
   } catch (error) {
-    alert(t('recipes.error-saving') + ': ' + (error.message || t('recipes.unknown-error')))
+    notificationStore.addNotification(
+      'error', 
+      'notifications.error', 
+      t('recipes.error-saving') + ': ' + (error.message || t('recipes.unknown-error'))
+    )
   } finally {
     isLoading.value = false
   }

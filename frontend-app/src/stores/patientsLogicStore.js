@@ -54,11 +54,6 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
         selectedRecordForEdit.value = record
         isEditing.value = true
         showFormModal.value = true
-        console.log('📋 Estados del modal:', {
-          showFormModal: showFormModal.value,
-          isEditing: isEditing.value,
-          selectedRecordForEdit: selectedRecordForEdit.value
-        })
      }
 
      function openRecipeFormModal(recipe = null) {
@@ -80,8 +75,6 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
 
      async function handleMedicalRecordSave(formData, patientId) {
         try {
-          console.log('💾 Guardando registro médico...')
-
           const patientsStore = usePatientsStore()
 
           // Verificar si viene en el nuevo formato (con medicalRecord y recipe separados)
@@ -103,7 +96,6 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
             
             // 2. Manejar Recipe si existe
             if (formData.recipe) {
-              console.log('💊 Procesando receta médica...')
               // Aquí agregamos lógica para recipes cuando esté lista
             }
             
@@ -119,8 +111,6 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
             }
           }
 
-          console.log('✅ Registro guardado exitosamente')
-          
           // Cerrar modal y recargar datos
           closeHistoryLogModals()
           await patientsStore.fetchPatientMedicalRecords(patientId)
@@ -134,8 +124,6 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
           )
           
         } catch (error) {
-          console.error('❌ Error al guardar registro:', error)
-          
           // Usar notification store en lugar de alert
           const notificationStore = useNotificationStore()
           notificationStore.addNotification(
@@ -148,18 +136,13 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
 
      async function handleRecipeSave(recipeData, patientId) {
         try {
-          console.log('💊 Guardando receta:', recipeData)
-          console.log('👤 Patient ID:', patientId)
-          
           const patientsStore = usePatientsStore()
           const notificationStore = useNotificationStore()
           
           if (isEditingRecipe.value && selectedRecipeForEdit.value) {
-            console.log('✏️ Actualizando receta ID:', selectedRecipeForEdit.value.id)
             await patientsStore.updateRecipe(selectedRecipeForEdit.value.id, recipeData)
             notificationStore.addNotification('success', 'general.success', 'Receta actualizada correctamente')
           } else {
-            console.log('➕ Creando nueva receta')
             await patientsStore.createRecipe(recipeData)
             notificationStore.addNotification('success', 'general.success', 'Receta creada correctamente')
           }
@@ -178,7 +161,6 @@ export const usePatientsLogicStore = defineStore('patientsLogic', () => {
           }
           
         } catch (error) {
-          console.error('❌ Error al guardar receta:', error)
           const notificationStore = useNotificationStore()
           notificationStore.addNotification('error', 'general.error', 'Error al guardar la receta: ' + (error.message || 'Error desconocido'))
         }
