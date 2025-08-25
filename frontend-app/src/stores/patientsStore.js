@@ -19,6 +19,7 @@ export const usePatientsStore = defineStore('patients', () => {
 
   const currentPatientMedicalRecords = ref(undefined)
   const isLoadingMedicalRecords = ref(false)
+  const hasError = ref(false)
 
   function setPatientsData(id) {
     currentPatientSelectedId.value = id
@@ -161,10 +162,14 @@ export const usePatientsStore = defineStore('patients', () => {
   }
 
   async function fetchMedicalRecordDetails(recordId) {
-    isLoadingMedicalRecords.value = false
+    isLoadingMedicalRecords.value = true
+    hasError.value = false
     try {
       const res = await instance.get(`/medicalrecords/${recordId}/details`)
       fullRecord.value = res.data
+    } catch (error) {
+      console.error('Error fetching medical record details:', error)
+      hasError.value = true
     } finally {
       isLoadingMedicalRecords.value = false
     }
@@ -226,7 +231,7 @@ export const usePatientsStore = defineStore('patients', () => {
     isLoadingPatientData,
     currentPatientMedicalRecords,
     isLoadingMedicalRecords,
-    isLoadingMedicalRecords,
+    hasError,
     // actions
     fetchPatientMedicalRecords,
     setPatientsData,

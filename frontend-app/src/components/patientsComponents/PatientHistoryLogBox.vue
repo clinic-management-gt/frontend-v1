@@ -103,6 +103,7 @@
       :is-open="showRecipeFormModal"
       :recipe="selectedRecipeForEdit"
       :is-editing="isEditingRecipe"
+      :treatment-id="getFirstTreatmentId()"
       @close="closeHistoryLogModals" 
       @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)" 
     />
@@ -122,6 +123,7 @@ import PrimaryButton from '@components/forms/PrimaryButton.vue'
 import Panel from '@components/forms/Panel.vue'
 import ConsultationDetailsModal from '../patientsDialogsComponents/ConsultationDetailsModal.vue'
 import MedicalRecordFormModal from '../patientsDialogsComponents/MedicalRecordFormModal.vue'
+import RecipeFormModal from '../patientsDialogsComponents/RecipeFormModal.vue'
 import { formatDateShort } from '@/utils/isoFormatDate.js'
 
 const props = defineProps({
@@ -177,6 +179,26 @@ function downloadRecord(record) {
 function handleViewRecipe(recipe) {
   emit('view-recipe', recipe)
   closeDetailsModal()
+}
+
+function getFirstTreatmentId() {
+  // Si estamos editando una receta existente, usar su treatmentId
+  if (selectedRecipeForEdit.value?.treatmentId) {
+    return selectedRecipeForEdit.value.treatmentId
+  }
+  
+  // Si hay registros médicos con tratamientos, buscar el primer tratamiento disponible
+  if (currentPatientMedicalRecords.value) {
+    const records = Object.values(currentPatientMedicalRecords.value)
+    for (const record of records) {
+      if (record.treatments && record.treatments.length > 0) {
+        return record.treatments[0].id
+      }
+    }
+  }
+  
+  // Si no hay tratamientos, retornar null para indicar que no se puede crear receta
+  return null
 }
 
 function resetPagination() {

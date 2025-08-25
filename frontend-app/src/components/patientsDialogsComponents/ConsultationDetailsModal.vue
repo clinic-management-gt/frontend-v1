@@ -132,6 +132,12 @@
             <div v-else class="text-center py-6">
               <div class="text-gray-400 text-4xl mb-2">💊</div>
               <p class="text-gray-500">{{ $t('patients.no-prescription') }}</p>
+              <button
+                @click="openRecipeFormModal()"
+                class="mt-3 px-4 py-2 text-blue-600 hover:text-blue-800 font-medium"
+              >
+                ✏️ {{ $t('general.edit') }}
+              </button>
             </div>
           </div>
 
@@ -245,6 +251,22 @@ const { fullRecord, isLoadingMedicalRecords, hasError } = storeToRefs(patientsSt
 const patientsLogicStore = usePatientsLogicStore()
 const { selectedRecord } = storeToRefs(patientsLogicStore)
 const { closeHistoryLogModals, openMedicalRecordEditModal, openRecipeFormModal } = patientsLogicStore
+
+function getFirstTreatmentId() {
+  // Si estamos editando una receta existente, usar su treatmentId
+  if (displayRecord.value?.recipes && displayRecord.value.recipes.length > 0) {
+    const firstRecipe = displayRecord.value.recipes[0]
+    if (firstRecipe.treatmentId) return firstRecipe.treatmentId
+  }
+  
+  // Si hay tratamientos disponibles, usar el primero
+  if (displayRecord.value?.treatments && displayRecord.value.treatments.length > 0) {
+    return displayRecord.value.treatments[0].id
+  }
+  
+  // Si no hay tratamientos, retornar un ID por defecto o null
+  return 1 // Por ahora usar 1 como fallback
+}
 
 const handleClose = () => {
   closeHistoryLogModals()
