@@ -468,29 +468,52 @@ onMounted(() => {
   fetchPatients()
 })
 </script>
-
 <template>
-  <div :class="styles['main-content']">
+  <div :class="styles['main-content']" data-testid="calendar-root">
     <!-- Header del calendario -->
-    <div :class="styles['calendar-header']">
-      <button @click="prevMonth" :class="styles['calendar-btn']">&lt;</button>
+    <div :class="styles['calendar-header']" data-testid="calendar-header">
+      <button
+        @click="prevMonth"
+        :class="styles['calendar-btn']"
+        data-testid="calendar-prev-btn"
+        aria-label="Mes anterior"
+      >
+        &lt;
+      </button>
       <div :class="styles['calendar-title']">
-        <span>{{ monthNames[currentMonth] }}</span>
-        <button @click="showYearSelect = !showYearSelect" :class="styles['calendar-year-btn']">
+        <span data-testid="calendar-month-name">{{ monthNames[currentMonth] }}</span>
+        <button
+          @click="showYearSelect = !showYearSelect"
+          :class="styles['calendar-year-btn']"
+          data-testid="calendar-year-btn"
+        >
           {{ currentYear }}
         </button>
-        <div v-if="showYearSelect" :class="styles['year-select']">
-          <div v-for="year in years" :key="year" @click="selectYear(year)" :class="styles['year-option']">
+        <div v-if="showYearSelect" :class="styles['year-select']" data-testid="year-select">
+          <div
+            v-for="year in years"
+            :key="year"
+            @click="selectYear(year)"
+            :class="styles['year-option']"
+            :data-testid="`year-option-${year}`"
+          >
             {{ year }}
           </div>
         </div>
       </div>
-      <button @click="nextMonth" :class="styles['calendar-btn']">&gt;</button>
+      <button
+        @click="nextMonth"
+        :class="styles['calendar-btn']"
+        data-testid="calendar-next-btn"
+        aria-label="Mes siguiente"
+      >
+        &gt;
+      </button>
     </div>
 
     <!-- Tabla del calendario -->
-    <div :class="styles['calendar-table']">
-      <div :class="styles['calendar-row']">
+    <div :class="styles['calendar-table']" data-testid="calendar-table">
+      <div :class="styles['calendar-row']" data-testid="calendar-days-header">
         <div v-for="day in days" :key="day" :class="styles['calendar-day']">{{ day }}</div>
       </div>
       <div v-for="(week, weekIndex) in weeks" :key="'week-' + weekIndex" :class="styles['calendar-row']">
@@ -499,6 +522,7 @@ onMounted(() => {
           :key="'day-' + cell.day + '-' + cell.month + '-' + cell.year"
           :class="[styles['calendar-cell'], cell.isOtherMonth ? styles['other-month'] : '']"
           @click="dayClicked(cell)"
+          :data-testid="`calendar-cell-${cell.year}-${cell.month}-${cell.day}`"
         >
           <span>{{ cell.day }}</span>
           <div :class="styles['calendar-events']">
@@ -508,16 +532,17 @@ onMounted(() => {
               :key="'event-' + eventIndex"
               :class="[styles['event'], styles[`event-${event.type.toLowerCase()}`]]"
               :style="{ backgroundColor: event.color }"
+              :data-testid="`calendar-event-${event.type.toLowerCase()}-${eventIndex}`"
             >
               <div :class="styles['event-header']">
                 <span :class="styles['event-icon']">
                   {{ event.type === 'Paciente' ? '👤' : event.type === 'Cita' ? '🩺' : '📋' }}
                 </span>
-                <span :class="styles['event-time']">
+                <span :class="styles['event-time']" data-testid="event-time">
                   {{ event.startTime }}<span v-if="event.endTime">-{{ event.endTime }}</span>
                 </span>
               </div>
-              <div :class="styles['event-text']">
+              <div :class="styles['event-text']" data-testid="event-text">
                 {{ event.type === 'Cita' ? event.text.replace('Cita: ', '') : event.text }}
               </div>
             </div>
@@ -527,37 +552,46 @@ onMounted(() => {
               v-if="getLimitedEventsForDay(cell).remainingCount > 0"
               :class="styles['more-events']"
               @click.stop="dayClicked(cell)"
+              data-testid="more-events-indicator"
             >
               +{{ getLimitedEventsForDay(cell).remainingCount }} más
             </div>
-
           </div>
         </div>
       </div>
     </div>
 
     <!-- Panel de actividades del día seleccionado -->
-    <div v-if="selectedDayObj" ref="refDaySelectedAgenda" :class="styles['day-agenda-panel']">
-      <h3>
+    <div
+      v-if="selectedDayObj"
+      ref="refDaySelectedAgenda"
+      :class="styles['day-agenda-panel']"
+      data-testid="day-agenda-panel"
+    >
+      <h3 data-testid="agenda-title">
         Agenda para el {{ selectedDayObj.day }}/{{ selectedDayObj.month + 1 }}/{{ selectedDayObj.year }}
       </h3>
 
-      <ul>
-        <li v-for="(event, i) in getEventsForDay(selectedDayObj)" :key="i">
+      <ul data-testid="agenda-events-list">
+        <li
+          v-for="(event, i) in getEventsForDay(selectedDayObj)"
+          :key="i"
+          :data-testid="`agenda-event-${i}`"
+        >
           <template v-if="editingIndex === i">
-            <div class="edit-fields">
-              <input v-model="editingText" placeholder="Texto" />
-              <input v-model="editingStart" type="time" />
-              <input v-model="editingEnd" type="time" placeholder="Fin (opcional)" />
-              <input v-model="editingColor" type="color" />
+            <div class="edit-fields" data-testid="edit-fields">
+              <input v-model="editingText" placeholder="Texto" data-testid="edit-text-input" />
+              <input v-model="editingStart" type="time" data-testid="edit-start-input" />
+              <input v-model="editingEnd" type="time" placeholder="Fin (opcional)" data-testid="edit-end-input" />
+              <input v-model="editingColor" type="color" data-testid="edit-color-input" />
             </div>
             <div class="edit-buttons-centered">
-              <button @click="saveEdit(i)">Guardar</button>
-              <button @click="cancelEdit">Cancelar</button>
+              <button @click="saveEdit(i)" data-testid="save-edit-btn">Guardar</button>
+              <button @click="cancelEdit" data-testid="cancel-edit-btn">Cancelar</button>
             </div>
           </template>
           <template v-else>
-            <span>
+            <span data-testid="event-display-text">
               <span v-if="event.type === 'Paciente'">👤 </span>
               <span v-else-if="event.type === 'Cita'">🩺 </span>
               <span v-else>📋 </span>
@@ -570,53 +604,130 @@ onMounted(() => {
 
               <!-- Botones diferentes según el tipo de evento -->
               <template v-if="event.type === 'Cita'">
-                <button @click="openAppointmentEdit(event)" :class="styles['edit-btn']">
+                <button
+                  @click="openAppointmentEdit(event)"
+                  :class="styles['edit-btn']"
+                  data-testid="edit-appointment-btn"
+                >
                   ✏️ Editar Cita
                 </button>
               </template>
               <template v-else>
-                <button @click="startEdit(i, event)" :class="styles['edit-btn']">Editar</button>
-                <button @click="deleteEvent(i)" :class="styles['delete-btn']">🗑️</button>
+                <button
+                  @click="startEdit(i, event)"
+                  :class="styles['edit-btn']"
+                  data-testid="edit-event-btn"
+                >
+                  Editar
+                </button>
+                <button
+                  @click="deleteEvent(i)"
+                  :class="styles['delete-btn']"
+                  data-testid="delete-event-btn"
+                >
+                  🗑️
+                </button>
               </template>
             </span>
           </template>
         </li>
-        <li v-if="getEventsForDay(selectedDayObj).length === 0">
+        <li v-if="getEventsForDay(selectedDayObj).length === 0" data-testid="no-events-message">
           No hay actividades ni pacientes.
         </li>
       </ul>
 
-      <div :class="styles['agenda-forms']">
+      <div :class="styles['agenda-forms']" data-testid="agenda-forms">
         <!-- Pacientes fila -->
-        <form @submit.prevent="addPatientEvent" :class="styles['agenda-form']">
-          <input v-model="selectedPatient" placeholder="Buscar o seleccionar paciente" required>
-          <input v-model="patientStartTime" type="time" required>
-          <input v-model="patientEndTime" type="time" placeholder="Fin (opcional)">
-          <input v-model="patientColor" type="color" title="Color paciente" class="color-input">
-          <button type="submit">Añadir paciente</button>
+        <form
+          @submit.prevent="addPatientEvent"
+          :class="styles['agenda-form']"
+          data-testid="add-patient-form"
+        >
+          <input
+            v-model="selectedPatient"
+            placeholder="Buscar o seleccionar paciente"
+            required
+            data-testid="patient-input"
+          >
+          <input
+            v-model="patientStartTime"
+            type="time"
+            required
+            data-testid="patient-start-time"
+          >
+          <input
+            v-model="patientEndTime"
+            type="time"
+            placeholder="Fin (opcional)"
+            data-testid="patient-end-time"
+          >
+          <input
+            v-model="patientColor"
+            type="color"
+            title="Color paciente"
+            class="color-input"
+            data-testid="patient-color"
+          >
+          <button type="submit" data-testid="add-patient-btn">Añadir paciente</button>
         </form>
 
         <!-- Actividad fila -->
-        <form @submit.prevent="addActivityEvent" :class="styles['agenda-form']">
-          <input v-model="activityText" placeholder="Actividad" required>
-          <input v-model="activityStartTime" type="time" required>
-          <input v-model="activityEndTime" type="time" placeholder="Fin (opcional)">
-          <input v-model="activityColor" type="color" title="Color actividad" class="color-input">
-          <button type="submit">Añadir actividad</button>
+        <form
+          @submit.prevent="addActivityEvent"
+          :class="styles['agenda-form']"
+          data-testid="add-activity-form"
+        >
+          <input
+            v-model="activityText"
+            placeholder="Actividad"
+            required
+            data-testid="activity-input"
+          >
+          <input
+            v-model="activityStartTime"
+            type="time"
+            required
+            data-testid="activity-start-time"
+          >
+          <input
+            v-model="activityEndTime"
+            type="time"
+            placeholder="Fin (opcional)"
+            data-testid="activity-end-time"
+          >
+          <input
+            v-model="activityColor"
+            type="color"
+            title="Color actividad"
+            class="color-input"
+            data-testid="activity-color"
+          >
+          <button type="submit" data-testid="add-activity-btn">Añadir actividad</button>
         </form>
       </div>
     </div>
 
     <!-- Modal de edición de citas -->
-    <div v-if="showEditModal" :class="styles['modal-overlay']" @click="closeEditModal">
-      <div :class="styles['modal-content']" @click.stop>
+    <div
+      v-if="showEditModal"
+      :class="styles['modal-overlay']"
+      @click="closeEditModal"
+      data-testid="edit-modal-overlay"
+    >
+      <div :class="styles['modal-content']" @click.stop data-testid="edit-modal-content">
         <div :class="styles['modal-header']">
           <h3>Editar Cita Médica</h3>
-          <button @click="closeEditModal" :class="styles['close-btn']">&times;</button>
+          <button
+            @click="closeEditModal"
+            :class="styles['close-btn']"
+            data-testid="close-modal-btn"
+          >
+            &times;
+          </button>
         </div>
 
         <div :class="styles['modal-body']">
-          <form @submit.prevent="saveAppointment">
+          <form @submit.prevent="saveAppointment" data-testid="edit-appointment-form">
             <!-- Selector de paciente mejorado -->
             <div :class="styles['form-group']">
               <label>Paciente:</label>
@@ -628,20 +739,22 @@ onMounted(() => {
                   @blur="onSearchBlur"
                   placeholder="Escriba para buscar paciente..."
                   :class="styles['search-input']"
+                  data-testid="patient-search-input"
                 />
-                <!-- Mostrar dropdown solo si está activo Y hay texto de búsqueda -->
-                <div v-if="showPatientDropdown && searchPatient && searchPatient.length > 2 && filteredPatients.length > 0" :class="styles['patient-dropdown']">
+                <div
+                  v-if="showPatientDropdown && searchPatient && searchPatient.length > 2 && filteredPatients.length > 0"
+                  :class="styles['patient-dropdown']"
+                  data-testid="patient-dropdown"
+                >
                   <div
                     v-for="patient in filteredPatients.slice(0, 5)"
                     :key="patient.id"
                     @mousedown="selectPatient(patient)"
                     :class="styles['patient-option']"
+                    :data-testid="`patient-option-${patient.id}`"
                   >
                     <strong>{{ patient.name }}</strong>
                     <span>{{ patient.email }}</span>
-                  </div>
-                  <div v-if="filteredPatients.length === 0" :class="styles['no-results']">
-                    No se encontraron pacientes
                   </div>
                 </div>
               </div>
@@ -655,6 +768,7 @@ onMounted(() => {
                 type="date"
                 required
                 :class="styles['form-input']"
+                data-testid="edit-date-input"
               />
             </div>
 
@@ -666,29 +780,47 @@ onMounted(() => {
                 type="time"
                 required
                 :class="styles['form-input']"
+                data-testid="edit-time-input"
               />
             </div>
 
             <!-- Estado -->
             <div :class="styles['form-group']">
               <label>Estado:</label>
-              <select v-model="editForm.status" :class="styles['form-select']">
+              <select
+                v-model="editForm.status"
+                :class="styles['form-select']"
+                data-testid="edit-status-select"
+              >
                 <option v-for="status in appointmentStatuses" :key="status" :value="status">
                   {{ status }}
                 </option>
               </select>
             </div>
 
-
             <!-- Botones -->
             <div :class="styles['modal-actions']">
-              <button type="submit" :class="styles['save-btn']">
+              <button
+                type="submit"
+                :class="styles['save-btn']"
+                data-testid="save-appointment-btn"
+              >
                 💾 Guardar Cambios
               </button>
-              <button type="button" @click="deleteAppointment" :class="styles['delete-btn']">
+              <button
+                type="button"
+                @click="deleteAppointment"
+                :class="styles['delete-btn']"
+                data-testid="delete-appointment-btn"
+              >
                 🗑️ Eliminar Cita
               </button>
-              <button type="button" @click="closeEditModal" :class="styles['cancel-btn']">
+              <button
+                type="button"
+                @click="closeEditModal"
+                :class="styles['cancel-btn']"
+                data-testid="cancel-modal-btn"
+              >
                 Cancelar
               </button>
             </div>

@@ -38,17 +38,21 @@
     </TransitionRoot>
 
     <!-- Barra lateral estática para escritorio -->
-    <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-      <div
-        class="flex grow flex-col gap-y-5 overflow-y-auto bg-primary-color align-center justify-center min-h-screen px-6 pb-4">
-        <div class="flex h-18 shrink-0 items-center bg-white mt-2 rounded-full">
-          <img class="h-16 w-auto mx-auto" src="/logo-gastro.png" alt="Logo Gastro" />
-        </div>
-        <nav class="flex flex-1 flex-col">
-          <NavigationBar />
-        </nav>
-      </div>
+<!-- Barra lateral estática para escritorio -->
+<div
+  class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col"
+  data-testid="sidebar-desktop"
+>
+  <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-primary-color align-center justify-center min-h-screen px-6 pb-4">
+    <div class="flex h-18 shrink-0 items-center bg-white mt-2 rounded-full">
+      <img class="h-16 w-auto mx-auto" src="/logo-gastro.png" alt="Logo Gastro" />
     </div>
+    <nav class="flex flex-1 flex-col">
+      <NavigationBar />
+    </nav>
+  </div>
+</div>
+
 
     <!-- Barra superior y contenido principal -->
     <div class="lg:pl-72">
