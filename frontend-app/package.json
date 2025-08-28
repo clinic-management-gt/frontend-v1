@@ -39,6 +39,7 @@
     "zod": "^3.24.3"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.28.0",
     "@eslint/js": "^9.34.0",
     "@pinia/testing": "^1.0.2",
     "@playwright/experimental-ct-vue": "^1.55.0",
