@@ -489,7 +489,7 @@ watch(
     } else {
       patientsStore.clearFullRecord();
     }
-  }
+  },
 );
 
 onMounted(() => {

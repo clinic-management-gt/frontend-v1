@@ -33,7 +33,7 @@ test('Dashboard muestra "Pacientes para hoy"', async ({ page }) => {
   await expect(
     page
       .getByRole("heading", { name: /Pacientes para hoy/i })
-      .or(page.getByText(/Pacientes para hoy/i))
+      .or(page.getByText(/Pacientes para hoy/i)),
   ).toBeVisible();
   await expect(page.getByText("Juan Pérez")).toBeVisible();
   await expect(page.getByText("Dra. Gómez")).toBeVisible();

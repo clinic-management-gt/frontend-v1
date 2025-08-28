@@ -10,7 +10,7 @@
           $t(
             isEditing
               ? "medical-records.edit-record"
-              : "medical-records.add-record"
+              : "medical-records.add-record",
           )
         }}
       </p>
@@ -284,7 +284,7 @@ async function handleSubmit() {
       notificationStore.addNotification(
         "warning",
         "general.warning",
-        "Por favor completa al menos un campo"
+        "Por favor completa al menos un campo",
       );
       return;
     }
@@ -293,20 +293,20 @@ async function handleSubmit() {
       // Actualizar registro existente - usar el store de lógica
       await patientsLogicStore.handleMedicalRecordSave(
         dataToSend,
-        props.patientId
+        props.patientId,
       );
     } else if (!props.isEditing && props.patientId) {
       // Crear nuevo registro usando el store de lógica
       await patientsLogicStore.handleMedicalRecordSave(
         dataToSend,
-        props.patientId
+        props.patientId,
       );
     } else {
       // No hacer nada si no hay condiciones válidas
       notificationStore.addNotification(
         "warning",
         "general.warning",
-        "No se puede procesar la solicitud"
+        "No se puede procesar la solicitud",
       );
       return;
     }
@@ -319,7 +319,7 @@ async function handleSubmit() {
       "general.error",
       props.isEditing
         ? "Error al actualizar el registro"
-        : "Error al crear el registro"
+        : "Error al crear el registro",
     );
   } finally {
     isLoading.value = false;
@@ -336,6 +336,6 @@ watch(
       });
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>

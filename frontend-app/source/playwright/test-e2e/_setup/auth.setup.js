@@ -7,7 +7,7 @@ test("login y guardo sesión", async ({ page }) => {
   // Valida credenciales antes de intentar fill
   if (!EMAIL || !PASSWORD) {
     throw new Error(
-      "Faltan E2E_EMAIL o E2E_PASSWORD (define .env o pasa variables al comando)."
+      "Faltan E2E_EMAIL o E2E_PASSWORD (define .env o pasa variables al comando).",
     );
   }
 

@@ -5,20 +5,20 @@ import { XMarkIcon } from "@heroicons/vue/24/solid";
 import { storeToRefs } from "pinia";
 import { useNotificationStore } from "@stores/notificationStore";
 
-const XCircleIcon = defineAsyncComponent(() =>
-  import("@heroicons/vue/24/outline/XCircleIcon")
+const XCircleIcon = defineAsyncComponent(
+  () => import("@heroicons/vue/24/outline/XCircleIcon"),
 );
-const ArrowLeftStartOnRectangleIcon = defineAsyncComponent(() =>
-  import("@heroicons/vue/24/outline/ArrowLeftStartOnRectangleIcon")
+const ArrowLeftStartOnRectangleIcon = defineAsyncComponent(
+  () => import("@heroicons/vue/24/outline/ArrowLeftStartOnRectangleIcon"),
 );
-const CheckCircleIcon = defineAsyncComponent(() =>
-  import("@heroicons/vue/24/outline/CheckCircleIcon")
+const CheckCircleIcon = defineAsyncComponent(
+  () => import("@heroicons/vue/24/outline/CheckCircleIcon"),
 );
-const ExclamationTriangleIcon = defineAsyncComponent(() =>
-  import("@heroicons/vue/24/outline/ExclamationTriangleIcon")
+const ExclamationTriangleIcon = defineAsyncComponent(
+  () => import("@heroicons/vue/24/outline/ExclamationTriangleIcon"),
 );
-const Spinner = defineAsyncComponent(() =>
-  import("../forms/SpinnerLoading.vue")
+const Spinner = defineAsyncComponent(
+  () => import("../forms/SpinnerLoading.vue"),
 );
 
 const notificationStore = useNotificationStore();

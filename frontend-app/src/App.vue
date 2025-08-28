@@ -16,11 +16,14 @@ import { ref, onMounted, defineAsyncComponent } from "vue";
 import { storeToRefs } from "pinia";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore";
 
-const patientsCreateFormDialog = defineAsyncComponent(() =>
-  import("@components/patientsDialogsComponents/PatientsCreateFormDialog.vue")
+const patientsCreateFormDialog = defineAsyncComponent(
+  () =>
+    import(
+      "@components/patientsDialogsComponents/PatientsCreateFormDialog.vue"
+    ),
 );
-const NotificationAlert = defineAsyncComponent(() =>
-  import("@components/forms/NotificationAlert.vue")
+const NotificationAlert = defineAsyncComponent(
+  () => import("@components/forms/NotificationAlert.vue"),
 );
 
 const patientsLogicStore = usePatientsLogicStore();

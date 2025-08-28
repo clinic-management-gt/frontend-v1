@@ -84,7 +84,7 @@ test.describe("Calendario E2E Tests", () => {
           0
         );
       },
-      { timeout: 10000 }
+      { timeout: 10000 },
     );
 
     // Verificar que hay eventos de tipo 'cita'
@@ -128,7 +128,7 @@ test.describe("Calendario E2E Tests", () => {
             .length > 0
         );
       },
-      { timeout: 10000 }
+      { timeout: 10000 },
     );
 
     const day22Cell = page.getByTestId("calendar-cell-2025-7-22");
@@ -216,7 +216,7 @@ test("verificación básica del calendario - FALLBACK", async ({ page }) => {
       console.log(
         `✅ Encontrado indicador de calendario: ${await indicator
           .first()
-          .textContent()}`
+          .textContent()}`,
       );
       break;
     }
@@ -226,7 +226,7 @@ test("verificación básica del calendario - FALLBACK", async ({ page }) => {
     // Si no encontramos nada, al menos verificar que la página cargó
     await expect(page.locator("body")).toBeVisible();
     console.log(
-      "⚠️  No se encontraron indicadores específicos del calendario, pero la página cargó"
+      "⚠️  No se encontraron indicadores específicos del calendario, pero la página cargó",
     );
 
     // Tomar screenshot para debug

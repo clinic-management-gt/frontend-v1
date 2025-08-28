@@ -93,12 +93,12 @@ export const usePatientsLogicStore = defineStore(
                 selectedRecordForEdit.value.id;
               await patientsStore.updateMedicalRecord(
                 recordId,
-                formData.medicalRecord
+                formData.medicalRecord,
               );
             } else {
               await patientsStore.createMedicalRecord(
                 patientId,
-                formData.medicalRecord
+                formData.medicalRecord,
               );
             }
           }
@@ -132,7 +132,7 @@ export const usePatientsLogicStore = defineStore(
           "general.success",
           isEditing.value
             ? "general.record-updated-successfully"
-            : "general.record-created-successfully"
+            : "general.record-created-successfully",
         );
       } catch (error) {
         // Usar notification store en lugar de alert
@@ -141,7 +141,7 @@ export const usePatientsLogicStore = defineStore(
           "error",
           "general.error",
           "Error al guardar el registro: " +
-            (error.message || "Error desconocido")
+            (error.message || "Error desconocido"),
         );
       }
     }
@@ -154,19 +154,19 @@ export const usePatientsLogicStore = defineStore(
         if (isEditingRecipe.value && selectedRecipeForEdit.value) {
           await patientsStore.updateRecipe(
             selectedRecipeForEdit.value.id,
-            recipeData
+            recipeData,
           );
           notificationStore.addNotification(
             "success",
             "general.success",
-            "Receta actualizada correctamente"
+            "Receta actualizada correctamente",
           );
         } else {
           await patientsStore.createRecipe(recipeData);
           notificationStore.addNotification(
             "success",
             "general.success",
-            "Receta creada correctamente"
+            "Receta creada correctamente",
           );
         }
 
@@ -176,7 +176,7 @@ export const usePatientsLogicStore = defineStore(
         // Recargar los detalles del medical record si hay uno seleccionado
         if (selectedRecord.value?.id) {
           await patientsStore.fetchMedicalRecordDetails(
-            selectedRecord.value.id
+            selectedRecord.value.id,
           );
         }
 
@@ -190,7 +190,7 @@ export const usePatientsLogicStore = defineStore(
           "error",
           "general.error",
           "Error al guardar la receta: " +
-            (error.message || "Error desconocido")
+            (error.message || "Error desconocido"),
         );
       }
     }
@@ -237,5 +237,5 @@ export const usePatientsLogicStore = defineStore(
   },
   {
     persist: false,
-  }
+  },
 );

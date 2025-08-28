@@ -6,6 +6,6 @@ test("renderiza TodayPatients (CT)", async ({ mount }) => {
     // si necesitas Pinia, la agregamos vía hooks (ver paso 5)
   });
   await expect(
-    cmp.getByRole("heading", { name: /Pacientes para hoy/i })
+    cmp.getByRole("heading", { name: /Pacientes para hoy/i }),
   ).toBeVisible();
 });

@@ -79,7 +79,7 @@ const todayFormatted = computed(() =>
     day: "numeric",
     month: "long",
     year: "numeric",
-  })
+  }),
 );
 
 // --------------------------------------------------
@@ -115,7 +115,7 @@ async function changueStatus(appointment) {
   // 3) PATCH contra el backend
   const ok = await patientsStore.updateAppointmentStatus(
     appointment.id,
-    next.label
+    next.label,
   );
   if (!ok) {
     // si fallo, revertimos

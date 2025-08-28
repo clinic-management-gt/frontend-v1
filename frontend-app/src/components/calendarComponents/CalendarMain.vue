@@ -75,7 +75,7 @@ const prevMonthDays = computed(() => {
   const prevMonthLastDate = new Date(
     currentYear.value,
     currentMonth.value,
-    0
+    0,
   ).getDate();
   const daysArr = [];
   for (let i = firstDayOfWeek.value - 1; i >= 0; i--) {
@@ -206,7 +206,7 @@ function getLimitedEventsForDay(dayObj) {
       (e) =>
         e.day === dayObj.day &&
         e.month === dayObj.month &&
-        e.year === dayObj.year
+        e.year === dayObj.year,
     )
     .sort((a, b) => (a.startTime || "").localeCompare(b.startTime || ""));
 
@@ -224,7 +224,7 @@ function getEventsForDay(dayObj) {
       (e) =>
         e.day === dayObj.day &&
         e.month === dayObj.month &&
-        e.year === dayObj.year
+        e.year === dayObj.year,
     )
     .sort((a, b) => (a.startTime || "").localeCompare(b.startTime || ""));
 }
@@ -248,7 +248,7 @@ function startEdit(i, event) {
   editingColor.value = event.color;
   // Índice real del evento en events.value
   editingEventId.value = events.value.findIndex(
-    (e) => e === dayEvents.value[i]
+    (e) => e === dayEvents.value[i],
   );
 }
 
@@ -400,7 +400,7 @@ function filterPatients() {
   filteredPatients.value = patients.value.filter(
     (patient) =>
       patient.name.toLowerCase().includes(searchPatient.value.toLowerCase()) ||
-      patient.email.toLowerCase().includes(searchPatient.value.toLowerCase())
+      patient.email.toLowerCase().includes(searchPatient.value.toLowerCase()),
   );
 }
 
@@ -439,7 +439,7 @@ async function saveAppointment() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(appointmentData),
-      }
+      },
     );
 
     if (!res.ok) throw new Error("Error al actualizar la cita");
@@ -464,7 +464,7 @@ async function deleteAppointment() {
       `http://localhost:9000/appointments/${editingAppointment.value.id}`,
       {
         method: "DELETE",
-      }
+      },
     );
 
     if (!res.ok) throw new Error("Error al eliminar la cita");
@@ -500,7 +500,7 @@ function openAppointmentEdit(event) {
   if (event.type === "Cita") {
     // Buscar la cita original en appointments
     const appointment = appointments.value.find((app) =>
-      event.text.includes(app.PatientName || app.patientName)
+      event.text.includes(app.PatientName || app.patientName),
     );
     if (appointment) {
       openEditModal(appointment);
@@ -604,8 +604,8 @@ onMounted(() => {
                     event.type === "Paciente"
                       ? "👤"
                       : event.type === "Cita"
-                      ? "🩺"
-                      : "📋"
+                        ? "🩺"
+                        : "📋"
                   }}
                 </span>
                 <span :class="styles['event-time']" data-testid="event-time">

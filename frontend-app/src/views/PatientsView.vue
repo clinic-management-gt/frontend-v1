@@ -113,7 +113,7 @@ onMounted(async () => {
       // Intentar cargar registros médicos
       try {
         await patientsStore.fetchPatientMedicalRecords(
-          currentPatientSelectedId.value
+          currentPatientSelectedId.value,
         );
       } catch (medicalError) {
         console.warn("No se pudieron cargar registros médicos:", medicalError);

@@ -102,7 +102,7 @@ const props = defineProps({
 
 // Lista de personas (pacientes) a mostrar
 const people = computed(() =>
-  Array.isArray(props.data) && props.data.length > 0 ? props.data : []
+  Array.isArray(props.data) && props.data.length > 0 ? props.data : [],
 );
 
 // Paciente seleccionado actualmente
@@ -115,7 +115,7 @@ watch(
   () => props.currentSelected,
   (newVal) => {
     selected.value = people.value.find((p) => p.id === newVal) || null;
-  }
+  },
 );
 
 // Cuando se selecciona un paciente, emite el id al padre
@@ -138,7 +138,7 @@ const filteredPeople = computed(() =>
         (`${person.name} ${person.lastName}` || "")
           .toLowerCase()
           .replace(/\s+/g, "")
-          .includes(query.value.toLowerCase().replace(/\s+/g, ""))
-      )
+          .includes(query.value.toLowerCase().replace(/\s+/g, "")),
+      ),
 );
 </script>

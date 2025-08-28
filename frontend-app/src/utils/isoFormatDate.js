@@ -50,7 +50,7 @@ export function isoFormatDate(dateInput) {
   const isoDate = `${year}-${month}-${day}`;
   const localDate = `${day}/${month}/${year}`;
   const longSpanishDate = `${day} de ${t(
-    monthNames[date.getMonth()]
+    monthNames[date.getMonth()],
   )} de ${year}`;
   const timestamp = date.getTime();
 

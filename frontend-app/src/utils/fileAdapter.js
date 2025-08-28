@@ -60,7 +60,7 @@ export class FileAdapter {
     const mimeMatch = header.match(/data:(.*);base64/);
     const mimeType = mimeMatch ? mimeMatch[1] : this.mimeType;
     return this.#fromBase64(base64Str).then(
-      (blob) => new Blob([blob], { type: mimeType })
+      (blob) => new Blob([blob], { type: mimeType }),
     );
   }
 }

@@ -237,7 +237,7 @@ async function handleSubmit() {
       notificationStore.addNotification(
         "success",
         "notifications.success",
-        t("recipes.recipe-updated")
+        t("recipes.recipe-updated"),
       );
     } else {
       // Crear nueva receta
@@ -247,7 +247,7 @@ async function handleSubmit() {
         notificationStore.addNotification(
           "warning",
           "general.warning",
-          t("recipes.error-no-treatment")
+          t("recipes.error-no-treatment"),
         );
         return;
       }
@@ -255,7 +255,7 @@ async function handleSubmit() {
       notificationStore.addNotification(
         "success",
         "notifications.success",
-        t("recipes.recipe-created")
+        t("recipes.recipe-created"),
       );
     }
 
@@ -267,7 +267,7 @@ async function handleSubmit() {
       "notifications.error",
       t("recipes.error-saving") +
         ": " +
-        (error.message || t("recipes.unknown-error"))
+        (error.message || t("recipes.unknown-error")),
     );
   } finally {
     isLoading.value = false;
@@ -289,7 +289,7 @@ watch(
           }
 
           const textarea = document.querySelector(
-            'textarea[placeholder*="prescripción"]'
+            'textarea[placeholder*="prescripción"]',
           );
           if (textarea) {
             // Forzar el enfoque múltiples veces para asegurar que funcione
@@ -301,6 +301,6 @@ watch(
       });
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>

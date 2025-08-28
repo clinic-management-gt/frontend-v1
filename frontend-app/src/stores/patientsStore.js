@@ -86,7 +86,7 @@ export const usePatientsStore = defineStore(
       }
       try {
         const res = await instance.get(
-          `/patients/${currentPatientSelectedId.value}`
+          `/patients/${currentPatientSelectedId.value}`,
         );
         currentPatientSelectedData.value = res.data;
       } finally {
@@ -101,7 +101,7 @@ export const usePatientsStore = defineStore(
       if (!patientId) return;
       try {
         const res = await instance.get(
-          `/patients/${patientId}/medicalrecords?page=1&limit=50`
+          `/patients/${patientId}/medicalrecords?page=1&limit=50`,
         );
         currentPatientMedicalRecords.value = res.data.records || [];
         return res.data;
@@ -115,7 +115,7 @@ export const usePatientsStore = defineStore(
       try {
         console.log(
           `➕ Creando medical record para paciente ${patientId} con datos:`,
-          recordData
+          recordData,
         );
         // Asegurar que el PatientId esté en los datos (backend espera PascalCase)
         const dataToSend = { ...recordData, PatientId: patientId };
@@ -125,7 +125,7 @@ export const usePatientsStore = defineStore(
       } catch (error) {
         console.error(
           "❌ Error en createMedicalRecord:",
-          error.response?.data || error.message
+          error.response?.data || error.message,
         );
         throw error;
       } finally {
@@ -138,27 +138,27 @@ export const usePatientsStore = defineStore(
       try {
         console.log(
           `🔄 Actualizando medical record ${recordId} con datos:`,
-          recordData
+          recordData,
         );
         console.log("🔍 URL de la petición:", `/medicalrecords/${recordId}`);
         console.log("🔍 Tipo de petición: PATCH");
         const res = await instance.patch(
           `/medicalrecords/${recordId}`,
-          recordData
+          recordData,
         );
         console.log("✅ Respuesta del servidor:", res.data);
         return res.data;
       } catch (error) {
         console.error(
           "❌ Error en updateMedicalRecord:",
-          error.response?.data || error.message
+          error.response?.data || error.message,
         );
         console.error("❌ Status del error:", error.response?.status);
         console.error("❌ Config de axios:", error.config);
         if (error.response?.data?.errors) {
           console.error(
             "❌ Validation errors detallados:",
-            error.response.data.errors
+            error.response.data.errors,
           );
         }
         throw error;
@@ -177,7 +177,7 @@ export const usePatientsStore = defineStore(
       } catch (error) {
         console.error(
           "❌ Error en deleteMedicalRecord:",
-          error.response?.data || error.message
+          error.response?.data || error.message,
         );
         throw error;
       } finally {
@@ -285,5 +285,5 @@ export const usePatientsStore = defineStore(
         "newPatientData",
       ],
     },
-  }
+  },
 );

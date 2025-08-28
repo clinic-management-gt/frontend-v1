@@ -43,7 +43,7 @@ watch(
       return item ?? { id, name: `ID: ${id}` };
     });
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 // Convertir objetos seleccionados en array de IDs
@@ -55,7 +55,7 @@ watch(
       model.value = ids;
     }
   },
-  { deep: true }
+  { deep: true },
 );
 </script>
 

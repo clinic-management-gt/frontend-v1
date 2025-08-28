@@ -50,12 +50,12 @@ const gmailList = computed(() => {
   const allEmails = values
     .filter(
       (c) =>
-        c && typeof c === "object" && c.gmail && typeof c.gmail === "object"
+        c && typeof c === "object" && c.gmail && typeof c.gmail === "object",
     )
     .flatMap((c) => Object.values(c.gmail)); // accede a todos los correos del objeto gmail
 
   const filteredEmails = allEmails.filter(
-    (email) => email != null && email !== ""
+    (email) => email != null && email !== "",
   );
   const uniqueEmails = [...new Set(filteredEmails)];
   return uniqueEmails;
@@ -72,7 +72,7 @@ const contactList = computed(() => {
         c &&
         typeof c === "object" &&
         c.contacts &&
-        typeof c.contacts === "object"
+        typeof c.contacts === "object",
     )
     .flatMap((c) => Object.values(c.contacts));
 

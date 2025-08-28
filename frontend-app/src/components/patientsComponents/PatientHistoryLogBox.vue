@@ -218,10 +218,10 @@ const currentPage = ref(1);
 
 // Computados para paginación
 const totalRecords = computed(
-  () => currentPatientMedicalRecords.value?.length || 0
+  () => currentPatientMedicalRecords.value?.length || 0,
 );
 const totalPages = computed(() =>
-  Math.ceil(totalRecords.value / itemsPerPage.value)
+  Math.ceil(totalRecords.value / itemsPerPage.value),
 );
 const paginatedRecords = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
@@ -301,6 +301,6 @@ watch(
       currentPage.value = 1;
       await patientsStore.fetchPatientMedicalRecords(newId);
     }
-  }
+  },
 );
 </script>
