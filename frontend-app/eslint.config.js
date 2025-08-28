@@ -1,16 +1,18 @@
 import vue from "eslint-plugin-vue";
 import js from "@eslint/js";
+import vueParser from "vue-eslint-parser";
+import babelParser from "@babel/eslint-parser";
 
 export default [
   js.configs.recommended,
   {
     files: ["**/*.vue"],
     languageOptions: {
-      parser: require.resolve("vue-eslint-parser"),
+      parser: vueParser,
       parserOptions: {
         ecmaVersion: 2020,
         sourceType: "module",
-        parser: "@babel/eslint-parser",
+        parser: babelParser,
       },
     },
     plugins: { vue },
