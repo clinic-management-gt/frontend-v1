@@ -4,8 +4,8 @@
       v-if="title"
       :title="title"
       :name="name"
-      :text-class="labelCss"
-      :is-required="isRequired"
+      :textClass="labelCss"
+      :isRequired="isRequired"
     />
     <fieldset>
       <div

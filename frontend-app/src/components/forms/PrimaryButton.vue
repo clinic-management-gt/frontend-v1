@@ -9,7 +9,7 @@
       ]"
       :disabled="props.isDisabled"
     >
-      <slot />
+      <slot ></slot>
     </button>
   </div>
 </template>

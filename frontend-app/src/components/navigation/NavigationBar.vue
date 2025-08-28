@@ -52,11 +52,11 @@
     </li>
     <div class="relative">
       <div class="absolute inset-0 flex items-center" aria-hidden="true">
-        <div class="w-full border-t border-primary-color-variation-1" />
+        <div class="w-full border-t border-primary-color-variation-1" ></div>
       </div>
     </div>
     <button @click="logout" class="flex justify-start">
-      <x-circle-icon class="h-6 w-6 shrink-0 text-white"></x-circle-icon>
+      <x-circle-icon class="h-6 w-6 shrink-0 text-white"/>
       <span class="text-md ml-2 text-white font-bold">{{
         $t("general.exit")
       }}</span>

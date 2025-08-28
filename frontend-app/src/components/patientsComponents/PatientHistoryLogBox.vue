@@ -131,7 +131,7 @@
     <consultation-details-modal
       v-if="showDetailsModal"
       :record="selectedRecord"
-      :is-open="showDetailsModal"
+      :isOpen="showDetailsModal"
       @close="closeHistoryLogModals"
       @view-recipe="handleViewRecipe"
       @edit="openMedicalRecordEditModal"
@@ -140,10 +140,10 @@
     <!-- Modal de formulario -->
     <medical-record-form-modal
       v-if="showFormModal"
-      :is-open="showFormModal"
-      :patient-id="currentPatientSelectedId || props.patientId"
+      :isOpen="showFormModal"
+      :patientId="currentPatientSelectedId || props.patientId"
       :record="selectedRecordForEdit"
-      :is-editing="isEditing"
+      :isEditing="isEditing"
       @close="closeHistoryLogModals"
       @save="(formData) => handleMedicalRecordSave(formData, props.patientId)"
     />
@@ -151,10 +151,10 @@
     <!-- Modal de formulario de recetas -->
     <recipe-form-modal
       v-if="showRecipeFormModal"
-      :is-open="showRecipeFormModal"
+      :isOpen="showRecipeFormModal"
       :recipe="selectedRecipeForEdit"
-      :is-editing="isEditingRecipe"
-      :treatment-id="getFirstTreatmentId()"
+      :isEditing="isEditingRecipe"
+      :treatmentId="getFirstTreatmentId()"
       @close="closeHistoryLogModals"
       @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)"
     />

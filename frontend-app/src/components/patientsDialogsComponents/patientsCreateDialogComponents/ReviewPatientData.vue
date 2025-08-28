@@ -33,7 +33,7 @@
         <div
           class="relative flex size-6 flex-none items-center justify-center bg-white"
         >
-          <div class="size-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" />
+          <div class="size-1.5 rounded-full bg-gray-100 ring-1 ring-gray-300" ></div>
         </div>
         <p class="flex-auto py-0.5 text-xs/5 text-gray-500">
           <span class="text-lg font-semibold font-medium text-gray-900">

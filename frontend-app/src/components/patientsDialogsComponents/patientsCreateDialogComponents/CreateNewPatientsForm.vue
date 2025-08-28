@@ -108,7 +108,7 @@
     <!-- phone input -->
     <div class="sm:col-span-2 space-y-2">
       <div class="flex items-center items-start">
-        <custom-label title="patients.phone-contact" :is-required="true" />
+        <custom-label title="patients.phone-contact" :isRequired="true" />
         <action-button-outline-icon
           @click="addPhone()"
           icon="PlusIcon"

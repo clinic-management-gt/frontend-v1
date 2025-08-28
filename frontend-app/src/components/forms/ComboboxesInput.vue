@@ -64,8 +64,8 @@ watch(
     <custom-label
       v-if="title"
       :title="title"
-      :text-class="labelCss"
-      :is-required="isRequired"
+      :textClass="labelCss"
+      :isRequired="isRequired"
     />
     <Combobox as="div" :multiple="multiple" v-model="selectedItems">
       <div class="relative mt-2">
@@ -74,7 +74,7 @@ watch(
           :placeholder="$t(placeholder)"
           @change="query = $event.target.value"
           @blur="query = ''"
-          :display-value="() => selectedDisplay"
+          :displayValue="() => selectedDisplay"
         />
         <ComboboxButton
           class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-hidden"

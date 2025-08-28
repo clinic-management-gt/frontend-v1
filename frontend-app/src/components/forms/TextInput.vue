@@ -5,9 +5,9 @@
       v-if="title"
       :title="title"
       :name="name"
-      :text-class="labelCss"
+      :textClass="labelCss"
     />
-    <div :class="{ 'mt-2': title && title !== 'general.empty' }" />
+    <div :class="{ 'mt-2': title && title !== 'general.empty' }" ></div>
     <!-- Input -->
     <div class="relative w-full">
       <input
