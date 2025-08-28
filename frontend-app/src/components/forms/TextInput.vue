@@ -1,7 +1,12 @@
 <template>
   <div>
     <!-- Label opcional -->
-    <CustomLabel v-if="title" :title="title" :name="name" :text-class="labelCss" />
+    <CustomLabel
+      v-if="title"
+      :title="title"
+      :name="name"
+      :text-class="labelCss"
+    />
     <div :class="{ 'mt-2': title && title !== 'general.empty' }" />
     <!-- Input -->
     <div class="relative w-full">
@@ -16,7 +21,7 @@
         :class="[
           'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow ring-1 ring-inset sm:text-sm sm:leading-6 px-2',
           ringColorClass,
-          focusOutlineClass
+          focusOutlineClass,
         ]"
       />
     </div>
@@ -24,75 +29,74 @@
 </template>
 
 <script setup>
-import { useField } from 'vee-validate'
-import { computed } from 'vue'
-import CustomLabel from './CustomLabel.vue'
+import { useField } from "vee-validate";
+import { computed } from "vue";
+import CustomLabel from "./CustomLabel.vue";
 
 const props = defineProps({
   modelValue: {
     type: [String, Number],
-    default: ''
+    default: "",
   },
   name: {
     type: String,
-    default: 'general.empty'
+    default: "general.empty",
   },
   type: {
     type: String,
-    default: 'text'
+    default: "text",
   },
   inputPlaceholder: {
     type: String,
-    default: 'general.empty'
+    default: "general.empty",
   },
   title: {
     type: String,
-    default: 'general.empty'
+    default: "general.empty",
   },
   labelCss: {
     type: String,
-    default: 'font-bold'
+    default: "font-bold",
   },
   inputColor: {
     type: String,
-    default: '[#489FB5]'
+    default: "[#489FB5]",
   },
   required: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 
-const { value, errorMessage, handleChange, handleBlur } = useField(props.name)
+const { value, errorMessage, handleChange, handleBlur } = useField(props.name);
 
 const ringColorClass = computed(() => {
   switch (props.inputColor) {
-    case 'patient-page-color':
-      return 'ring-patient-page-color'
-    case 'primary-color':
-      return 'ring-primary-color'
-    case 'primary-color-variation-1':
-      return 'ring-primary-color-variation-1'
-    case 'primary-color-variation-2':
-      return 'ring-primary-color-variation-2'
+    case "patient-page-color":
+      return "ring-patient-page-color";
+    case "primary-color":
+      return "ring-primary-color";
+    case "primary-color-variation-1":
+      return "ring-primary-color-variation-1";
+    case "primary-color-variation-2":
+      return "ring-primary-color-variation-2";
     default:
-      return 'ring-gray-300' // fallback
+      return "ring-gray-300"; // fallback
   }
-})
+});
 
 const focusOutlineClass = computed(() => {
   switch (props.inputColor) {
-    case 'patient-page-color':
-      return 'focus-visible:outline-patient-page-color'
-    case 'primary-color':
-      return 'focus-visible:outline-primary-color'
-    case 'primary-color-variation-1':
-      return 'focus-visible:outline-primary-color-variation-1'
-    case 'primary-color-variation-2':
-      return 'focus-visible:outline-primary-color-variation-2'
+    case "patient-page-color":
+      return "focus-visible:outline-patient-page-color";
+    case "primary-color":
+      return "focus-visible:outline-primary-color";
+    case "primary-color-variation-1":
+      return "focus-visible:outline-primary-color-variation-1";
+    case "primary-color-variation-2":
+      return "focus-visible:outline-primary-color-variation-2";
     default:
-      return 'focus-visible:outline-gray-300' // fallback
+      return "focus-visible:outline-gray-300"; // fallback
   }
-})
-
+});
 </script>

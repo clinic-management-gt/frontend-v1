@@ -1,12 +1,16 @@
 <template>
   <div class="p-6">
-    <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+    <div
+      class="max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden"
+    >
       <!-- Cabecera de color -->
       <div class="h-32 bg-teal-400"></div>
 
       <div class="flex flex-col items-center -mt-16 px-6 pb-6">
         <!-- Avatar -->
-        <div class="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-gray-200">
+        <div
+          class="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-gray-200"
+        >
           <img
             v-if="user.avatarUrl"
             :src="user.avatarUrl"
@@ -28,18 +32,24 @@
         </div>
 
         <!-- Nombre completo y email -->
-        <h2 class="mt-4 text-2xl font-semibold text-gray-800">{{ fullName }}</h2>
+        <h2 class="mt-4 text-2xl font-semibold text-gray-800">
+          {{ fullName }}
+        </h2>
         <p class="text-gray-500">{{ user.email }}</p>
 
         <!-- Datos extra: rol y fecha de creación -->
-        <div class="mt-6 w-full grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
+        <div
+          class="mt-6 w-full grid grid-cols-1 sm:grid-cols-2 gap-4 text-center"
+        >
           <div>
             <p class="text-sm text-gray-400">Rol</p>
             <p class="mt-1 font-medium text-gray-700">{{ user.role }}</p>
           </div>
           <div>
             <p class="text-sm text-gray-400">Creado el</p>
-            <p class="mt-1 font-medium text-gray-700">{{ formattedCreatedAt }}</p>
+            <p class="mt-1 font-medium text-gray-700">
+              {{ formattedCreatedAt }}
+            </p>
           </div>
         </div>
       </div>
@@ -48,26 +58,26 @@
 </template>
 
 <script setup>
-import { computed }     from 'vue'
-import { useAuthStore } from '@/stores/authStore'
+import { computed } from "vue";
+import { useAuthStore } from "@/stores/authStore";
 
 // Pinia store
-const authStore = useAuthStore()
-const user      = computed(() => authStore.user || {})
+const authStore = useAuthStore();
+const user = computed(() => authStore.user || {});
 
 // Nombre completo
 const fullName = computed(() => {
-  const { first_name = '', last_name = '' } = user.value
-  return [ first_name, last_name ].filter(Boolean).join(' ') || 'Sin nombre'
-})
+  const { first_name = "", last_name = "" } = user.value;
+  return [first_name, last_name].filter(Boolean).join(" ") || "Sin nombre";
+});
 
 // Fecha formateada con API nativa
 const formattedCreatedAt = computed(() => {
-  if (!user.value.created_at) return '—'
-  return new Date(user.value.created_at).toLocaleDateString('es-GT', {
-    day:   '2-digit',
-    month: 'long',
-    year:  'numeric'
-  })
-})
+  if (!user.value.created_at) return "—";
+  return new Date(user.value.created_at).toLocaleDateString("es-GT", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+});
 </script>

@@ -6,12 +6,11 @@
 <script setup>
 import { usePatientsStore } from "@stores/patientsStore";
 
-const patientStore = usePatientsStore()
+const patientStore = usePatientsStore();
 
 import TodayPatients from "@components/dashboardComponents/TodayPatients.vue";
 
 //const patientStore = PatientsStore()
 
-
-patientStore.fetchAppointments()
+patientStore.fetchAppointments();
 </script>

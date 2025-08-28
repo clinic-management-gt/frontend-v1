@@ -1,24 +1,31 @@
 <template>
-  <div class="bg-gray-50 ">
+  <div class="bg-gray-50">
     <RouterView />
-    <patients-create-form-dialog v-if="showCreateFormDialog" @close="closeAllPatientDialog"
-    :isOpen="showCreateFormDialog" />
+    <patients-create-form-dialog
+      v-if="showCreateFormDialog"
+      @close="closeAllPatientDialog"
+      :isOpen="showCreateFormDialog"
+    />
     <notification-alert />
   </div>
 </template>
 
 <script setup>
-import { RouterView } from 'vue-router'
-import { ref, onMounted, defineAsyncComponent} from 'vue'
-import { storeToRefs } from 'pinia'
-import { usePatientsLogicStore } from '@stores/patientsLogicStore'
+import { RouterView } from "vue-router";
+import { ref, onMounted, defineAsyncComponent } from "vue";
+import { storeToRefs } from "pinia";
+import { usePatientsLogicStore } from "@stores/patientsLogicStore";
 
-const patientsCreateFormDialog = defineAsyncComponent(()=> import('@components/patientsDialogsComponents/PatientsCreateFormDialog.vue'))
-const NotificationAlert = defineAsyncComponent(() => import('@components/forms/NotificationAlert.vue'))
+const patientsCreateFormDialog = defineAsyncComponent(() =>
+  import("@components/patientsDialogsComponents/PatientsCreateFormDialog.vue")
+);
+const NotificationAlert = defineAsyncComponent(() =>
+  import("@components/forms/NotificationAlert.vue")
+);
 
-const patientsLogicStore = usePatientsLogicStore()
-const { closeAllPatientDialog } = patientsLogicStore
-const { showCreateFormDialog } = storeToRefs(patientsLogicStore)
+const patientsLogicStore = usePatientsLogicStore();
+const { closeAllPatientDialog } = patientsLogicStore;
+const { showCreateFormDialog } = storeToRefs(patientsLogicStore);
 
 // Considering in case we want that every certain amount of time, the page will logout for security reasons
 // This includes no intervention of the user on the screen during x amount of time.
@@ -47,5 +54,4 @@ const { showCreateFormDialog } = storeToRefs(patientsLogicStore)
 
 // // Inicia temporizador al cargar la app
 // resetInactivityTimer()
-
 </script>

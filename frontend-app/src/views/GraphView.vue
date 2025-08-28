@@ -1,8 +1,6 @@
 <template>
-     <div>
-          <p>Graph</p>
-     </div>
+  <div>
+    <p>Graph</p>
+  </div>
 </template>
-<script setup>
-
-</script>
+<script setup></script>

@@ -66,7 +66,7 @@
   z-index: 10;
   padding: 0.5rem;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 .year-option {
   cursor: pointer;
@@ -83,7 +83,7 @@
   max-width: 1200px; /* Aumentar el ancho máximo */
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   background: #fff;
   border: 1px solid #e0e0e0;
   margin: 0 auto;
@@ -173,7 +173,7 @@
   font-size: 0.7rem;
   color: white;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   transition: all 0.1s ease;
   display: flex;
   align-items: center;
@@ -183,7 +183,7 @@
 }
 
 .event:hover {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .event-header {
@@ -258,7 +258,7 @@
   border-radius: 12px;
   padding: 1.5rem;
   margin-top: 2rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .day-agenda-panel h3 {
@@ -628,31 +628,32 @@
     min-height: 70px;
     padding: 0.3rem 0.2rem;
   }
-  
+
   .event {
     font-size: 0.6rem;
     padding: 0.15rem 0.3rem;
     min-height: 1.2rem;
     max-height: 1.2rem;
   }
-  
-  .event-text, .event-time {
+
+  .event-text,
+  .event-time {
     font-size: 0.55rem;
   }
-  
+
   .more-events {
     font-size: 0.55rem;
   }
-  
+
   .modal-content {
     width: 95%;
     margin: 1rem;
   }
-  
+
   .modal-actions {
     flex-direction: column;
   }
-  
+
   .save-btn,
   .delete-btn,
   .cancel-btn {

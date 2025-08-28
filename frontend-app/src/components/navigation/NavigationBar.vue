@@ -9,11 +9,17 @@
             :to="item.to"
             :data-testid="`nav-${key}`"
             :class="[
-              item.current ? 'bg-bg-primary-color' : 'hover:bg-primary-color-variation-1',
-              'group flex gap-x-1 rounded-md p-2 text-sm leading-6 font-semibold text-white'
+              item.current
+                ? 'bg-bg-primary-color'
+                : 'hover:bg-primary-color-variation-1',
+              'group flex gap-x-1 rounded-md p-2 text-sm leading-6 font-semibold text-white',
             ]"
           >
-            <component :is="item.icon" class="h-6 w-6 shrink-0 text-white mr-2" aria-hidden="true" />
+            <component
+              :is="item.icon"
+              class="h-6 w-6 shrink-0 text-white mr-2"
+              aria-hidden="true"
+            />
             <span class="text-md">{{ $t(item.name) }}</span>
           </RouterLink>
 
@@ -28,10 +34,14 @@
                   :data-testid="`nav-${key}-${subKey}`"
                   :class="[
                     subItem.current ? 'bg-emerald-600' : 'hover:bg-emerald-900',
-                    'block rounded-md py-2 pl-4 flex text-sm leading-6 text-white space-x-4'
+                    'block rounded-md py-2 pl-4 flex text-sm leading-6 text-white space-x-4',
                   ]"
                 >
-                  <component :is="subItem.icon" class="h-6 mr-1 w-6 shrink-0 text-white" aria-hidden="true" />
+                  <component
+                    :is="subItem.icon"
+                    class="h-6 mr-1 w-6 shrink-0 text-white"
+                    aria-hidden="true"
+                  />
                   {{ $t(subItem.name) }}
                 </RouterLink>
               </li>
@@ -42,31 +52,60 @@
     </li>
     <div class="relative">
       <div class="absolute inset-0 flex items-center" aria-hidden="true">
-          <div class="w-full border-t border-primary-color-variation-1" />
+        <div class="w-full border-t border-primary-color-variation-1" />
       </div>
     </div>
     <button @click="logout" class="flex justify-start">
       <x-circle-icon class="h-6 w-6 shrink-0 text-white"></x-circle-icon>
-      <span class="text-md ml-2 text-white font-bold">{{ $t('general.exit') }}</span>
+      <span class="text-md ml-2 text-white font-bold">{{
+        $t("general.exit")
+      }}</span>
     </button>
   </ul>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { RouterLink } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
-import { HomeIcon, UserIcon, ChartBarIcon, CalendarIcon, ChevronRightIcon, XCircleIcon } from '@heroicons/vue/24/outline'
+import { ref } from "vue";
+import { RouterLink } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import {
+  HomeIcon,
+  UserIcon,
+  ChartBarIcon,
+  CalendarIcon,
+  ChevronRightIcon,
+  XCircleIcon,
+} from "@heroicons/vue/24/outline";
 
-const authStore = useAuthStore()
-const logout = () => authStore.logout()
+const authStore = useAuthStore();
+const logout = () => authStore.logout();
 
 const navigationObject = {
-  dashboard: { name: 'dashboard.dashboard', to: '/dashboard', icon: HomeIcon, current: false },
-  patients:  { name: 'patients.patients',   to: '/patients',  icon: UserIcon, current: false },
-  graph:     { name: 'graph.graph',         to: '/graph',     icon: ChartBarIcon, current: false },
-  calendar:  { name: 'calendar.calendar',   to: '/calendar',  icon: CalendarIcon, current: false },
-}
+  dashboard: {
+    name: "dashboard.dashboard",
+    to: "/dashboard",
+    icon: HomeIcon,
+    current: false,
+  },
+  patients: {
+    name: "patients.patients",
+    to: "/patients",
+    icon: UserIcon,
+    current: false,
+  },
+  graph: {
+    name: "graph.graph",
+    to: "/graph",
+    icon: ChartBarIcon,
+    current: false,
+  },
+  calendar: {
+    name: "calendar.calendar",
+    to: "/calendar",
+    icon: CalendarIcon,
+    current: false,
+  },
+};
 
-const openIndex = ref(null)
+const openIndex = ref(null);
 </script>

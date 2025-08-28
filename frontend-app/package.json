@@ -7,17 +7,16 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 5173",
-
     "test": "vitest run",
     "test:watch": "vitest",
-
     "test:e2e": "playwright test -c source/playwright/config/playwright.e2e.config.js",
     "test:e2e:ui": "playwright test --ui -c source/playwright/config/playwright.e2e.config.js",
     "test:e2e:headed": "playwright test --headed -c source/playwright/config/playwright.e2e.config.js",
     "test:e2e:debug": "PWDEBUG=1 playwright test -c source/playwright/config/playwright.e2e.config.js",
-
     "test:ct": "playwright test -c source/playwright/config/playwright.ct.config.js",
-    "test:ct:ui": "playwright test --ui -c source/playwright/config/playwright.ct.config.js"
+    "test:ct:ui": "playwright test --ui -c source/playwright/config/playwright.ct.config.js",
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .js,.vue"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.17",
