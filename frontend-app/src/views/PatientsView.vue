@@ -1,7 +1,13 @@
 <template>
-     <div>
+     <div class="px-6 py-8 mx-auto">
           <div v-if="isLoadingPatientData" class="text-center py-6">
                {{ $t('patients.loading-patients-data') }}
+          </div>
+          <div v-else-if="!currentPatientSelectedId">
+            <panel>
+               {{ $t('patients.select-a-patient-to-view-details') }}
+              <patients-table :data="allPatients" />
+            </panel>
           </div>
           <div v-else class="px-6 py-8 mx-auto grid grid-cols-5 grid-rows-5 gap-5">
                <panel class="col-span-5">
@@ -47,6 +53,7 @@ import PatientDataSheetBox from "@components/patientsComponents/PatientDataSheet
 import PatientHistoryLogBox from "@components/patientsComponents/PatientHistoryLogBox.vue"
 import PatientImportantInformationBox from "@components/patientsComponents/PatientImportantInformationBox.vue"
 import PatientMainDataBox from "@components/patientsComponents/PatientMainDataBox.vue"
+import PatientsTable from "@components/patientsComponents/PatientTable.vue"
 
 import PatientsDataSheetDialog from '@components/patientsDialogsComponents/patientsDataSheetDialog.vue';
 import Panel from "@components/forms/Panel.vue"
@@ -71,7 +78,8 @@ const {
      currentPatientSelectedId,
      currentPatientSelectedData,
      currentPatientMedicalRecords,
-     isLoadingPatientData
+     isLoadingPatientData,
+     allPatients
 } = storeToRefs(patientsStore);
 
 const patientsLogicStore = usePatientsLogicStore()
