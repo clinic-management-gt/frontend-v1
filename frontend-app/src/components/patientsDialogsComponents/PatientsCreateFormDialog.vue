@@ -10,6 +10,9 @@
           <template #body>
                <div class="grid grid-cols-2">
                     <div>
+                      <button @click="downloadFile(patientData.id, 'laboratorios', 2)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
+                        Descargar ficha de datos
+                      </button>
                          <drag-drop-file-input @sendFiles="handleSendFiles"
                               title="patients.drag-or-click-here-to-load-the-PDF-of-the-data-sheet" />
                         <general-i-frame v-if="file" :source="file"/>
@@ -85,8 +88,8 @@ const showDialog = computed({
 
 function handleSendFiles(fileReceived) {
   rawFile.value = fileReceived
-  console.log('fileReceived', fileReceived)
-  patientsStore.uploadFile(fileReceived)
+  console.log("fileReceived", fileReceived)
+  patientsStore.uploadFile(fileReceived, "laboratorios", 1, "descripcion de prueba", 1)
   if (fileReceived) {
     generate()
     newPatientData.value.file = fileReceived
@@ -95,6 +98,20 @@ function handleSendFiles(fileReceived) {
     blobUrl.value = null
     newPatientData.value.file = null
   }
+}
+function downloadFile(patientId, type, medicalRecordID) {
+  patientsStore.downloadFile(1, "laboratorios", 1).then((blob) => {
+    const url = window.URL.createObjectURL(new Blob([blob]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `ficha_datos_${patientId}.pdf`) //or any other extension
+    document.body.appendChild(link)
+    link.click()
+    link.parentNode.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  }).catch((error) => {
+    console.error('Error downloading file:', error)
+  })
 }
 
 function nextPage() {

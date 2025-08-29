@@ -175,17 +175,48 @@ export const usePatientsStore = defineStore('patients', () => {
     }
   }
 
-  async function uploadFile(file, patientId) {
+  async function uploadFile(file, type, patientId, description, medicalRecordID) {
     isLoadingMedicalRecords.value = true
     try {
       const formData = new FormData()
+      formData.append('patientId', patientId)
+      formData.append('type', type)
+      formData.append('descripcion', description)
       formData.append('file', file)
+      formData.append('medicalRecordID', medicalRecordID)
 
       const res = await instance.post(`/files/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       })
+      return res.data
+    } catch (error) {
+      console.error('Error uploading file:', error)
+      throw error
+    } finally {
+      isLoadingMedicalRecords.value = false
+    }
+  }
+
+  async function downloadFile(PatientId, type, MedicalRecordId) {
+    try {
+      const res = await instance.get('/files/download', {
+        params: {
+          PatientId,
+          type,
+          MedicalRecordId
+        },
+        responseType: 'blob'
+      }
+
+      )
+      return res.data
+    } catch (error) {
+      console.error('Error downloading file:', error)
+      throw error
+    }
+  }
 
   // === FUNCIONES PARA RECETAS ===
   async function fetchRecipe(recipeId) {
@@ -256,7 +287,7 @@ export const usePatientsStore = defineStore('patients', () => {
     deleteMedicalRecord,
     fetchMedicalRecordDetails,
     uploadFile,
-    // recipe actions
+    downloadFile,
     fetchRecipe,
     updateRecipe,
     createRecipe,
