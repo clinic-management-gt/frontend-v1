@@ -85,6 +85,8 @@ const showDialog = computed({
 
 function handleSendFiles(fileReceived) {
   rawFile.value = fileReceived
+  console.log("fileReceived", fileReceived)
+  patientsStore.uploadFile(fileReceived, "laboratorios", 1, "descripcion de prueba", 1)
   if (fileReceived) {
     generate()
     newPatientData.value.file = fileReceived
@@ -93,6 +95,20 @@ function handleSendFiles(fileReceived) {
     blobUrl.value = null
     newPatientData.value.file = null
   }
+}
+function downloadFile(patientId, type, medicalRecordID) {
+  patientsStore.downloadFile(1, "laboratorios", 1).then((blob) => {
+    const url = window.URL.createObjectURL(new Blob([blob]))
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `ficha_datos_${patientId}.pdf`) //or any other extension
+    document.body.appendChild(link)
+    link.click()
+    link.parentNode.removeChild(link)
+    window.URL.revokeObjectURL(url)
+  }).catch((error) => {
+    console.error('Error downloading file:', error)
+  })
 }
 
 function nextPage() {
