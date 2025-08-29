@@ -10,9 +10,6 @@
           <template #body>
                <div class="grid grid-cols-2">
                     <div>
-                      <button @click="downloadFile(patientData.id, 'laboratorios', 2)" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">
-                        Descargar ficha de datos
-                      </button>
                          <drag-drop-file-input @sendFiles="handleSendFiles"
                               title="patients.drag-or-click-here-to-load-the-PDF-of-the-data-sheet" />
                         <general-i-frame v-if="file" :source="file"/>
