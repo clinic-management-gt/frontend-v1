@@ -50,7 +50,14 @@
     "completed": "Completado",
     "pending": "Pendiente",
     "canceled": "Cancelado",
-    "waiting": "En espera"
+    "waiting": "En espera",
+    "success": "Éxito",
+    "warning": "Advertencia",
+    "error": "Error",
+    "medical-record-updated-successfully": "Registro médico actualizado exitosamente",
+    "medical-record-created-successfully": "Registro médico creado exitosamente",
+    "record-updated-successfully": "Registro actualizado correctamente",
+    "record-created-successfully": "Registro creado correctamente"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -140,7 +147,15 @@
     "exam-results": "Resultados del examen",
     "add-recipe": "Agregar receta",
     "recipe": "Receta",
-    "prescription": "Prescripción"
+    "prescription": "Prescripción",
+    "weight-kg": "Peso (kg)",
+    "height-cm": "Altura (cm)",
+    "family-background": "Antecedentes familiares",
+    "evolution-note-detail": "Notas de evolución",
+    "weight-kg-label": "Peso (kg)",
+    "height-cm-label": "Altura (cm)",
+    "family-background-label": "Antecedentes familiares",
+    "evolution-notes-label": "Notas de evolución"
   },
   "graph": {
     "graph": "Graficar"
@@ -179,7 +194,6 @@
     "timeout-message": "El servidor tardó demasiado en responder.",
     "unknown-error": "Error desconocido",
     "unknown-error-message": "Ocurrió un error inesperado. Intenta nuevamente.",
-
     "error-400": "Solicitud inválida",
     "error-400-message": "La solicitud no es válida.",
     "error-401": "No autorizado",
@@ -208,5 +222,49 @@
     "error-503-message": "El servicio no está disponible temporalmente.",
     "error-504": "Tiempo de espera de puerta de enlace",
     "error-504-message": "El servidor upstream tardó demasiado en responder."
+  },
+  "notifications": {
+    "error": "Error",
+    "error-updating-record": "Error al actualizar el registro",
+    "record-updated-successfully": "Registro actualizado exitosamente",
+    "error-creating-record": "Error al crear el registro",
+    "record-created-successfully": "Registro creado exitosamente",
+    "success": "Éxito",
+    "medical-record-updated-successfully": "Registro médico actualizado exitosamente",
+    "medical-record-created-successfully": "Registro médico creado exitosamente"
+  },
+  "recipes": {
+    "edit-recipe": "Editar receta médica",
+    "create-recipe": "Crear receta médica",
+    "prescription": "Prescripción médica",
+    "prescription-placeholder": "Escriba aquí la prescripción médica completa...",
+    "creation-date": "Fecha de creación",
+    "last-edit": "Última edición",
+    "treatment-id": "ID de tratamiento",
+    "warning": "Advertencia",
+    "warning-no-treatment": "No se encontró un tratamiento asociado. Para crear una receta, primero debe haber un tratamiento registrado en esta consulta.",
+    "saving": "Guardando...",
+    "recipe-updated": "Receta actualizada exitosamente",
+    "recipe-created": "Receta creada exitosamente",
+    "error-saving": "Error al guardar la receta",
+    "error-no-treatment": "No se puede crear la receta: falta treatmentId",
+    "date-not-available": "Fecha no disponible",
+    "invalid-date": "Fecha inválida",
+    "unknown-error": "Error desconocido"
+  },
+  "medical-records": {
+    "edit-record": "Editar registro médico",
+    "add-record": "Agregar registro médico",
+    "basic-info": "Información básica",
+    "weight": "Peso (kg)",
+    "height": "Altura (cm)",
+    "current-value": "Valor actual",
+    "weight-placeholder": "Ingrese nuevo peso...",
+    "height-placeholder": "Ingrese nueva altura...",
+    "family-history": "Antecedentes familiares",
+    "family-history-placeholder": "Antecedentes familiares del paciente...",
+    "evolution-notes": "Notas de evolución",
+    "evolution-notes-placeholder": "Notas de evolución del paciente...",
+    "saving": "Guardando..."
   }
 }

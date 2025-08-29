@@ -44,9 +44,18 @@
 
           <!-- Nota de evolución -->
           <div class="bg-blue-50 rounded-lg p-4">
-            <h3 class="text-lg font-semibold mb-3 text-blue-800">{{ $t('patients.evolution-note') }}</h3>
-            <div v-if="record?.evolutionNote" class="prose max-w-none">
-              <p class="text-gray-700 whitespace-pre-line">{{ record.evolutionNote }}</p>
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-lg font-semibold text-blue-800">{{ $t('patients.evolution-note') }}</h3>
+              <button 
+                @click="editEvolutionNote"
+                class="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1"
+              >
+                <action-button-solid-icon icon="PencilIcon" size="h-4 w-4" color="text-blue-600" />
+                Editar
+              </button>
+            </div>
+            <div v-if="record?.medicalRecord?.notes || record?.evolutionNote" class="prose max-w-none">
+              <p class="text-gray-700 whitespace-pre-line">{{ record?.medicalRecord?.notes || record?.evolutionNote }}</p>
             </div>
             <div v-else class="text-gray-400 italic py-4">
               {{ $t('patients.no-evolution-note') }}
@@ -55,18 +64,30 @@
 
           <!-- Receta médica -->
           <div class="bg-green-50 rounded-lg p-4">
-            <h3 class="text-lg font-semibold mb-3 text-green-800">{{ $t('patients.medical-recipe') }}</h3>
-            <div v-if="record?.prescription && record.prescription.length > 0">
-              <div v-for="(med, index) in record.prescription" :key="index" class="mb-3 p-3 bg-white rounded border">
-                <div class="font-medium text-gray-800">{{ med.medicine || med.name }}</div>
-                <div class="text-sm text-gray-600 mt-1">
-                  <span v-if="med.dosage"><strong>Dosis:</strong> {{ med.dosage }}</span>
-                  <span v-if="med.frequency" class="ml-4"><strong>Frecuencia:</strong> {{ med.frequency }}</span>
-                  <span v-if="med.duration" class="ml-4"><strong>Duración:</strong> {{ med.duration }}</span>
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-lg font-semibold text-green-800">{{ $t('patients.medical-recipe') }}</h3>
+              <button 
+                v-if="record?.recipes && record.recipes.length > 0"
+                @click="editFirstRecipe"
+                class="text-green-600 hover:text-green-800 text-sm flex items-center gap-1"
+              >
+                <action-button-solid-icon icon="PencilIcon" size="h-4 w-4" color="text-green-600" />
+                Editar
+              </button>
+            </div>
+            <div v-if="record?.recipes && record.recipes.length > 0">
+              <div v-for="(recipe, index) in record.recipes" :key="index" class="mb-3 p-3 bg-white rounded border relative">
+                <button 
+                  @click="editRecipe(recipe)"
+                  class="absolute top-2 right-2 text-green-600 hover:text-green-800 p-1 rounded"
+                  title="Editar receta"
+                >
+                  <action-button-solid-icon icon="PencilIcon" size="h-4 w-4" color="text-green-600" />
+                </button>
+                <div class="text-sm text-gray-600 mb-2">
+                  <strong>Fecha:</strong> {{ formatRecordDate(recipe.createdAt) }}
                 </div>
-                <div v-if="med.observations" class="text-sm text-gray-500 mt-1">
-                  <strong>Observaciones:</strong> {{ med.observations }}
-                </div>
+                <div class="whitespace-pre-line text-gray-700 pr-8">{{ recipe.prescription }}</div>
               </div>
             </div>
             <div v-else class="text-gray-400 italic py-4">
@@ -128,6 +149,7 @@
 
 <script setup>
 import ActionButtonSolidIcon from '@components/forms/ActionButtonSolidIcon.vue'
+import { usePatientsLogicStore } from '@stores/patientsLogicStore.js'
 
 const props = defineProps({
   record: {
@@ -141,6 +163,9 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'edit', 'download'])
+
+const patientsLogicStore = usePatientsLogicStore()
+const { openEditModal, openRecipeFormModal } = patientsLogicStore
 
 function formatRecordDate(dateString) {
   if (!dateString) return 'Fecha no disponible'
@@ -160,6 +185,22 @@ function formatRecordDate(dateString) {
 
 function editRecord() {
   emit('edit', props.record)
+}
+
+function editEvolutionNote() {
+  // Abrir modal de edición de medical record
+  openEditModal(props.record)
+}
+
+function editRecipe(recipe) {
+  // Abrir modal de edición de receta
+  openRecipeFormModal(recipe)
+}
+
+function editFirstRecipe() {
+  if (props.record?.recipes && props.record.recipes.length > 0) {
+    editRecipe(props.record.recipes[0])
+  }
 }
 
 function downloadRecord() {
