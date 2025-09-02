@@ -256,8 +256,6 @@ export const usePatientsStore = defineStore('patients', () => {
       'appointments',
       'appointmentsToday',
       'allPatients',
-      'currentPatientSelectedId',
-      'currentPatientSelectedData',
       'newPatientData'
     ]
   }

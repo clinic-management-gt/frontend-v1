@@ -12,7 +12,7 @@ import {
      CheckCircleIcon, DocumentPlusIcon, FolderArrowDownIcon, XCircleIcon, PlusCircleIcon, UserIcon,
      ArrowLongRightIcon, CheckIcon, ArchiveBoxIcon, ListBulletIcon, DocumentIcon, DocumentTextIcon,
      PhoneIcon, EnvelopeIcon, PencilSquareIcon, ChevronRightIcon, ChevronLeftIcon, XMarkIcon, CakeIcon,
-     IdentificationIcon, ScaleIcon, KeyIcon, ChartBarSquareIcon
+     IdentificationIcon, ScaleIcon, KeyIcon, ChartBarSquareIcon, ArrowTopRightOnSquareIcon
 } from '@heroicons/vue/24/outline'
 const props = defineProps({
      icon: String,
@@ -38,6 +38,6 @@ const icons = {
      CheckCircleIcon, DocumentPlusIcon, FolderArrowDownIcon, XCircleIcon, PlusCircleIcon, UserIcon,
      ArrowLongRightIcon, CheckIcon, ArchiveBoxIcon, ListBulletIcon, DocumentIcon, DocumentTextIcon,
      PhoneIcon, EnvelopeIcon, PencilSquareIcon, ChevronRightIcon, ChevronLeftIcon, XMarkIcon, CakeIcon,
-     IdentificationIcon, ScaleIcon, KeyIcon, ChartBarSquareIcon
+     IdentificationIcon, ScaleIcon, KeyIcon, ChartBarSquareIcon, ArrowTopRightOnSquareIcon
 }
 </script>

@@ -5,7 +5,7 @@
           </div>
           <div v-else-if="!currentPatientSelectedId">
             <panel>
-               {{ $t('patients.select-a-patient-to-view-details') }}
+               {{ $t('patients.number-of-patients' , { count: totalPatients }) }}
               <patients-table :data="allPatients" />
             </panel>
           </div>
@@ -44,9 +44,6 @@ import { usePatientsStore } from "@stores/patientsStore";
 import { usePatientsLogicStore } from '@stores/patientsLogicStore.js'
 import { ref, watch, computed, onMounted, defineAsyncComponent } from 'vue';
 import { storeToRefs } from "pinia";
-import { isoFormatDate } from '@/utils/isoFormatDate';
-import { formatAgeFromDate } from '@/utils/formatAge';
-import { normalizeGender } from '@/utils/normalizeGender';
 
 import PatientContactDataBox from "@components/patientsComponents/PatientContactDataBox.vue"
 import PatientDataSheetBox from "@components/patientsComponents/PatientDataSheetBox.vue"
@@ -66,11 +63,6 @@ function openRecipeModal(receta) {
      selectedRecipe.value = receta
      showRecipeModal.value = true
 }
-
-function closeRecipeModal() {
-     showRecipeModal.value = false
-     selectedRecipe.value = null
-}
 // Store y referencias
 
 const patientsStore = usePatientsStore();
@@ -88,6 +80,7 @@ const {
 } = storeToRefs(patientsLogicStore)
 const { openDataSheetPatientDialog, closeAllPatientDialog } = patientsLogicStore
 
+const totalPatients = computed(() => allPatients.value ? allPatients.value.length : 0);
 
 // Observador para cargar datos cuando cambie el ID
 watch(currentPatientSelectedId, async (newId) => {

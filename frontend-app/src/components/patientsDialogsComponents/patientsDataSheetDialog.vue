@@ -101,6 +101,9 @@ const patientInfo = computed(() => [
      { label: 'general.family-pediatrician', value: patientData.value?.familyPediatrician ?? '' },
      { label: 'general.sex', value: patientData.value?.gender ?? '' }
 ])
+const background = computed(()=> [
+     
+])
 
 const showDialog = computed({
      get: () => patientsLogicStore.showDataSheetPatientDialog,

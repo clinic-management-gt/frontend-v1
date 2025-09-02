@@ -160,7 +160,8 @@
     "height-cm-label": "Altura (cm)",
     "family-background-label": "Antecedentes familiares",
     "evolution-notes-label": "Notas de evolución",
-    "empty-data": "No hay pacientes disponibles"
+    "empty-data": "No hay pacientes disponibles",
+    "number-of-patients": "Número de pacientes {count}"
   },
   "graph": {
     "graph": "Graficar"
