@@ -80,7 +80,7 @@ function tKey(key, fallbackKey) {
 
   return notificationExist(full)
     ? full
-    : fallback ?? "http-errors.unknown-error";
+    : (fallback ?? "http-errors.unknown-error");
 }
 
 // Checks if a notification key exists in the i18n store
@@ -104,9 +104,11 @@ function pickBackendMessage(data) {
 
   if (typeof data === "string") return data;
   if (typeof data?.message === "string") return data.message;
-  if (typeof data?.error_description === "string") return data.error_description;
+  if (typeof data?.error_description === "string")
+    return data.error_description;
   if (typeof data?.error === "string") return data.error;
-  if (Array.isArray(data?.errors)) return data.errors.filter(Boolean).join(" • ");
+  if (Array.isArray(data?.errors))
+    return data.errors.filter(Boolean).join(" • ");
 
   return null;
 }

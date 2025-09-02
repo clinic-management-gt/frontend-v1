@@ -8,7 +8,9 @@
       :is-required="isRequired"
     />
     <fieldset>
-      <div class="flex flex-col md:flex-row md:space-x-6 space-y-5 md:space-y-0">
+      <div
+        class="flex flex-col md:flex-row md:space-x-6 space-y-5 md:space-y-0"
+      >
         <div
           v-for="d in data"
           :key="d.id"
@@ -36,37 +38,37 @@
 </template>
 
 <script setup>
-import CustomLabel from '@/components/forms/CustomLabel.vue'
-import { computed } from 'vue'
+import CustomLabel from "@/components/forms/CustomLabel.vue";
+import { computed } from "vue";
 const props = defineProps({
-     title: {
-          type: String,
-          default: ''
-     },
-     name: {
-          type: String,
-          default: ''
-     },
-     data: {
-          type: Array,
-          required: true
-     },
-     labelCss: {
-          type: String,
-          default: 'font-bold'
-     },
-     currentSelected: {
-          type: Number,
-          required: true
-     },
-     isRequired: {
-          type: Boolean,
-          default: false
-     },
-     setLocalMessage: {
-          type: String,
-          default: 'general.empty'
-     }
-})
-const selected = defineModel('currentSelected')
+  title: {
+    type: String,
+    default: "",
+  },
+  name: {
+    type: String,
+    default: "",
+  },
+  data: {
+    type: Array,
+    required: true,
+  },
+  labelCss: {
+    type: String,
+    default: "font-bold",
+  },
+  currentSelected: {
+    type: Number,
+    required: true,
+  },
+  isRequired: {
+    type: Boolean,
+    default: false,
+  },
+  setLocalMessage: {
+    type: String,
+    default: "general.empty",
+  },
+});
+const selected = defineModel("currentSelected");
 </script>
