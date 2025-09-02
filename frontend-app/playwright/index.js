@@ -1,11 +1,11 @@
-import { beforeMount } from '@playwright/experimental-ct-vue/hooks';
-import { createTestingPinia } from '@pinia/testing';
+import { beforeMount } from "@playwright/experimental-ct-vue/hooks";
+import { createTestingPinia } from "@pinia/testing";
 
 beforeMount(async ({ app, hooksConfig }) => {
   if (hooksConfig?.pinia) {
     const pinia = createTestingPinia({
       stubActions: false,
-      ...(hooksConfig.pinia || {})
+      ...(hooksConfig.pinia || {}),
     });
     app.use(pinia);
   }

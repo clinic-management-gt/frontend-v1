@@ -1,11 +1,11 @@
-import { vi } from 'vitest'
+import { vi } from "vitest";
 
-globalThis.$t = (key) => key
+globalThis.$t = (key) => key;
 
 globalThis.matchMedia = vi.fn().mockImplementation((query) => ({
-     matches: false,
-     media: query,
-     addEventListener: vi.fn(),
-     removeEventListener: vi.fn(),
-     dispatchEvent: vi.fn(),
-}))
+  matches: false,
+  media: query,
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn(),
+}));
