@@ -3,7 +3,19 @@ import vue from "eslint-plugin-vue";
 import vueParser from "vue-eslint-parser";
 
 export default [
+  {
+    ignores: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/coverage/**",
+      "**/.vite/**",
+      "**/playwright-report/**",
+      "source/playwright/**"
+    ],
+  },
   js.configs.recommended,
+  ...vue.configs["flat/recommended"],
   {
     files: ["**/*.vue"],
     languageOptions: {

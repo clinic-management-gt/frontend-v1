@@ -1,6 +1,6 @@
 <template>
   <general-dialog-modal
-    :is-open="isOpen"
+    :isOpen="isOpen"
     dialogSize="max-w-2xl"
     @close-modal="handleClose"
   >
@@ -12,14 +12,19 @@
     <template #body>
       <div class="space-y-6 max-h-[70vh] overflow-y-auto">
         <!-- Formulario principal -->
-        <form @submit.prevent="handleSubmit" class="space-y-4">
+        <form
+          class="space-y-4"
+          @submit.prevent="handleSubmit"
+        >
           <!-- Alerta si no hay treatmentId -->
           <div
             v-if="!props.isEditing && !props.treatmentId"
             class="bg-yellow-50 border border-yellow-200 rounded-lg p-4"
           >
             <div class="flex items-center">
-              <div class="text-yellow-400 text-lg mr-2">⚠️</div>
+              <div class="text-yellow-400 text-lg mr-2">
+                ⚠️
+              </div>
               <div>
                 <h4 class="text-yellow-800 font-semibold">
                   {{ $t("recipes.warning") }}
@@ -33,7 +38,9 @@
 
           <!-- Información de la receta -->
           <div class="bg-gray-50 p-4 rounded-lg">
-            <h3 class="text-lg font-semibold mb-4">Receta médica</h3>
+            <h3 class="text-lg font-semibold mb-4">
+              Receta médica
+            </h3>
 
             <!-- Prescripción -->
             <div>
@@ -47,16 +54,18 @@
                 class="mb-3 text-xs text-gray-500 bg-gray-50 p-3 rounded border"
               >
                 <div class="flex items-center justify-between">
+                  <span>📅 <strong>{{ $t("recipes.creation-date") }}:</strong>
+                    {{ formatDate(originalValues.createdAt) }}</span>
                   <span
-                    >📅 <strong>{{ $t("recipes.creation-date") }}:</strong>
-                    {{ formatDate(originalValues.createdAt) }}</span
-                  >
-                  <span v-if="originalValues.updatedAt" class="ml-4"
-                    >✏️ <strong>{{ $t("recipes.last-edit") }}:</strong>
-                    {{ formatDate(originalValues.updatedAt) }}</span
-                  >
+                    v-if="originalValues.updatedAt"
+                    class="ml-4"
+                  >✏️ <strong>{{ $t("recipes.last-edit") }}:</strong>
+                    {{ formatDate(originalValues.updatedAt) }}</span>
                 </div>
-                <div v-if="originalValues.treatmentId" class="mt-1">
+                <div
+                  v-if="originalValues.treatmentId"
+                  class="mt-1"
+                >
                   🔗 <strong>{{ $t("recipes.treatment-id") }}:</strong>
                   {{ originalValues.treatmentId }}
                 </div>
@@ -78,7 +87,10 @@
 
     <!-- Botones de acción -->
     <template #buttons>
-      <primary-button v-if="isLoading" :disabled="isLoading">
+      <primary-button
+        v-if="isLoading"
+        :disabled="isLoading"
+      >
         <span class="flex items-center">
           <svg
             class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
@@ -93,20 +105,20 @@
               r="10"
               stroke="currentColor"
               stroke-width="4"
-            ></circle>
+            />
             <path
               class="opacity-75"
               fill="currentColor"
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
+            />
           </svg>
           {{ $t("recipes.saving") }}
         </span>
       </primary-button>
       <primary-button
         v-else
-        @click="handleSubmit"
         :disabled="isLoading || !formData.prescription.trim()"
+        @click="handleSubmit"
       >
         <p class="uppercase">
           {{ $t(isEditing ? "general.update" : "general.save") }}
@@ -117,7 +129,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, computed } from "vue";
+import { ref, watch, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePatientsStore } from "@stores/patientsStore.js";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
@@ -126,8 +138,6 @@ import { formatDate } from "@utils/isoFormatDate.js";
 
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
 import PrimaryButton from "@components/forms/PrimaryButton.vue";
-import CustomLabel from "@components/forms/CustomLabel.vue";
-import { storeToRefs } from "pinia";
 
 const props = defineProps({
   isOpen: {

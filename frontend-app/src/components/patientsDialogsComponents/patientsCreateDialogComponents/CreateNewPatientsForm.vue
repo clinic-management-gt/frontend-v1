@@ -32,23 +32,26 @@
     />
     <!-- gender input -->
     <radio-group
+      v-model:currentSelected="currentGender"
       title="patients.gender"
       :data="genders"
-      v-model:currentSelected="currentGender"
       class="mt-2 col-span-2 sm:col-span-1"
     />
 
     <!-- alergies selector -->
     <radio-group
+      v-model:currentSelected="hasAlergies"
       title="patients.suffer-from-allergies"
       :data="yesnoOptions"
-      v-model:currentSelected="hasAlergies"
       class="mt-2 sm:col-span-2"
     />
-    <div v-if="hasAlergies === 0" class="w-full col-span-2">
+    <div
+      v-if="hasAlergies === 0"
+      class="w-full col-span-2"
+    >
       <comboboxes-input
-        :data="alergies"
         v-model:currentSelected="currentAlergies"
+        :data="alergies"
         title="patients.alergies"
         placeholder="patients.alergies-placeholder"
         class="mt-2 sm:col-span-2"
@@ -57,15 +60,18 @@
 
     <!-- syndrome selector -->
     <radio-group
+      v-model:currentSelected="hasSyndromes"
       title="patients.suffer-from-syndromes"
       :data="yesnoOptions"
-      v-model:currentSelected="hasSyndromes"
       class="mt-2 sm:col-span-2"
     />
-    <div v-if="hasSyndromes === 0" class="w-full col-span-2">
+    <div
+      v-if="hasSyndromes === 0"
+      class="w-full col-span-2"
+    >
       <comboboxes-input
-        :data="syndrome"
         v-model:currentSelected="currentSyndromes"
+        :data="syndrome"
         title="patients.syndrome"
         placeholder="patients.syndrome-placeholder"
         class="mt-2 sm:col-span-2"
@@ -108,11 +114,14 @@
     <!-- phone input -->
     <div class="sm:col-span-2 space-y-2">
       <div class="flex items-center items-start">
-        <custom-label title="patients.phone-contact" :is-required="true" />
+        <custom-label
+          title="patients.phone-contact"
+          :isRequired="true"
+        />
         <action-button-outline-icon
-          @click="addPhone()"
           icon="PlusIcon"
           color="text-patient-page-color"
+          @click="addPhone()"
         />
       </div>
       <div
@@ -129,17 +138,17 @@
           class="w-full"
         />
         <action-button-outline-icon
-          @click="deletePhone(item.id)"
           icon="TrashIcon"
           color="text-red-500"
+          @click="deletePhone(item.id)"
         />
       </div>
     </div>
 
     <!-- insurance selector -->
     <comboboxes-input
-      :data="insurances"
       v-model:currentSelected="currentInsurance"
+      :data="insurances"
       title="patients.insurance"
       placeholder="patients.insurance-placeholder"
       class="mt-2 sm:col-span-2"
@@ -170,13 +179,11 @@
 </template>
 <script setup>
 import { useForm } from "vee-validate";
-import { ref, watchEffect, computed, watch } from "vue";
+import { ref, watchEffect, computed } from "vue";
 import { usePatientsStore } from "@stores/patientsStore.js";
 import { storeToRefs } from "pinia";
-import { DateTime } from "luxon";
 import * as yup from "yup";
 
-import ActionButtonSolidIcon from "@components/forms/ActionButtonSolidIcon.vue";
 import ActionButtonOutlineIcon from "@components/forms/ActionButtonOutlinedIcon.vue";
 import CustomLabel from "@/components/forms/CustomLabel.vue";
 import TextInput from "@components/forms/TextInput.vue";

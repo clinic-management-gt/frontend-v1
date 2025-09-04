@@ -4,15 +4,24 @@
       Pacientes para hoy — {{ todayFormatted }}
     </h1>
 
-    <div v-if="isLoadingAppointmentsToday" class="text-center py-6">
-      <basic-spinner-loading color="#489FB5" class="mx-auto" />
+    <div
+      v-if="isLoadingAppointmentsToday"
+      class="text-center py-6"
+    >
+      <basic-spinner-loading
+        color="#489FB5"
+        class="mx-auto"
+      />
     </div>
 
     <div v-else>
-      <transition-group name="fade" tag="div">
+      <transition-group
+        name="fade"
+        tag="div"
+      >
         <div
-          v-if="appointmentsToday.length > 0"
           v-for="appointment in appointmentsToday"
+          v-if="appointmentsToday.length > 0"
           :key="appointment.id"
           class="flex items-stretch h-32 rounded-xl overflow-hidden my-4"
         >
@@ -42,8 +51,8 @@
                 'flex items-center justify-center h-full w-1/4 ml-4 shadow-md rounded-xl text-white font-bold text-xl capitalize',
                 statusClass(appointment.status),
               ]"
-              @click="changueStatus(appointment)"
               style="cursor: pointer"
+              @click="changueStatus(appointment)"
             >
               {{ appointment.status }}
             </div>
@@ -58,11 +67,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { usePatientsStore } from "../../stores/patientsStore";
 import BasicSpinnerLoading from "../forms/BasicSpinnerLoading.vue";
-import Panel from "@components/forms/Panel.vue";
 
 // Pinia
 const patientsStore = usePatientsStore();

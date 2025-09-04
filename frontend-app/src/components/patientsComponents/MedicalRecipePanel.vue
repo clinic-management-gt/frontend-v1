@@ -6,10 +6,12 @@
       class="bg-gray-200 rounded-lg shadow-lg w-full max-w-xl p-8 flex flex-col gap-6"
     >
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">{{ $t("patients.consult-detail") }}</h2>
+        <h2 class="text-2xl font-bold">
+          {{ $t("patients.consult-detail") }}
+        </h2>
         <button
-          @click="$emit('close')"
           class="text-gray-500 hover:text-gray-800 text-2xl"
+          @click="$emit('close')"
         >
           &times;
         </button>
@@ -31,9 +33,14 @@
             <div class="text-sm text-gray-500 mb-2">
               Fecha: {{ recipe.createdAt }}
             </div>
-            <div class="whitespace-pre-line">{{ recipe.prescription }}</div>
+            <div class="whitespace-pre-line">
+              {{ recipe.prescription }}
+            </div>
           </div>
-          <div v-else class="text-gray-400 italic">
+          <div
+            v-else
+            class="text-gray-400 italic"
+          >
             {{ $t("patients.no-recipe-selected") }}
           </div>
         </div>
@@ -44,6 +51,9 @@
 
 <script setup>
 const props = defineProps({
-  recipe: Object,
+  recipe: {
+    type: Object,
+    default: null,
+  },
 });
 </script>

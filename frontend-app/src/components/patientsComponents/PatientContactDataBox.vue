@@ -1,7 +1,11 @@
 <template>
   <div class="flex justify-between items-center mx-4 my-4">
     <div class="flex flex-col">
-      <span v-for="(item, index) in contactList" :key="index" class="flex my-2">
+      <span
+        v-for="(item, index) in contactList"
+        :key="index"
+        class="flex my-2"
+      >
         <action-button-solid-icon
           icon="PhoneIcon"
           size="h-10 w-10"
@@ -31,8 +35,6 @@
 </template>
 <script setup>
 import { computed } from "vue";
-import { formatAgeFromDate } from "@utils/formatAge";
-import { normalizeGender } from "@utils/normalizeGender";
 
 import ActionButtonSolidIcon from "@components/forms/ActionButtonSolidIcon.vue";
 

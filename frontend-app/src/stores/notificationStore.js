@@ -26,11 +26,10 @@ export const useNotificationStore = defineStore(
       if (notification) {
         notification.timeoutId = timeoutId;
       }
-      console.log(notifications.value);
     }
 
-    function hideNotification(id) {
-      const notification = notifications.value.find(({ id }) => id === id);
+    function hideNotification(Id) {
+      const notification = notifications.value.find(({ id }) => id === Id);
       const index = notifications.value.indexOf(notification);
       if (notification) {
         notification.visible = false;

@@ -1,17 +1,27 @@
 <template>
   <div class="flex items-center justify-start">
-    <div v-if="isRequired" class="text-red-600">*</div>
+    <div
+      v-if="isRequired"
+      class="text-red-600"
+    >
+      *
+    </div>
     <label
       :for="props.name"
       :class="[props.textClass, 'block leading-6 truncate', props.textSize]"
-      >{{ $t(props.title) }}</label
-    >
+    >{{ $t(props.title) }}</label>
   </div>
 </template>
 <script setup>
 const props = defineProps({
-  name: String,
-  title: String,
+  name: {
+    type: String,
+    default: "",
+  },
+  title: {
+    type: String,
+    default: "",
+  },
   textClass: {
     type: String,
     default: "text-gray-600",

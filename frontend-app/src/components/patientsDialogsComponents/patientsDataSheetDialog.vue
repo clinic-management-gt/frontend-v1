@@ -1,18 +1,20 @@
 <template>
   <general-dialog-modal
     ref="createDialog"
-    @close-modal="handleClose"
     :isOpen="isOpen"
     dialogSize="max-w-6xl"
+    @close-modal="handleClose"
   >
     <template #title>
       <div class="flex justify-between items-center px-6 py-2 border-b">
         <div>
-          <p class="text-xl">{{ $t("patients.data-sheet") }}</p>
+          <p class="text-xl">
+            {{ $t("patients.data-sheet") }}
+          </p>
         </div>
         <button
-          @click="handleClose"
           class="text-black hover:text-gray-400 text-3xl font-bold leading-none"
+          @click="handleClose"
         >
           ×
         </button>
@@ -21,7 +23,7 @@
     <template #body>
       <div class="grid grid-cols-2 grid-rows-3 gap-4">
         <div class="col-span-2">
-          <panel>
+          <app-panel>
             <p class="font-bold">
               {{ $t("patients.patients-data") }}
             </p>
@@ -37,35 +39,35 @@
                 <p>{{ item.value }}</p>
               </div>
             </div>
-          </panel>
+          </app-panel>
         </div>
         <div class="row-start-2">
-          <panel>
+          <app-panel>
             <p class="font-bold">
               {{ $t("patients.record") }}
             </p>
-          </panel>
+          </app-panel>
         </div>
         <div class="row-start-2">
-          <panel>
+          <app-panel>
             <p class="font-bold">
               {{ $t("patients.current-illnesses") }}
             </p>
-          </panel>
+          </app-panel>
         </div>
         <div class="row-start-3">
-          <panel>
+          <app-panel>
             <p class="font-bold">
               {{ $t("patients.exams") }}
             </p>
-          </panel>
+          </app-panel>
         </div>
         <div class="row-start-3">
-          <panel>
+          <app-panel>
             <p class="font-bold">
               {{ $t("patients.laboratories") }}
             </p>
-          </panel>
+          </app-panel>
         </div>
       </div>
     </template>
@@ -74,13 +76,11 @@
 <script setup>
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { usePatientsStore } from "@stores/patientsStore.js";
-import { DialogTitle } from "@headlessui/vue";
-import { useForm } from "vee-validate";
-import { ref, defineAsyncComponent, computed } from "vue";
+import { computed } from "vue";
 import { storeToRefs } from "pinia";
 
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
-import Panel from "@components/forms/Panel.vue";
+import AppPanel from "@components/forms/AppPanel.vue";
 
 const patientsStore = usePatientsStore();
 const { currentPatientSelectedData } = storeToRefs(patientsStore);
@@ -91,21 +91,6 @@ const { showDataSheetPatientDialog } = storeToRefs(patientsLogicStore);
 const handleClose = (closeModal) => {
   showDataSheetPatientDialog.value = closeModal;
 };
-
-const props = defineProps({
-  contractCategoryId: {
-    type: Number || null,
-    default: null,
-  },
-  id: {
-    type: Number || null,
-    default: null,
-  },
-  isOpen: {
-    type: Boolean,
-    default: false,
-  },
-});
 
 const patientData = computed(() => currentPatientSelectedData.value);
 
@@ -121,10 +106,4 @@ const patientInfo = computed(() => [
   { label: "general.sex", value: patientData.value?.gender ?? "" },
 ]);
 
-const showDialog = computed({
-  get: () => patientsLogicStore.showDataSheetPatientDialog,
-  set: (val) => {
-    patientsLogicStore.showDataSheetPatientDialog = val;
-  },
-});
 </script>

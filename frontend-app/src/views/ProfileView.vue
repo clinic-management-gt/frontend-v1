@@ -35,18 +35,26 @@
         <h2 class="mt-4 text-2xl font-semibold text-gray-800">
           {{ fullName }}
         </h2>
-        <p class="text-gray-500">{{ user.email }}</p>
+        <p class="text-gray-500">
+          {{ user.email }}
+        </p>
 
         <!-- Datos extra: rol y fecha de creación -->
         <div
           class="mt-6 w-full grid grid-cols-1 sm:grid-cols-2 gap-4 text-center"
         >
           <div>
-            <p class="text-sm text-gray-400">Rol</p>
-            <p class="mt-1 font-medium text-gray-700">{{ user.role }}</p>
+            <p class="text-sm text-gray-400">
+              Rol
+            </p>
+            <p class="mt-1 font-medium text-gray-700">
+              {{ user.role }}
+            </p>
           </div>
           <div>
-            <p class="text-sm text-gray-400">Creado el</p>
+            <p class="text-sm text-gray-400">
+              Creado el
+            </p>
             <p class="mt-1 font-medium text-gray-700">
               {{ formattedCreatedAt }}
             </p>

@@ -1,4 +1,3 @@
-// PatientsDataSheetDialog.test.js
 import { describe, it, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createTestingPinia } from "@pinia/testing";
@@ -57,8 +56,6 @@ describe("PatientsDataSheetDialog.vue", () => {
     });
 
     await wrapper.vm.$nextTick();
-    console.log(wrapper.html()); // Útil para depurar visualmente
-
     expect(wrapper.text()).toContain("Ana");
     expect(wrapper.text()).toContain("Pérez");
     expect(wrapper.text()).toContain("2001-01-01");

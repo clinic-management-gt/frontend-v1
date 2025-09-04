@@ -1,8 +1,17 @@
 <template>
-  <ul role="list" class="flex flex-1 flex-col gap-y-7">
+  <ul
+    role="list"
+    class="flex flex-1 flex-col gap-y-7"
+  >
     <li>
-      <ul role="list" class="-mx-2 space-y-1">
-        <li v-for="(item, key) in navigationObject" :key="key">
+      <ul
+        role="list"
+        class="-mx-2 space-y-1"
+      >
+        <li
+          v-for="(item, key) in navigationObject"
+          :key="key"
+        >
           <!-- Item simple -->
           <RouterLink
             v-if="!item.children"
@@ -27,8 +36,14 @@
           <div v-else>
             <!-- botón del disclosure -->
             <!-- ... -->
-            <ul v-show="openIndex === key" class="mt-1 px-2">
-              <li v-for="(subItem, subKey) in item.children" :key="subKey">
+            <ul
+              v-show="openIndex === key"
+              class="mt-1 px-2"
+            >
+              <li
+                v-for="(subItem, subKey) in item.children"
+                :key="subKey"
+              >
                 <RouterLink
                   :to="subItem.to"
                   :data-testid="`nav-${key}-${subKey}`"
@@ -51,12 +66,18 @@
       </ul>
     </li>
     <div class="relative">
-      <div class="absolute inset-0 flex items-center" aria-hidden="true">
-        <div class="w-full border-t border-primary-color-variation-1" />
+      <div
+        class="absolute inset-0 flex items-center"
+        aria-hidden="true"
+      >
+        <div class="w-full border-t border-primary-color-variation-1"></div>
       </div>
     </div>
-    <button @click="logout" class="flex justify-start">
-      <x-circle-icon class="h-6 w-6 shrink-0 text-white"></x-circle-icon>
+    <button
+      class="flex justify-start"
+      @click="logout"
+    >
+      <x-circle-icon class="h-6 w-6 shrink-0 text-white" />
       <span class="text-md ml-2 text-white font-bold">{{
         $t("general.exit")
       }}</span>
@@ -73,7 +94,6 @@ import {
   UserIcon,
   ChartBarIcon,
   CalendarIcon,
-  ChevronRightIcon,
   XCircleIcon,
 } from "@heroicons/vue/24/outline";
 

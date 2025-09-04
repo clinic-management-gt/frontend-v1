@@ -3,7 +3,12 @@
     class="flex min-h-screen flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8"
   >
     <div class="sm:mx-auto sm:w-full sm:max-w-sm text-center">
-      <img class="mx-auto" src="/logo-gastro.png" width="250" height="250" />
+      <img
+        class="mx-auto"
+        src="/logo-gastro.png"
+        width="250"
+        height="250"
+      />
       <h2
         class="mt-10 text-2xl font-bold leading-9 tracking-tight text-gray-900"
       >
@@ -11,8 +16,8 @@
       </h2>
     </div>
     <form
-      @submit.prevent="onSubmitLogin"
       class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm space-y-4"
+      @submit.prevent="onSubmitLogin"
     >
       <text-input
         class="mt-2"
@@ -32,13 +37,18 @@
         inputColor="primary-color"
       />
 
-      <div v-if="error !== null" class="text-red-600 text-sm">{{ error }}</div>
+      <div
+        v-if="error !== null"
+        class="text-red-600 text-sm"
+      >
+        {{ error }}
+      </div>
 
       <primary-button
-        @click="onSubmitLogin"
         type="submit"
         :disabled="isLoadingAuthStore || !isFormValid"
         class="w-full flex justify-center"
+        @click="onSubmitLogin"
       >
         <basic-spinner-loading v-if="isLoadingAuthStore" />
         <span v-else>{{ $t("login.login") }}</span>
@@ -48,8 +58,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed } from "vue";
 import { useAuthStore } from "@/stores/authStore";
 import { useForm } from "vee-validate";
 import { storeToRefs } from "pinia";
@@ -59,7 +68,6 @@ import TextInput from "@components/forms/TextInput.vue";
 import PrimaryButton from "@components/forms/PrimaryButton.vue";
 import BasicSpinnerLoading from "@components/forms/BasicSpinnerLoading.vue";
 
-const router = useRouter();
 const authStore = useAuthStore();
 const { isLoadingAuthStore, error } = storeToRefs(authStore);
 const validationError = ref(false);

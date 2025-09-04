@@ -51,20 +51,18 @@ export const usePatientsStore = defineStore(
 
     // patientsStore.js
     async function updateAppointmentStatus(id, newStatus) {
+      isLoadingAppointmentsToday.value = true;
       try {
-        const res = await instance.patch(`/appointments/${id}`, {
+        await instance.patch(`/appointments/${id}`, {
           status: newStatus,
         });
-
         const idx = appointmentsToday.value.findIndex((a) => a.id === id);
         if (idx !== -1) {
           appointmentsToday.value[idx].status = newStatus;
         }
-
         return true;
-      } catch (e) {
-        console.error("Error al actualizar estado de cita:", e);
-        return false;
+      } finally {
+        isLoadingAppointmentsToday.value = false;
       }
     }
 
@@ -81,7 +79,6 @@ export const usePatientsStore = defineStore(
     async function fetchPatientData() {
       isLoadingPatientData.value = true;
       if (!currentPatientSelectedId.value) {
-        console.warn("ID de paciente no definido");
         return;
       }
       try {
@@ -113,21 +110,10 @@ export const usePatientsStore = defineStore(
     async function createMedicalRecord(patientId, recordData) {
       isLoadingMedicalRecords.value = true;
       try {
-        console.log(
-          `➕ Creando medical record para paciente ${patientId} con datos:`,
-          recordData,
-        );
         // Asegurar que el PatientId esté en los datos (backend espera PascalCase)
         const dataToSend = { ...recordData, PatientId: patientId };
         const res = await instance.post(`/medicalrecords`, dataToSend);
-        console.log("✅ Medical record creado:", res.data);
         return res.data;
-      } catch (error) {
-        console.error(
-          "❌ Error en createMedicalRecord:",
-          error.response?.data || error.message,
-        );
-        throw error;
       } finally {
         isLoadingMedicalRecords.value = false;
       }
@@ -136,32 +122,11 @@ export const usePatientsStore = defineStore(
     async function updateMedicalRecord(recordId, recordData) {
       isLoadingMedicalRecords.value = true;
       try {
-        console.log(
-          `🔄 Actualizando medical record ${recordId} con datos:`,
-          recordData,
-        );
-        console.log("🔍 URL de la petición:", `/medicalrecords/${recordId}`);
-        console.log("🔍 Tipo de petición: PATCH");
         const res = await instance.patch(
           `/medicalrecords/${recordId}`,
           recordData,
         );
-        console.log("✅ Respuesta del servidor:", res.data);
         return res.data;
-      } catch (error) {
-        console.error(
-          "❌ Error en updateMedicalRecord:",
-          error.response?.data || error.message,
-        );
-        console.error("❌ Status del error:", error.response?.status);
-        console.error("❌ Config de axios:", error.config);
-        if (error.response?.data?.errors) {
-          console.error(
-            "❌ Validation errors detallados:",
-            error.response.data.errors,
-          );
-        }
-        throw error;
       } finally {
         isLoadingMedicalRecords.value = false;
       }
@@ -170,16 +135,8 @@ export const usePatientsStore = defineStore(
     async function deleteMedicalRecord(recordId) {
       isLoadingMedicalRecords.value = true;
       try {
-        console.log(`🗑️ Eliminando medical record ${recordId}`);
         await instance.delete(`/medicalrecords/${recordId}`);
-        console.log("✅ Medical record eliminado");
         return true;
-      } catch (error) {
-        console.error(
-          "❌ Error en deleteMedicalRecord:",
-          error.response?.data || error.message,
-        );
-        throw error;
       } finally {
         isLoadingMedicalRecords.value = false;
       }
@@ -191,9 +148,6 @@ export const usePatientsStore = defineStore(
       try {
         const res = await instance.get(`/medicalrecords/${recordId}/details`);
         fullRecord.value = res.data;
-      } catch (error) {
-        console.error("Error fetching medical record details:", error);
-        hasError.value = true;
       } finally {
         isLoadingMedicalRecords.value = false;
       }
@@ -222,7 +176,6 @@ export const usePatientsStore = defineStore(
         });
         return res.data;
       } catch (error) {
-        console.error("Error uploading file:", error);
         throw error;
       } finally {
         isLoadingMedicalRecords.value = false;
@@ -240,13 +193,11 @@ export const usePatientsStore = defineStore(
           responseType: "blob",
         });
         return res.data;
-      } catch (error) {
-        console.error("Error downloading file:", error);
-        throw error;
+      } finally {
+        return null;
       }
     }
 
-    // === FUNCIONES PARA RECETAS ===
     async function fetchRecipe(recipeId) {
       isLoadingMedicalRecords.value = true;
       try {
@@ -275,10 +226,6 @@ export const usePatientsStore = defineStore(
       } finally {
         isLoadingMedicalRecords.value = false;
       }
-    }
-
-    function clearFullRecord() {
-      fullRecord.value = null;
     }
 
     function clearFullRecord() {
@@ -319,7 +266,7 @@ export const usePatientsStore = defineStore(
       fetchRecipe,
       updateRecipe,
       createRecipe,
-      clearFullRecord,
+      clearFullRecord
     };
   },
   {
