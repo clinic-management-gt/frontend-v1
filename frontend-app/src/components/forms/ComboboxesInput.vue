@@ -2,11 +2,7 @@
 import { ref, computed, watch } from "vue";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/vue/20/solid";
 import {
-  Combobox,
-  ComboboxButton,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
+  Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions,
 } from "@headlessui/vue";
 import CustomLabel from "@/components/forms/CustomLabel.vue";
 
@@ -19,26 +15,25 @@ const props = defineProps({
   isRequired: { type: Boolean, default: false },
 });
 
-// Declarar los eventos que el componente puede emitir (incluye "close")
-const emit = defineEmits(["close"]);
+// ❌ const emit = defineEmits(["close"]); // no lo usas → elimínalo
 
-const model = defineModel("currentSelected"); // Esto será un array de IDs
+// ✅ Declara tipo del modelo
+const model = defineModel("currentSelected", {
+  type: [Array, Number, null],
+  default: () => [],
+});
+
 const selectedItems = ref([]);
 const query = ref("");
 
-// Mostrar nombres
-const selectedDisplay = computed(() => {
-  return selectedItems.value.map((i) => i.name).join(", ");
-});
-
-// Para mostrar los elementos visibles, usar `data` directamente
+const selectedDisplay = computed(() => selectedItems.value.map((i) => i.name).join(", "));
 const fullData = computed(() => props.data);
 
-// Convertir el modelo (array de IDs) en objetos (algunos conocidos, otros no)
+// Sync modelo (ids) → objetos
 watch(
   () => model.value,
   (newIds) => {
-    if (!Array.isArray(newIds)) return;
+    if (!Array.isArray(newIds)) return; // si estás en modo single, lo ignoras
     selectedItems.value = newIds.map((id) => {
       const item = props.data.find((d) => d.id === id);
       return item ?? { id, name: `ID: ${id}` };
@@ -47,7 +42,7 @@ watch(
   { immediate: true },
 );
 
-// Convertir objetos seleccionados en array de IDs
+// Objetos seleccionados → modelo (ids)
 watch(
   selectedItems,
   (items) => {

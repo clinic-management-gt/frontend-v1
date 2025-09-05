@@ -1,9 +1,6 @@
 <template>
   <div class="w-full">
-    <Combobox
-      v-model="selected"
-      @update:model-value="onSelect"
-    >
+    <Combobox v-model="selected" @update:model-value="onSelect">
       <div class="relative">
         <ComboboxInput
           class="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 bg-white placeholder:text-gray-400"
@@ -12,14 +9,10 @@
           @change="query = $event.target.value"
           @focus="query = ''"
         />
-        <ComboboxButton
-          class="absolute inset-y-0 right-0 flex items-center pr-2"
-        >
-          <ChevronUpDownIcon
-            class="h-5 w-5 text-gray-400"
-            aria-hidden="true"
-          />
+        <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
+          <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
         </ComboboxButton>
+
         <TransitionRoot
           leave="transition ease-in duration-100"
           leaveFrom="opacity-100"
@@ -35,11 +28,12 @@
             >
               {{ $t("general.patient-not-found") }}
             </div>
+
             <!-- Opciones de pacientes -->
             <ComboboxOption
               v-for="person in filteredPeople"
               :key="person.id"
-              v-slot="{ selected, active }"
+              v-slot="{ selected: isSelected, active }"
               as="template"
               :value="person"
             >
@@ -52,19 +46,16 @@
               >
                 <span
                   class="block truncate"
-                  :class="{ 'font-medium': selected, 'font-normal': !selected }"
+                  :class="{ 'font-medium': isSelected, 'font-normal': !isSelected }"
                 >
                   {{ person.name }} {{ person.lastName }} ({{ person.gender }})
                 </span>
                 <span
-                  v-if="selected"
+                  v-if="isSelected"
                   class="absolute inset-y-0 left-0 flex items-center pl-3"
                   :class="{ 'text-white': active, 'text-teal-600': !active }"
                 >
-                  <CheckIcon
-                    class="h-5 w-5"
-                    aria-hidden="true"
-                  />
+                  <CheckIcon class="h-5 w-5" aria-hidden="true" />
                 </span>
               </li>
             </ComboboxOption>
@@ -87,66 +78,55 @@ import {
 } from "@headlessui/vue";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/vue/20/solid";
 
-// Definición de props y eventos
 const emit = defineEmits(["update:currentSelected"]);
 const props = defineProps({
-  data: {
-    type: Array,
-    default: () => [],
-  },
-  currentSelected: {
-    type: Number,
-    default: undefined,
-  },
-  placeholder: {
-    type: String,
-    default: "",
-  },
-  isRequired: {
-    type: Boolean,
-    default: false,
-  },
+  data: { type: Array, default: () => [] },
+  currentSelected: { type: Number, default: undefined },
+  placeholder: { type: String, default: "" },
+  isRequired: { type: Boolean, default: false },
 });
 
-// Lista de personas (pacientes) a mostrar
 const people = computed(() =>
-  Array.isArray(props.data) && props.data.length > 0 ? props.data : [],
+  Array.isArray(props.data) && props.data.length > 0 ? props.data : []
 );
 
-// Paciente seleccionado actualmente
 const selected = ref(null);
-// Texto de búsqueda actual
 const query = ref("");
 
-// Sincroniza el valor seleccionado externo con el interno
+// Sincroniza selección externa → interna
 watch(
   () => props.currentSelected,
   (newVal) => {
     selected.value = people.value.find((p) => p.id === newVal) || null;
   },
+  { immediate: true }
 );
 
-// Cuando se selecciona un paciente, emite el id al padre
+// Emitir id al seleccionar
 function onSelect(newVal) {
   selected.value = newVal;
   emit("update:currentSelected", newVal?.id);
 }
 
-// Muestra el nombre del paciente seleccionado en el input, o el placeholder si no hay selección
+// Texto mostrado en el input
 function displayText(person) {
   if (!person || query.value !== "") return "";
-  return `${person.name} ${person.lastName} (${person.gender})`;
+  const name = person?.name ?? "";
+  const last = person?.lastName ?? "";
+  const gender = person?.gender ?? "";
+  return `${name} ${last} (${gender})`;
 }
 
-// Filtra la lista de pacientes según el texto de búsqueda
-const filteredPeople = computed(() =>
-  query.value === ""
-    ? people.value
-    : people.value.filter((person) =>
-        (`${person.name} ${person.lastName}` ?? "")
-          .toLowerCase()
-          .replace(/\s+/g, "")
-          .includes(query.value.toLowerCase().replace(/\s+/g, "")),
-      ),
-);
+// Filtro por query (sin `??` inválido)
+const filteredPeople = computed(() => {
+  const q = query.value.toLowerCase().replace(/\s+/g, "");
+  if (!q) return people.value;
+
+  return people.value.filter((person) => {
+    const name = (person?.name ?? "").toLowerCase();
+    const last = (person?.lastName ?? "").toLowerCase();
+    const merged = (name + " " + last).replace(/\s+/g, "");
+    return merged.includes(q);
+  });
+});
 </script>

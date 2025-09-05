@@ -54,7 +54,7 @@ const gmailList = computed(() => {
       (c) =>
         c && typeof c === "object" && c.gmail && typeof c.gmail === "object",
     )
-    .flatMap((c) => Object.values(c.gmail)); // accede a todos los correos del objeto gmail
+    .flatMap((c) => Object.values(c.gmail));
 
   const filteredEmails = allEmails.filter(
     (email) => email != null && email !== "",

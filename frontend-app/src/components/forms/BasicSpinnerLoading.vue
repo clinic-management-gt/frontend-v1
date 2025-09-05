@@ -1,6 +1,6 @@
 <template>
   <svg
-    :style="{ color }"
+    :style="{ color: props.color }"
     class="animate-spin h-5 w-5 text-gray"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
