@@ -54,6 +54,7 @@ const props = defineProps({
   data: {
     type: [String, File, Object],
     required: false,
+    default: null,
   },
   title: {
     type: String,

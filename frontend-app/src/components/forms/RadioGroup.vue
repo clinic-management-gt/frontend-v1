@@ -38,6 +38,7 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import CustomLabel from "@/components/forms/CustomLabel.vue";
 const props = defineProps({
   title: {
@@ -69,5 +70,13 @@ const props = defineProps({
     default: "general.empty",
   },
 });
-const selected = defineModel("currentSelected");
+
+// declarar el emit para el v-model ("update:currentSelected")
+const emit = defineEmits(["update:currentSelected"]);
+
+// sustituir defineModel por un computed con getter/setter
+const selected = computed({
+  get: () => props.currentSelected,
+  set: (val) => emit("update:currentSelected", val),
+});
 </script>

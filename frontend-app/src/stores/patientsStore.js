@@ -175,27 +175,21 @@ export const usePatientsStore = defineStore(
           },
         });
         return res.data;
-      } catch (error) {
-        throw error;
       } finally {
         isLoadingMedicalRecords.value = false;
       }
     }
 
     async function downloadFile(PatientId, type, MedicalRecordId) {
-      try {
-        const res = await instance.get("/files/download", {
-          params: {
-            PatientId,
-            type,
-            MedicalRecordId,
-          },
-          responseType: "blob",
-        });
-        return res.data;
-      } finally {
-        return null;
-      }
+      const res = await instance.get("/files/download", {
+        params: {
+          PatientId,
+          type,
+          MedicalRecordId,
+        },
+        responseType: "blob",
+      });
+      return res.data;
     }
 
     async function fetchRecipe(recipeId) {

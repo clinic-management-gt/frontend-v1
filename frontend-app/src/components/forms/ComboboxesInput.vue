@@ -19,6 +19,9 @@ const props = defineProps({
   isRequired: { type: Boolean, default: false },
 });
 
+// Declarar los eventos que el componente puede emitir (incluye "close")
+const emit = defineEmits(["close"]);
+
 const model = defineModel("currentSelected"); // Esto será un array de IDs
 const selectedItems = ref([]);
 const query = ref("");
