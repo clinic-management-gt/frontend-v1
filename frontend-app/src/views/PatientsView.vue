@@ -67,8 +67,8 @@ function closeRecipeModal() {
   showRecipeModal.value = false;
   selectedRecipe.value = null;
 }
-// Store y referencias
 
+// Store y referencias
 const patientsStore = usePatientsStore();
 const {
   currentPatientSelectedId,
@@ -79,8 +79,7 @@ const {
 
 const patientsLogicStore = usePatientsLogicStore();
 const { showDataSheetPatientDialog } = storeToRefs(patientsLogicStore);
-const { openDataSheetPatientDialog, closeAllPatientDialog } =
-  patientsLogicStore;
+const { openDataSheetPatientDialog, closeAllPatientDialog } = patientsLogicStore;
 
 // Observador para cargar datos cuando cambie el ID
 watch(currentPatientSelectedId, async (newId) => {

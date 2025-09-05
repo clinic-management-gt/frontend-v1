@@ -281,10 +281,6 @@ export const usePatientsStore = defineStore(
       fullRecord.value = null;
     }
 
-    function clearFullRecord() {
-      fullRecord.value = null;
-    }
-
     return {
       // state
       fullRecord,
