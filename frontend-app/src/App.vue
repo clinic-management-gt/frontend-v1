@@ -3,8 +3,8 @@
     <RouterView />
     <patients-create-form-dialog
       v-if="showCreateFormDialog"
-      @close="closeAllPatientDialog"
       :isOpen="showCreateFormDialog"
+      @close="closeAllPatientDialog"
     />
     <notification-alert />
   </div>
@@ -12,7 +12,7 @@
 
 <script setup>
 import { RouterView } from "vue-router";
-import { ref, onMounted, defineAsyncComponent } from "vue";
+import { defineAsyncComponent } from "vue";
 import { storeToRefs } from "pinia";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore";
 

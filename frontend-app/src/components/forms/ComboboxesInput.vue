@@ -2,11 +2,7 @@
 import { ref, computed, watch } from "vue";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/vue/20/solid";
 import {
-  Combobox,
-  ComboboxButton,
-  ComboboxInput,
-  ComboboxOption,
-  ComboboxOptions,
+  Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions,
 } from "@headlessui/vue";
 import CustomLabel from "@/components/forms/CustomLabel.vue";
 
@@ -19,25 +15,25 @@ const props = defineProps({
   isRequired: { type: Boolean, default: false },
 });
 
-const model = defineModel("currentSelected"); // Esto será un array de IDs
+// ❌ const emit = defineEmits(["close"]); // no lo usas → elimínalo
+
+// ✅ Declara tipo del modelo
+const model = defineModel("currentSelected", {
+  type: [Array, Number, null],
+  default: () => [],
+});
+
 const selectedItems = ref([]);
 const query = ref("");
 
-// Mostrar nombres
-const selectedDisplay = computed(() => {
-  return selectedItems.value.map((i) => i.name).join(", ");
-});
-
-// Para mostrar los elementos visibles, usar `data` directamente
+const selectedDisplay = computed(() => selectedItems.value.map((i) => i.name).join(", "));
 const fullData = computed(() => props.data);
 
-// Convertir el modelo (array de IDs) en objetos (algunos conocidos, otros no)
+// Sync modelo (ids) → objetos
 watch(
   () => model.value,
   (newIds) => {
-    if (!Array.isArray(newIds)) return;
-
-    const knownIds = new Set(props.data.map((i) => i.id));
+    if (!Array.isArray(newIds)) return; // si estás en modo single, lo ignoras
     selectedItems.value = newIds.map((id) => {
       const item = props.data.find((d) => d.id === id);
       return item ?? { id, name: `ID: ${id}` };
@@ -46,7 +42,7 @@ watch(
   { immediate: true },
 );
 
-// Convertir objetos seleccionados en array de IDs
+// Objetos seleccionados → modelo (ids)
 watch(
   selectedItems,
   (items) => {
@@ -64,17 +60,21 @@ watch(
     <custom-label
       v-if="title"
       :title="title"
-      :text-class="labelCss"
-      :is-required="isRequired"
+      :textClass="labelCss"
+      :isRequired="isRequired"
     />
-    <Combobox as="div" :multiple="multiple" v-model="selectedItems">
+    <Combobox
+      v-model="selectedItems"
+      as="div"
+      :multiple="multiple"
+    >
       <div class="relative mt-2">
         <ComboboxInput
           class="block w-full rounded-md bg-white py-1.5 pr-12 pl-3 text-base text-gray-900 border border-patient-page-color placeholder:text-gray-400 focus:border-patient-page-color focus:ring-patient-page-color focus:ring-1 focus:outline-none sm:text-sm"
           :placeholder="$t(placeholder)"
+          :displayValue="() => selectedDisplay"
           @change="query = $event.target.value"
           @blur="query = ''"
-          :display-value="() => selectedDisplay"
         />
         <ComboboxButton
           class="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-hidden"
@@ -89,9 +89,9 @@ watch(
           <ComboboxOption
             v-for="item in fullData"
             :key="item.id"
+            v-slot="{ active, selected }"
             :value="item"
             as="template"
-            v-slot="{ active, selected }"
           >
             <li
               :class="[

@@ -19,8 +19,8 @@
           </p>
         </div>
         <button
-          @click="$emit('close')"
           class="text-white hover:text-gray-200 text-2xl p-2 rounded-full hover:bg-blue-700 transition-colors"
+          @click="$emit('close')"
         >
           &times;
         </button>
@@ -36,30 +36,28 @@
             </h3>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <span class="text-sm text-gray-600"
-                  >{{ $t("general.date") }}:</span
-                >
+                <span class="text-sm text-gray-600">{{ $t("general.date") }}:</span>
                 <p class="font-medium">
                   {{ formatRecordDate(record?.createdAt) }}
                 </p>
               </div>
               <div>
-                <span class="text-sm text-gray-600"
-                  >{{ $t("general.status") }}:</span
-                >
-                <p class="font-medium">{{ record?.status || "Completado" }}</p>
+                <span class="text-sm text-gray-600">{{ $t("general.status") }}:</span>
+                <p class="font-medium">
+                  {{ record?.status || "Completado" }}
+                </p>
               </div>
               <div v-if="record?.appointmentType">
-                <span class="text-sm text-gray-600"
-                  >{{ $t("general.appointment-type") }}:</span
-                >
-                <p class="font-medium">{{ record.appointmentType }}</p>
+                <span class="text-sm text-gray-600">{{ $t("general.appointment-type") }}:</span>
+                <p class="font-medium">
+                  {{ record.appointmentType }}
+                </p>
               </div>
               <div v-if="record?.diagnosis">
-                <span class="text-sm text-gray-600"
-                  >{{ $t("general.diagnosis") }}:</span
-                >
-                <p class="font-medium">{{ record.diagnosis }}</p>
+                <span class="text-sm text-gray-600">{{ $t("general.diagnosis") }}:</span>
+                <p class="font-medium">
+                  {{ record.diagnosis }}
+                </p>
               </div>
             </div>
           </div>
@@ -71,8 +69,8 @@
                 {{ $t("patients.evolution-note") }}
               </h3>
               <button
-                @click="editEvolutionNote"
                 class="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1"
+                @click="editEvolutionNote"
               >
                 <action-button-solid-icon
                   icon="PencilIcon"
@@ -90,7 +88,10 @@
                 {{ record?.medicalRecord?.notes || record?.evolutionNote }}
               </p>
             </div>
-            <div v-else class="text-gray-400 italic py-4">
+            <div
+              v-else
+              class="text-gray-400 italic py-4"
+            >
               {{ $t("patients.no-evolution-note") }}
             </div>
           </div>
@@ -103,8 +104,8 @@
               </h3>
               <button
                 v-if="record?.recipes && record.recipes.length > 0"
-                @click="editFirstRecipe"
                 class="text-green-600 hover:text-green-800 text-sm flex items-center gap-1"
+                @click="editFirstRecipe"
               >
                 <action-button-solid-icon
                   icon="PencilIcon"
@@ -121,9 +122,9 @@
                 class="mb-3 p-3 bg-white rounded border relative"
               >
                 <button
-                  @click="editRecipe(recipe)"
                   class="absolute top-2 right-2 text-green-600 hover:text-green-800 p-1 rounded"
                   title="Editar receta"
+                  @click="editRecipe(recipe)"
                 >
                   <action-button-solid-icon
                     icon="PencilIcon"
@@ -140,7 +141,10 @@
                 </div>
               </div>
             </div>
-            <div v-else class="text-gray-400 italic py-4">
+            <div
+              v-else
+              class="text-gray-400 italic py-4"
+            >
               {{ $t("patients.no-prescription") }}
             </div>
           </div>
@@ -162,7 +166,10 @@
                 <div class="font-medium text-gray-800">
                   {{ exam.name || exam.type }}
                 </div>
-                <div v-if="exam.result" class="text-sm text-gray-600 mt-1">
+                <div
+                  v-if="exam.result"
+                  class="text-sm text-gray-600 mt-1"
+                >
                   <strong>Resultado:</strong> {{ exam.result }}
                 </div>
                 <div
@@ -176,7 +183,10 @@
           </div>
 
           <!-- Observaciones generales -->
-          <div v-if="record?.observations" class="bg-yellow-50 rounded-lg p-4">
+          <div
+            v-if="record?.observations"
+            class="bg-yellow-50 rounded-lg p-4"
+          >
             <h3 class="text-lg font-semibold mb-3 text-yellow-800">
               {{ $t("general.observations") }}
             </h3>
@@ -190,8 +200,8 @@
       <!-- Footer con acciones -->
       <div class="flex justify-end gap-3 p-6 border-t bg-gray-50">
         <button
-          @click="editRecord"
           class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+          @click="editRecord"
         >
           <action-button-solid-icon
             icon="PencilIcon"
@@ -201,8 +211,8 @@
           {{ $t("general.edit") }}
         </button>
         <button
-          @click="downloadRecord"
           class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2"
+          @click="downloadRecord"
         >
           <action-button-solid-icon
             icon="ArrowDownTrayIcon"
@@ -212,8 +222,8 @@
           {{ $t("general.download") }}
         </button>
         <button
-          @click="$emit('close')"
           class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+          @click="$emit('close')"
         >
           {{ $t("general.close") }}
         </button>
@@ -254,7 +264,7 @@ function formatRecordDate(dateString) {
       minute: "2-digit",
     });
   } catch (error) {
-    return "Fecha inválida";
+    return error;
   }
 }
 
@@ -263,12 +273,10 @@ function editRecord() {
 }
 
 function editEvolutionNote() {
-  // Abrir modal de edición de medical record
   openEditModal(props.record);
 }
 
 function editRecipe(recipe) {
-  // Abrir modal de edición de receta
   openRecipeFormModal(recipe);
 }
 

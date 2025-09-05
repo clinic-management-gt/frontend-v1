@@ -1,8 +1,12 @@
 <template>
   <div class="flex justify-between items-center mx-6 my-4">
     <div class="flex flex-col">
-      <h1 class="text-3xl font-bold">{{ data.name }}</h1>
-      <h1 class="text-3xl font-bold">{{ data.lastName }}</h1>
+      <h1 class="text-3xl font-bold">
+        {{ data.name }}
+      </h1>
+      <h1 class="text-3xl font-bold">
+        {{ data.lastName }}
+      </h1>
     </div>
     <div class="flex flex-col">
       <p>{{ $t("general.age") }}: {{ ageNumber }}</p>
@@ -11,22 +15,21 @@
     </div>
     <div class="flex justify-between">
       <action-button-solid-icon
-        @click="props.createAction && props.createAction()"
         icon="PlusIcon"
         size="h-16 w-16"
         color="text-patient-page-color"
+        @click="props.createAction && props.createAction()"
       />
       <action-button-solid-icon
-        @click="props.chartAction && props.chartAction()"
         icon="ChartBarSquareIcon"
         size="h-16 w-16"
         color="text-patient-page-color"
+        @click="props.chartAction && props.chartAction()"
       />
     </div>
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
 import { formatAgeFromDate } from "@utils/formatAge";
 import { normalizeGender } from "@utils/normalizeGender";
 

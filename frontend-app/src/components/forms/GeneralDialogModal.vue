@@ -1,15 +1,23 @@
 <template>
   <div>
-    <transition-root appear :show="props.isOpen" as="template">
-      <Dialog as="div" @close="closeModal" class="relative z-50">
+    <transition-root
+      appear
+      :show="props.isOpen"
+      as="template"
+    >
+      <Dialog
+        as="div"
+        class="relative z-50"
+        @close="closeModal"
+      >
         <transition-child
           as="template"
           enter="duration-300 ease-out"
-          enter-from="opacity-0"
-          enter-to="opacity-100"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
           leave="duration-200 ease-in"
-          leave-from="opacity-100"
-          leave-to="opacity-0"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
         >
           <div class="fixed inset-0 bg-black/25 pointer-events-none"></div>
         </transition-child>
@@ -21,11 +29,11 @@
             <transition-child
               as="template"
               enter="duration-300 ease-out"
-              enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
               leave="duration-200 ease-in"
-              leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
             >
               <dialog-panel
                 :class="[
@@ -34,9 +42,11 @@
                 ]"
               >
                 <dialog-title class="mb-4">
-                  <slot name="title"> </slot>
+                  <slot name="title">
+                  </slot>
                 </dialog-title>
-                <slot name="body"> </slot>
+                <slot name="body">
+                </slot>
                 <div class="mt-2 flex justify-end">
                   <primary-button
                     v-if="cancelButton === false"
@@ -49,7 +59,8 @@
                       {{ $t("general.cancel") }}
                     </p>
                   </primary-button>
-                  <slot name="buttons"> </slot>
+                  <slot name="buttons">
+                  </slot>
                 </div>
               </dialog-panel>
             </transition-child>
@@ -67,8 +78,7 @@ import {
   TransitionChild,
   Dialog,
   DialogTitle,
-  DialogPanel,
-  Portal,
+  DialogPanel
 } from "@headlessui/vue";
 
 const emit = defineEmits(["closeModal"]);

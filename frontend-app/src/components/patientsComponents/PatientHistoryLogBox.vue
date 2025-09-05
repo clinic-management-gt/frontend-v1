@@ -1,7 +1,9 @@
 <template>
   <div>
     <div class="flex justify-between items-center mb-4">
-      <p class="text-2xl font-bold">{{ $t("patients.patient-history") }}</p>
+      <p class="text-2xl font-bold">
+        {{ $t("patients.patient-history") }}
+      </p>
 
       <!-- Botón para agregar nuevo registro -->
       <div class="flex align-center items-center">
@@ -37,7 +39,10 @@
                   {{ formatDateShort(item.createdAt) }}
                 </p>
               </div>
-              <p v-if="item.diagnosis" class="text-sm text-gray-600 ml-5">
+              <p
+                v-if="item.diagnosis"
+                class="text-sm text-gray-600 ml-5"
+              >
                 <strong>Diagnóstico:</strong> {{ item.diagnosis }}
               </p>
             </div>
@@ -79,13 +84,21 @@
         <label class="text-sm text-gray-600">{{ $t("general.show") }}:</label>
         <select
           v-model="itemsPerPage"
-          @change="resetPagination"
           class="px-2 py-1 border rounded text-sm"
+          @change="resetPagination"
         >
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="15">15</option>
-          <option value="20">20</option>
+          <option value="5">
+            5
+          </option>
+          <option value="10">
+            10
+          </option>
+          <option value="15">
+            15
+          </option>
+          <option value="20">
+            20
+          </option>
         </select>
         <span class="text-sm text-gray-600">{{ $t("general.elements") }}</span>
       </div>
@@ -94,9 +107,9 @@
         class="flex justify-between items-center mt-4 text-sm text-gray-600"
       >
         <button
-          @click="goToPreviousPage"
           :disabled="currentPage === 1"
           class="px-3 py-1 border rounded disabled:opacity-50"
+          @click="goToPreviousPage"
         >
           {{ $t("general.previous") || "Anterior" }}
         </button>
@@ -107,9 +120,9 @@
         </span>
 
         <button
-          @click="goToNextPage"
           :disabled="currentPage === totalPages"
           class="px-3 py-1 border rounded disabled:opacity-50"
+          @click="goToNextPage"
         >
           {{ $t("general.next") || "Siguiente" }}
         </button>
@@ -131,7 +144,7 @@
     <consultation-details-modal
       v-if="showDetailsModal"
       :record="selectedRecord"
-      :is-open="showDetailsModal"
+      :isOpen="showDetailsModal"
       @close="closeHistoryLogModals"
       @view-recipe="handleViewRecipe"
       @edit="openMedicalRecordEditModal"
@@ -140,10 +153,10 @@
     <!-- Modal de formulario -->
     <medical-record-form-modal
       v-if="showFormModal"
-      :is-open="showFormModal"
-      :patient-id="currentPatientSelectedId || props.patientId"
+      :isOpen="showFormModal"
+      :patientId="currentPatientSelectedId || props.patientId"
       :record="selectedRecordForEdit"
-      :is-editing="isEditing"
+      :isEditing="isEditing"
       @close="closeHistoryLogModals"
       @save="(formData) => handleMedicalRecordSave(formData, props.patientId)"
     />
@@ -151,10 +164,10 @@
     <!-- Modal de formulario de recetas -->
     <recipe-form-modal
       v-if="showRecipeFormModal"
-      :is-open="showRecipeFormModal"
+      :isOpen="showRecipeFormModal"
       :recipe="selectedRecipeForEdit"
-      :is-editing="isEditingRecipe"
-      :treatment-id="getFirstTreatmentId()"
+      :isEditing="isEditingRecipe"
+      :treatmentId="getFirstTreatmentId()"
       @close="closeHistoryLogModals"
       @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)"
     />
@@ -169,9 +182,6 @@ import { storeToRefs } from "pinia";
 import { DocumentIcon } from "@heroicons/vue/24/outline";
 
 import ActionButtonSolidIcon from "@components/forms/ActionButtonSolidIcon.vue";
-import ActionButtonOutlinedIcon from "@components/forms/ActionButtonOutlinedIcon.vue";
-import PrimaryButton from "@components/forms/PrimaryButton.vue";
-import Panel from "@components/forms/Panel.vue";
 import ConsultationDetailsModal from "../patientsDialogsComponents/ConsultationDetailsModal.vue";
 import MedicalRecordFormModal from "../patientsDialogsComponents/MedicalRecordFormModal.vue";
 import RecipeFormModal from "../patientsDialogsComponents/RecipeFormModal.vue";
@@ -190,7 +200,6 @@ const emit = defineEmits(["view-recipe"]);
 const patientsStore = usePatientsStore();
 const {
   currentPatientMedicalRecords,
-  isLoadingMedicalRecords,
   currentPatientSelectedId,
 } = storeToRefs(patientsStore);
 const patientsLogicStore = usePatientsLogicStore();
@@ -241,8 +250,7 @@ async function deleteRecord(record) {
     await patientsStore.fetchPatientMedicalRecords(props.patientId);
     alert("Registro eliminado correctamente");
   } catch (error) {
-    console.error("Error al eliminar registro:", error);
-    alert("Error al eliminar el registro");
+    return error;
   }
 }
 
@@ -253,7 +261,6 @@ function downloadRecord(record) {
 
 function handleViewRecipe(recipe) {
   emit("view-recipe", recipe);
-  closeDetailsModal();
 }
 
 function getFirstTreatmentId() {
