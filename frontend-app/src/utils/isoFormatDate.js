@@ -41,10 +41,6 @@ export function isoFormatDate(dateInput) {
   const year = date.getFullYear();
   const month = pad2(date.getMonth() + 1);
   const day = pad2(date.getDate());
-  const hours = pad2(date.getHours());
-  const minutes = pad2(date.getMinutes());
-  const seconds = pad2(date.getSeconds());
-  const milliseconds = date.getMilliseconds();
 
   const iso8601 = date.toISOString();
   const isoDate = `${year}-${month}-${day}`;
@@ -70,22 +66,15 @@ export function isoFormatDate(dateInput) {
  */
 export function formatDate(dateString, options = {}) {
   if (!dateString) return "Fecha no disponible";
-
-  try {
-    const defaultOptions = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      ...options,
-    };
-
-    return new Date(dateString).toLocaleDateString("es-ES", defaultOptions);
-  } catch (error) {
-    console.error("Error al formatear fecha:", error);
-    return "Fecha inválida";
-  }
+  const defaultOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    ...options,
+  };
+  return new Date(dateString).toLocaleDateString("es-ES", defaultOptions);
 }
 
 /**

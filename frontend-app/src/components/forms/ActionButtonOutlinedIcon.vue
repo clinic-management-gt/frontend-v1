@@ -1,10 +1,16 @@
 <template>
   <form @submit.prevent>
     <button :class="[buttonStyles]">
-      <p v-if="props.title !== 'general.empty'" class="mr-2">
+      <p
+        v-if="props.title !== 'general.empty'"
+        class="mr-2"
+      >
         {{ $t(props.title) }}
       </p>
-      <component :is="icons[icon]" :class="[props.color, props.size]" />
+      <component
+        :is="icons[icon]"
+        :class="[props.color, props.size]"
+      />
     </button>
   </form>
 </template>
@@ -43,7 +49,10 @@ import {
 } from "@heroicons/vue/24/outline";
 
 const props = defineProps({
-  icon: String,
+  icon: {
+    type: String,
+    default: "PlusIcon",
+  },
   color: {
     type: String,
     default: "text-primary-color",

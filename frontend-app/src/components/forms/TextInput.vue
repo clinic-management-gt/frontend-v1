@@ -5,24 +5,24 @@
       v-if="title"
       :title="title"
       :name="name"
-      :text-class="labelCss"
+      :textClass="labelCss"
     />
-    <div :class="{ 'mt-2': title && title !== 'general.empty' }" />
+    <div :class="{ 'mt-2': title && title !== 'general.empty' }"></div>
     <!-- Input -->
     <div class="relative w-full">
       <input
         :id="name"
+        v-model="value"
         :name="name"
         :type="type"
         :placeholder="$t(inputPlaceholder)"
-        v-model="value"
-        @blur="handleBlur"
         :required="required"
         :class="[
           'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow ring-1 ring-inset sm:text-sm sm:leading-6 px-2',
           ringColorClass,
           focusOutlineClass,
         ]"
+        @blur="handleBlur"
       />
     </div>
   </div>
@@ -68,7 +68,7 @@ const props = defineProps({
   },
 });
 
-const { value, errorMessage, handleChange, handleBlur } = useField(props.name);
+const { value, handleBlur } = useField(props.name);
 
 const ringColorClass = computed(() => {
   switch (props.inputColor) {

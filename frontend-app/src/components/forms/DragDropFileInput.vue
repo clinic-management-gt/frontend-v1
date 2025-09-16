@@ -7,12 +7,12 @@
   >
     <div :disabled="isDragging">
       <input
+        id="filePdf_input"
         ref="filePdf"
         class="hidden"
-        @change="handleFilePdf"
-        id="filePdf_input"
         type="file"
         :accept="aceptAll ? true : 'application/pdf'"
+        @change="handleFilePdf"
       />
       <div class="flex items-center m-4">
         <action-button-outlined-icon
@@ -22,7 +22,11 @@
           color="text-patient-page-color"
           @click="triggerFilePdf"
         />
-        <a @click="triggerFilePdf" class="ml-2" role="button">{{
+        <a
+          class="ml-2"
+          role="button"
+          @click="triggerFilePdf"
+        >{{
           $t(title)
         }}</a>
         <action-button-outlined-icon
@@ -33,16 +37,15 @@
         <action-button-outlined-icon
           v-if="filePdfUploaded"
           icon="TrashIcon"
-          @click="deletePdf"
           size="h-6 w-6 mr-1"
           color="text-red-500"
+          @click="deletePdf"
         />
       </div>
     </div>
   </div>
 </template>
 <script setup>
-import ActionButtonSolidIcon from "@components/forms/ActionButtonSolidIcon.vue";
 import ActionButtonOutlinedIcon from "@components/forms/ActionButtonOutlinedIcon.vue";
 import { ref } from "vue";
 
@@ -51,6 +54,7 @@ const props = defineProps({
   data: {
     type: [String, File, Object],
     required: false,
+    default: null,
   },
   title: {
     type: String,
@@ -60,7 +64,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  currentSelected: {},
+  currentSelected: {
+    type: [String, Object, File],
+    default: null,
+  },
 });
 
 const filePdf = ref(null);

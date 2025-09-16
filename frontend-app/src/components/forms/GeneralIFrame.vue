@@ -11,14 +11,16 @@
     </div>
     <div class="block sm:hidden mt-4">
       <primary-button @click="downloadPdf">
-        <div class="uppercase">{{ $t("general.download-pdf") }}</div>
+        <div class="uppercase">
+          {{ $t("general.download-pdf") }}
+        </div>
       </primary-button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { computed, onMounted, watch } from "vue";
 import { useBlobAdapter } from "@/composables/useBlobAdapter";
 import PrimaryButton from "@components/forms/PrimaryButton.vue";
 

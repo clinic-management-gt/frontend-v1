@@ -1,6 +1,6 @@
 <template>
   <general-dialog-modal
-    :is-open="isOpen"
+    :isOpen="isOpen"
     dialogSize="max-w-4xl"
     @close-modal="handleClose"
   >
@@ -18,7 +18,10 @@
     <template #body>
       <div class="space-y-6 max-h-[70vh] overflow-y-auto">
         <!-- Formulario principal -->
-        <form @submit.prevent="handleSubmit" class="space-y-4">
+        <form
+          class="space-y-4"
+          @submit.prevent="handleSubmit"
+        >
           <!-- Información básica -->
           <div class="bg-gray-50 p-4 rounded-lg">
             <h3 class="text-lg font-semibold mb-4">
@@ -33,7 +36,7 @@
                 }}</label>
                 <!-- Mostrar valor actual como referencia -->
                 <div
-                  v-if="props.isEditing && originalValues.weight"
+                  v-if="isEditing && originalValues.weight"
                   class="mb-2 text-xs text-gray-500 bg-gray-50 p-2 rounded border"
                 >
                   📊 {{ $t("medical-records.current-value") }}:
@@ -53,7 +56,7 @@
                 }}</label>
                 <!-- Mostrar valor actual como referencia -->
                 <div
-                  v-if="props.isEditing && originalValues.height"
+                  v-if="isEditing && originalValues.height"
                   class="mb-2 text-xs text-gray-500 bg-gray-50 p-2 rounded border"
                 >
                   📊 {{ $t("medical-records.current-value") }}:
@@ -101,7 +104,10 @@
 
     <!-- Botones de acción -->
     <template #buttons>
-      <primary-button v-if="isLoading" :disabled="isLoading">
+      <primary-button
+        v-if="isLoading"
+        :disabled="isLoading"
+      >
         <span class="flex items-center">
           <svg
             class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
@@ -116,17 +122,21 @@
               r="10"
               stroke="currentColor"
               stroke-width="4"
-            ></circle>
+            />
             <path
               class="opacity-75"
               fill="currentColor"
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
+            />
           </svg>
           {{ $t("medical-records.saving") }}
         </span>
       </primary-button>
-      <primary-button v-else @click="handleSubmit" :disabled="isLoading">
+      <primary-button
+        v-else
+        :disabled="isLoading"
+        @click="handleSubmit"
+      >
         <p class="uppercase">
           {{ $t(isEditing ? "general.update" : "general.save") }}
         </p>
@@ -136,9 +146,7 @@
 </template>
 <script setup>
 import { ref, watch, nextTick } from "vue";
-import { useI18n } from "vue-i18n";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
-import { usePatientsStore } from "@stores/patientsStore.js";
 import { useNotificationStore } from "@stores/notificationStore.js";
 
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
@@ -158,20 +166,14 @@ const props = defineProps({
     type: Object,
     default: () => null,
   },
-  isEditing: {
-    type: Boolean,
-    default: false,
-  },
 });
 
 const emit = defineEmits(["close", "save"]);
 
-const { t } = useI18n();
 const patientsLogicStore = usePatientsLogicStore();
-const patientsStore = usePatientsStore();
 const notificationStore = useNotificationStore();
 
-const { selectedRecordForEdit, isEditing } = storeToRefs(patientsLogicStore);
+const { isEditing } = storeToRefs(patientsLogicStore);
 const { closeHistoryLogModals } = patientsLogicStore;
 
 // Estados
@@ -198,7 +200,7 @@ function handleClose() {
 
 // Cargar datos del record cuando se abre en modo edición
 function loadRecordData() {
-  if (props.isEditing && props.record) {
+  if (isEditing.value && props.record) {
     // Acceder a los datos según la estructura del backend
     const record = props.record.medicalRecord || props.record;
 
@@ -252,7 +254,7 @@ async function handleSubmit() {
       formData.value.weight !== undefined
     ) {
       weightToSend = parseFloat(formData.value.weight);
-    } else if (props.isEditing && originalValues.value.weight) {
+    } else if (isEditing.value && originalValues.value.weight) {
       weightToSend = parseFloat(originalValues.value.weight);
     }
 
@@ -263,7 +265,7 @@ async function handleSubmit() {
       formData.value.height !== undefined
     ) {
       heightToSend = parseFloat(formData.value.height);
-    } else if (props.isEditing && originalValues.value.height) {
+    } else if (isEditing.value && originalValues.value.height) {
       heightToSend = parseFloat(originalValues.value.height);
     }
 
@@ -289,13 +291,13 @@ async function handleSubmit() {
       return;
     }
 
-    if (props.isEditing && props.record) {
+    if (isEditing.value && props.record) {
       // Actualizar registro existente - usar el store de lógica
       await patientsLogicStore.handleMedicalRecordSave(
         dataToSend,
         props.patientId,
       );
-    } else if (!props.isEditing && props.patientId) {
+    } else if (!isEditing.value && props.patientId) {
       // Crear nuevo registro usando el store de lógica
       await patientsLogicStore.handleMedicalRecordSave(
         dataToSend,
@@ -313,14 +315,6 @@ async function handleSubmit() {
 
     // El store de lógica ya maneja el cierre del modal y recarga de datos
     emit("save", dataToSend);
-  } catch (error) {
-    notificationStore.addNotification(
-      "error",
-      "general.error",
-      props.isEditing
-        ? "Error al actualizar el registro"
-        : "Error al crear el registro",
-    );
   } finally {
     isLoading.value = false;
   }
@@ -328,7 +322,7 @@ async function handleSubmit() {
 
 // Observar cambios en props para cargar datos
 watch(
-  [() => props.isOpen, () => props.record, () => props.isEditing],
+  [() => props.isOpen, () => props.record, () => isEditing.value],
   () => {
     if (props.isOpen) {
       nextTick(() => {

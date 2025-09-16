@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
-import ActionButtonSolidIcon from "@components/forms/ActionButtonSolidIcon.vue";
 import PatientMainDataBox from "@components/patientsComponents/PatientMainDataBox.vue";
 
 describe("PatientMainDataBox.vue", () => {

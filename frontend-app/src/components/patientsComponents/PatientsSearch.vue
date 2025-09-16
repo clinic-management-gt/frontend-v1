@@ -2,10 +2,10 @@
   <div class="w-full flex items-center justify-center">
     <div class="w-full max-w-xl">
       <combo-box-autocomplete-input
-        :data="allPatients"
         v-model:currentSelected="currentPatientSelectedId"
-        @update:currentSelected="patientsStore.setPatientsData"
+        :data="allPatients"
         :placeholder="$t('general.search-patient')"
+        @update:current-selected="patientsStore.setPatientsData"
       />
     </div>
   </div>
