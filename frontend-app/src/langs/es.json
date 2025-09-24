@@ -78,7 +78,19 @@
   },
   "dashboard": {
     "dashboard": "Dashboard",
-    "no-patients-for-today": "No hay citas para el día de hoy."
+    "no-patients-for-today": "No hay citas para el día de hoy.",
+    "new-appointment": "Nueva cita",
+    "schedule-appointment": "Agendar cita",
+    "patient": "Paciente",
+    "select-existing-patient": "Seleccionar paciente existente",
+    "create-new-patient": "Crear nuevo paciente",
+    "patient-name": "Nombre del paciente",
+    "appointment-date": "Fecha de la cita",
+    "appointment-time": "Hora de la cita",
+    "appointment-reason": "Motivo de la cita",
+    "appointment-reason-placeholder": "Describe brevemente el motivo de la consulta...",
+    "appointment-scheduled-successfully": "Cita agendada exitosamente",
+    "error-scheduling-appointment": "Error al agendar la cita. Inténtalo nuevamente."
   },
   "patients": {
     "patients": "Pacientes",

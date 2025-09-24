@@ -237,6 +237,31 @@ export const usePatientsStore = defineStore(
       }
     }
 
+    async function createBasicPatient(patientData) {
+      isLoadingAllPatients.value = true;
+      try {
+        const res = await instance.post(`/patients/basic`, patientData);
+        // Actualizar la lista de pacientes para incluir el nuevo
+        await fetchAllPatients();
+        return res.data;
+      } finally {
+        isLoadingAllPatients.value = false;
+      }
+    }
+
+    async function createAppointment(appointmentData) {
+      isLoadingAppointments.value = true;
+      try {
+        const res = await instance.post(`/appointments`, appointmentData);
+        // Recargar las citas para reflejar el cambio
+        await fetchAppointments();
+        await fetchAppointmentsToday();
+        return res.data;
+      } finally {
+        isLoadingAppointments.value = false;
+      }
+    }
+
     function clearFullRecord() {
       fullRecord.value = null;
     }
@@ -275,6 +300,8 @@ export const usePatientsStore = defineStore(
       fetchRecipe,
       updateRecipe,
       createRecipe,
+      createBasicPatient,
+      createAppointment,
       clearFullRecord
     };
   },
