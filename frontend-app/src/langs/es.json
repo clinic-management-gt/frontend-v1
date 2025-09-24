@@ -41,6 +41,7 @@
     "close": "Cerrar",
     "observations": "Observaciones",
     "diagnosis": "Diagnóstico",
+    "diagnosis-label": "Diagnóstico:",
     "appointment-type": "Tipo de cita",
     "no-medical-records": "No hay registros médicos disponibles",
     "delete": "Eliminar",
@@ -63,6 +64,8 @@
     "number-of-pages": "Número de páginas",
     "filters": "Filtros",
     "clear-all": "Limpiar todo"
+    "confirm-deletion": "Confirmar eliminación",
+    "delete-confirmation-message": "¿Estás seguro de que deseas eliminar este registro médico? Esta acción no se puede deshacer."
   },
   "login": {
     "login": "Iniciar sesión",
@@ -240,7 +243,9 @@
     "record-created-successfully": "Registro creado exitosamente",
     "success": "Éxito",
     "medical-record-updated-successfully": "Registro médico actualizado exitosamente",
-    "medical-record-created-successfully": "Registro médico creado exitosamente"
+    "medical-record-created-successfully": "Registro médico creado exitosamente",
+    "medical-record-deleted-successfully": "El registro médico ha sido eliminado correctamente",
+    "error-deleting-record": "Error al eliminar el registro médico. Inténtalo nuevamente."
   },
   "recipes": {
     "edit-recipe": "Editar receta médica",

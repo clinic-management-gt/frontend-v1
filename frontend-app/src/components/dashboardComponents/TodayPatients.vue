@@ -21,7 +21,11 @@
             <div class="mb-2 flex w-full">
               <div class="flex items-center bg-white shadow-md rounded-xl w-3/4 p-4 flex-1">
                 <div class="flex-1">
-                  <h2 class="text-3xl font-bold text-gray-800">
+                  <h2 
+                    class="text-3xl font-bold text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
+                    :title="`Ver detalles de ${appointment.patientName}`"
+                    @click="navigateToPatient(appointment)"
+                  >
                     {{ appointment.patientName }}
                   </h2>
                   <p class="text-gray-600">
@@ -62,11 +66,13 @@
 <script setup>
 import { computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
+import { useRouter } from "vue-router";
 import { usePatientsStore } from "../../stores/patientsStore";
 import BasicSpinnerLoading from "../forms/BasicSpinnerLoading.vue";
 
 const patientsStore = usePatientsStore();
 const { appointmentsToday, isLoadingAppointmentsToday } = storeToRefs(patientsStore);
+const router = useRouter();
 
 onMounted(() => {
   patientsStore.fetchAppointmentsToday();
@@ -115,5 +121,16 @@ function formatDateTime(dateString) {
     minute: "numeric",
     hour12: true,
   });
+}
+
+/**
+ * Navega al detalle del paciente seleccionado
+ * @param {Object} appointment - Objeto de cita que contiene patientId
+ */
+function navigateToPatient(appointment) {
+  if (appointment.patientId) {
+    patientsStore.setPatientsData(appointment.patientId);
+    router.push('/patients');
+  }
 }
 </script>
