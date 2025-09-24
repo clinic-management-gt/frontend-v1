@@ -8,23 +8,23 @@
       />
       <input
         id="search-field"
+        :key="cleanText"
         :value="inputBinding"
-        @input="e => inputBinding = e.target.value"
         class="block w-full rounded-lg border-0 bg-gray-100 py-2 pl-10 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-base"
         :placeholder="$t(textPlaceholder)"
         type="search"
         name="search"
-        :key="cleanText"
+        @input="e => inputBinding = e.target.value"
       />
     </div>
   </form>
 </template>
 
 <script setup>
-import { MagnifyingGlassIcon } from '@heroicons/vue/24/solid'
-import { computed } from 'vue'
+import { MagnifyingGlassIcon } from '@heroicons/vue/24/solid';
+import { computed } from 'vue';
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const props = defineProps({
   modelValue: {
@@ -43,15 +43,15 @@ const props = defineProps({
     type: Boolean,
     default: false
   }
-})
+});
 
 // Computed con getter y setter para v-model + limpieza reactiva
 const inputBinding = computed({
   get() {
-    return props.cleanText ? '' : props.modelValue
+    return props.cleanText ? '' : props.modelValue;
   },
   set(value) {
-    emit('update:modelValue', value)
+    emit('update:modelValue', value);
   }
-})
+});
 </script>

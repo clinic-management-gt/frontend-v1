@@ -6,8 +6,10 @@
     >
       {{ $t("patients.loading-patients-data") }}
     </div>
-    <div v-else-if="currentPatientSelectedData == null"
-      class="px-6 py-6 mx-auto">
+    <div
+      v-else-if="currentPatientSelectedData == null"
+      class="px-6 py-6 mx-auto"
+    >
       <app-panel>
         <div class="flex items-center">
           <p class="text-2xl mr-2">
@@ -17,8 +19,8 @@
             ({{ Object.keys(allPatients).length }})
           </p>
         </div>
-        <patients-filter :data="allPatients" @FilteredData="handleFilters"/>
-        <patient-table :data="updatedFilteredPatients"/>
+        <patients-filter :data="allPatients" @filtered-data="handleFilters" />
+        <patient-table :data="updatedFilteredPatients" />
       </app-panel>
     </div>
     <div
@@ -26,11 +28,10 @@
       class="px-6 py-6 mx-auto"
     >
       <p class="flex items-center cursor-pointer text-gray-500 mb-2" @click="returnToPatientsTable()">
-      <arrow-uturn-left-icon class="size-4 mr-2"/>
-      {{ $t('patients.return-to-patient-table') }}
+        <arrow-uturn-left-icon class="size-4 mr-2" />
+        {{ $t('patients.return-to-patient-table') }}
       </p>
       <div class="grid grid-cols-5 grid-rows-5 gap-5">
-
         <app-panel class="col-span-5">
           <PatientMainDataBox :data="currentPatientSelectedData" />
         </app-panel>
@@ -45,8 +46,8 @@
         </app-panel>
         <div class="col-span-3 row-span-3 col-start-3 row-start-3">
           <patient-history-log-box
-          :patientId="currentPatientSelectedId"
-          @view-recipe="openRecipeModal"
+            :patientId="currentPatientSelectedId"
+            @view-recipe="openRecipeModal"
           />
         </div>
       </div>
@@ -97,10 +98,10 @@ const patientsLogicStore = usePatientsLogicStore();
 const { showDataSheetPatientDialog } = storeToRefs(patientsLogicStore);
 const { openDataSheetPatientDialog, closeAllPatientDialog, returnToPatientsTable } = patientsLogicStore;
 
-const updatedFilteredPatients = ref([])
+const updatedFilteredPatients = ref([]);
 const handleFilters = (filteredData) => {
-     updatedFilteredPatients.value = filteredData
-}
+     updatedFilteredPatients.value = filteredData;
+};
 
 watch(currentPatientSelectedId, async (newId) => {
   if (newId) {

@@ -1,33 +1,35 @@
 <template>
-     <general-table :data="tableData" :is-loading-content="isLoadingPatientData"
-          :default-sort="currentSort" @update:sort="(newSort) => currentSort = newSort" />
+  <general-table
+    :data="tableData"
+    :isLoadingContent="isLoadingPatientData"
+    :defaultSort="currentSort"
+    @update:sort="(newSort) => currentSort = newSort"
+  />
 </template>
 <script setup>
 import { usePatientsStore } from "@stores/patientsStore";
-import { usePatientsLogicStore } from '@stores/patientsLogicStore'
-import { computed, ref } from 'vue'
-import { useI18n } from "vue-i18n";
-import { formatAgeFromDate } from '@utils/formatAge.js'
-import { formatDateShort } from '@utils/isoFormatDate.js'
+import { usePatientsLogicStore } from '@stores/patientsLogicStore';
+import { computed, ref } from 'vue';
+import { formatAgeFromDate } from '@utils/formatAge.js';
+import { formatDateShort } from '@utils/isoFormatDate.js';
 import { storeToRefs } from "pinia";
 
-import GeneralTable from '@components/forms/GeneralTable.vue'
+import GeneralTable from '@components/forms/GeneralTable.vue';
 
-const { t } = useI18n();
 const props = defineProps({
      data: {
           type: [Array, Object],
           default: () => []
      },
-})
+});
 
-const patientsLogicStore = usePatientsLogicStore()
-const { openCreateFormDialog, selectPatientById } = patientsLogicStore
+const patientsLogicStore = usePatientsLogicStore();
+const { selectPatientById } = patientsLogicStore;
 const patientsStore = usePatientsStore();
 const { isLoadingPatientData } = storeToRefs(patientsStore);
 
-const currentSort = ref({ key: 'name', direction: 'asc' })
-console.log(props.data)
+const currentSort = ref({ key: 'name', direction: 'asc' });
+console.log(props.data);
 const patientsHeader = computed(() => ({
      headers: [
           { key: 'name', label: 'general.first-name', current: false, visible: true, sortable: true, sortType: 'string', hasAction: false, valueKey: 'name' },
@@ -37,7 +39,7 @@ const patientsHeader = computed(() => ({
      ],
      noDataMessage: 'patients.empty-data',
      iconType: 'solidIcon',
-}))
+}));
 
 const tableData = computed(() => ({
      ...patientsHeader.value,
@@ -49,5 +51,5 @@ const tableData = computed(() => ({
           lastVisit: [{ date: patient.date, hasLabel: true, label: formatDateShort(patient.date), style: 'px-3 py-4 text-sm text-start text-gray-700' }],
           action: () =>  selectPatientById(patient.id),
      }))
-}))
+}));
 </script>
