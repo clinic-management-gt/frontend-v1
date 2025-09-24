@@ -207,7 +207,6 @@
 import { computed, ref, watch, onMounted } from "vue";
 import { usePatientsStore } from "@stores/patientsStore";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
-import { useNotificationStore } from "@stores/notificationStore.js";
 import { storeToRefs } from "pinia";
 import { DocumentIcon } from "@heroicons/vue/24/outline";
 
@@ -233,7 +232,6 @@ const {
   currentPatientSelectedId,
 } = storeToRefs(patientsStore);
 const patientsLogicStore = usePatientsLogicStore();
-const notificationStore = useNotificationStore();
 
 // Estado para confirmación de eliminación
 const recordToDelete = ref(null);
@@ -299,27 +297,11 @@ function cancelDelete() {
 async function confirmDelete() {
   if (!recordToDelete.value) return;
 
-  try {
-    await patientsStore.deleteMedicalRecord(recordToDelete.value.id);
-    await patientsStore.fetchPatientMedicalRecords(props.patientId);
-    
-    // Mostrar notificación de éxito
-    notificationStore.addNotification(
-      "success",
-      "general.success",
-      "El registro médico ha sido eliminado correctamente"
-    );
-  } catch {
-    // Mostrar notificación de error
-    notificationStore.addNotification(
-      "error",
-      "general.error",
-      "Error al eliminar el registro médico. Inténtalo nuevamente."
-    );
-  } finally {
-    // Cerrar modal
-    cancelDelete();
-  }
+  await patientsStore.deleteMedicalRecord(recordToDelete.value.id);
+  await patientsStore.fetchPatientMedicalRecords(props.patientId);
+  
+  // Cerrar modal
+  cancelDelete();
 }
 
 function downloadRecord() {

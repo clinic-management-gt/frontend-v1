@@ -231,7 +231,9 @@
     "record-created-successfully": "Registro creado exitosamente",
     "success": "Éxito",
     "medical-record-updated-successfully": "Registro médico actualizado exitosamente",
-    "medical-record-created-successfully": "Registro médico creado exitosamente"
+    "medical-record-created-successfully": "Registro médico creado exitosamente",
+    "medical-record-deleted-successfully": "El registro médico ha sido eliminado correctamente",
+    "error-deleting-record": "Error al eliminar el registro médico. Inténtalo nuevamente."
   },
   "recipes": {
     "edit-recipe": "Editar receta médica",
