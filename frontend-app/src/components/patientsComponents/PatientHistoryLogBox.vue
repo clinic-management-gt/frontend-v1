@@ -179,23 +179,23 @@
     >
       <div class="bg-white rounded-lg p-6 max-w-md mx-4">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">
-          Confirmar eliminación
+          {{ $t("general.confirm-deletion") }}
         </h3>
         <p class="text-gray-600 mb-6">
-          ¿Estás seguro de que deseas eliminar este registro médico? Esta acción no se puede deshacer.
+          {{ $t("general.delete-confirmation-message") }}
         </p>
         <div class="flex justify-end space-x-3">
           <button
             class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
             @click="cancelDelete"
           >
-            Cancelar
+            {{ $t("general.cancel") }}
           </button>
           <button
             class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
             @click="confirmDelete"
           >
-            Eliminar
+            {{ $t("general.delete") }}
           </button>
         </div>
       </div>
