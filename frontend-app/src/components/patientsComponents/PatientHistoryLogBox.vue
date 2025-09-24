@@ -43,7 +43,7 @@
                 v-if="item.diagnosis"
                 class="text-sm text-gray-600 ml-5"
               >
-                <strong>Diagnóstico:</strong> {{ item.diagnosis }}
+                <strong>{{ $t("general.diagnosis-label") }}</strong> {{ item.diagnosis }}
               </p>
             </div>
 
@@ -171,6 +171,35 @@
       @close="closeHistoryLogModals"
       @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)"
     />
+
+    <!-- Modal de confirmación de eliminación -->
+    <div
+      v-if="showDeleteConfirmation"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+          {{ $t("general.confirm-deletion") }}
+        </h3>
+        <p class="text-gray-600 mb-6">
+          {{ $t("general.delete-confirmation-message") }}
+        </p>
+        <div class="flex justify-end space-x-3">
+          <button
+            class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+            @click="cancelDelete"
+          >
+            {{ $t("general.cancel") }}
+          </button>
+          <button
+            class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+            @click="confirmDelete"
+          >
+            {{ $t("general.delete") }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -203,6 +232,10 @@ const {
   currentPatientSelectedId,
 } = storeToRefs(patientsStore);
 const patientsLogicStore = usePatientsLogicStore();
+
+// Estado para confirmación de eliminación
+const recordToDelete = ref(null);
+const showDeleteConfirmation = ref(false);
 const {
   showFormModal,
   showDetailsModal,
@@ -241,22 +274,38 @@ const paginatedRecords = computed(() => {
   return records.slice(start, end);
 });
 
-async function deleteRecord(record) {
-  if (!confirm("¿Estás seguro de que deseas eliminar este registro médico?"))
-    return;
-
-  try {
-    await patientsStore.deleteMedicalRecord(record.id);
-    await patientsStore.fetchPatientMedicalRecords(props.patientId);
-    alert("Registro eliminado correctamente");
-  } catch (error) {
-    return error;
-  }
+/**
+ * Inicia el proceso de eliminación mostrando modal de confirmación
+ * @param {Object} record - Registro médico a eliminar
+ */
+function deleteRecord(record) {
+  recordToDelete.value = record;
+  showDeleteConfirmation.value = true;
 }
 
-function downloadRecord(record) {
-  // Implementar descarga de PDF
-  console.log("Descargar registro:", record);
+/**
+ * Cancela la eliminación del registro médico
+ */
+function cancelDelete() {
+  recordToDelete.value = null;
+  showDeleteConfirmation.value = false;
+}
+
+/**
+ * Confirma y ejecuta la eliminación del registro médico
+ */
+async function confirmDelete() {
+  if (!recordToDelete.value) return;
+
+  await patientsStore.deleteMedicalRecord(recordToDelete.value.id);
+  await patientsStore.fetchPatientMedicalRecords(props.patientId);
+  
+  // Cerrar modal
+  cancelDelete();
+}
+
+function downloadRecord() {
+  // TODO: Implementar funcionalidad de descarga de PDF
 }
 
 function handleViewRecipe(recipe) {

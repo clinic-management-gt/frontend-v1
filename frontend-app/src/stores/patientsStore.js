@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import instance from "@stores/axios.js";
+import { useNotificationStore } from "@stores/notificationStore.js";
+import { globalI18n } from "@/langs/index.js";
 
 export const usePatientsStore = defineStore(
   "patients",
@@ -133,10 +135,23 @@ export const usePatientsStore = defineStore(
     }
 
     async function deleteMedicalRecord(recordId) {
+      const notificationStore = useNotificationStore();
       isLoadingMedicalRecords.value = true;
+      
       try {
         await instance.delete(`/medicalrecords/${recordId}`);
+        
+        // Mostrar notificación de éxito usando i18n
+        notificationStore.addNotification(
+          "success",
+          "notifications.success",
+          globalI18n.t("notifications.medical-record-deleted-successfully")
+        );
+        
         return true;
+      } catch {
+        // El manejo de errores se hace en el backend
+        throw new Error(globalI18n.t("notifications.error-deleting-record"));
       } finally {
         isLoadingMedicalRecords.value = false;
       }
