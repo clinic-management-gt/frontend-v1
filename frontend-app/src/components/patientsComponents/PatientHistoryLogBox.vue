@@ -309,23 +309,21 @@ async function confirmDelete() {
       "general.success",
       "El registro médico ha sido eliminado correctamente"
     );
-  } catch (error) {
+  } catch {
     // Mostrar notificación de error
     notificationStore.addNotification(
       "error",
       "general.error",
       "Error al eliminar el registro médico. Inténtalo nuevamente."
     );
-    console.error("Error eliminando registro:", error);
   } finally {
     // Cerrar modal
     cancelDelete();
   }
 }
 
-function downloadRecord(record) {
-  // Implementar descarga de PDF
-  console.log("Descargar registro:", record);
+function downloadRecord() {
+  // TODO: Implementar funcionalidad de descarga de PDF
 }
 
 function handleViewRecipe(recipe) {
