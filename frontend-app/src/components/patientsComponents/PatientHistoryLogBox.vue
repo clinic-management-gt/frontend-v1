@@ -171,6 +171,35 @@
       @close="closeHistoryLogModals"
       @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)"
     />
+
+    <!-- Modal de confirmación de eliminación -->
+    <div
+      v-if="showDeleteConfirmation"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+          Confirmar eliminación
+        </h3>
+        <p class="text-gray-600 mb-6">
+          ¿Estás seguro de que deseas eliminar este registro médico? Esta acción no se puede deshacer.
+        </p>
+        <div class="flex justify-end space-x-3">
+          <button
+            class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+            @click="cancelDelete"
+          >
+            Cancelar
+          </button>
+          <button
+            class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+            @click="confirmDelete"
+          >
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -178,6 +207,7 @@
 import { computed, ref, watch, onMounted } from "vue";
 import { usePatientsStore } from "@stores/patientsStore";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
+import { useNotificationStore } from "@stores/notificationStore.js";
 import { storeToRefs } from "pinia";
 import { DocumentIcon } from "@heroicons/vue/24/outline";
 
@@ -203,6 +233,11 @@ const {
   currentPatientSelectedId,
 } = storeToRefs(patientsStore);
 const patientsLogicStore = usePatientsLogicStore();
+const notificationStore = useNotificationStore();
+
+// Estado para confirmación de eliminación
+const recordToDelete = ref(null);
+const showDeleteConfirmation = ref(false);
 const {
   showFormModal,
   showDetailsModal,
@@ -241,16 +276,50 @@ const paginatedRecords = computed(() => {
   return records.slice(start, end);
 });
 
-async function deleteRecord(record) {
-  if (!confirm("¿Estás seguro de que deseas eliminar este registro médico?"))
-    return;
+/**
+ * Inicia el proceso de eliminación mostrando modal de confirmación
+ * @param {Object} record - Registro médico a eliminar
+ */
+function deleteRecord(record) {
+  recordToDelete.value = record;
+  showDeleteConfirmation.value = true;
+}
+
+/**
+ * Cancela la eliminación del registro médico
+ */
+function cancelDelete() {
+  recordToDelete.value = null;
+  showDeleteConfirmation.value = false;
+}
+
+/**
+ * Confirma y ejecuta la eliminación del registro médico
+ */
+async function confirmDelete() {
+  if (!recordToDelete.value) return;
 
   try {
-    await patientsStore.deleteMedicalRecord(record.id);
+    await patientsStore.deleteMedicalRecord(recordToDelete.value.id);
     await patientsStore.fetchPatientMedicalRecords(props.patientId);
-    alert("Registro eliminado correctamente");
+    
+    // Mostrar notificación de éxito
+    notificationStore.addNotification(
+      "success",
+      "general.success",
+      "El registro médico ha sido eliminado correctamente"
+    );
   } catch (error) {
-    return error;
+    // Mostrar notificación de error
+    notificationStore.addNotification(
+      "error",
+      "general.error",
+      "Error al eliminar el registro médico. Inténtalo nuevamente."
+    );
+    console.error("Error eliminando registro:", error);
+  } finally {
+    // Cerrar modal
+    cancelDelete();
   }
 }
 
