@@ -43,7 +43,7 @@
                 v-if="item.diagnosis"
                 class="text-sm text-gray-600 ml-5"
               >
-                <strong>Diagnóstico:</strong> {{ item.diagnosis }}
+                <strong>{{ $t("general.diagnosis-label") }}</strong> {{ item.diagnosis }}
               </p>
             </div>
 

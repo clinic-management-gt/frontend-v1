@@ -41,6 +41,7 @@
     "close": "Cerrar",
     "observations": "Observaciones",
     "diagnosis": "Diagnóstico",
+    "diagnosis-label": "Diagnóstico:",
     "appointment-type": "Tipo de cita",
     "no-medical-records": "No hay registros médicos disponibles",
     "delete": "Eliminar",
