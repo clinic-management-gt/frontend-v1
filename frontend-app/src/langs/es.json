@@ -85,6 +85,7 @@
     "select-existing-patient": "Seleccionar paciente existente",
     "create-new-patient": "Crear nuevo paciente",
     "patient-name": "Nombre del paciente",
+    "patient-gender": "Género del paciente",
     "appointment-date": "Fecha de la cita",
     "appointment-time": "Hora de la cita",
     "appointment-reason": "Motivo de la cita",

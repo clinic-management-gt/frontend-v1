@@ -57,13 +57,51 @@
 
           <!-- Input para nuevo paciente -->
           <div v-if="patientType === 'new'">
-            <input
-              v-model="newPatientName"
-              type="text"
-              required
-              :placeholder="$t('dashboard.patient-name')"
-              class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
-            />
+            <div class="space-y-4">
+              <input
+                v-model="newPatientName"
+                type="text"
+                required
+                :placeholder="$t('dashboard.patient-name')"
+                class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+              />
+              
+              <!-- Selección de género -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ $t("dashboard.patient-gender") }}
+                </label>
+                <div class="flex space-x-4">
+                  <label class="flex items-center">
+                    <input
+                      v-model="newPatientGender"
+                      type="radio"
+                      value="masculino"
+                      class="mr-2"
+                    />
+                    {{ $t("general.male") }}
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      v-model="newPatientGender"
+                      type="radio"
+                      value="femenino"
+                      class="mr-2"
+                    />
+                    {{ $t("general.female") }}
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      v-model="newPatientGender"
+                      type="radio"
+                      value="no_especificado"
+                      class="mr-2"
+                    />
+                    {{ $t("general.not-specified") }}
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -153,6 +191,7 @@ const { allPatients } = storeToRefs(patientsStore);
 const patientType = ref("existing");
 const selectedPatientId = ref(null);
 const newPatientName = ref("");
+const newPatientGender = ref("no_especificado");
 const appointmentDate = ref("");
 const appointmentTime = ref("");
 const appointmentReason = ref("");
@@ -185,6 +224,7 @@ function resetForm() {
   patientType.value = "existing";
   selectedPatientId.value = null;
   newPatientName.value = "";
+  newPatientGender.value = "no_especificado";
   appointmentDate.value = "";
   appointmentTime.value = "";
   appointmentReason.value = "";
@@ -238,7 +278,8 @@ async function handleSubmit() {
 
       const newPatient = await patientsStore.createBasicPatient({
         name: firstName,
-        lastName: lastName
+        lastName: lastName,
+        gender: newPatientGender.value
       });
       
       patientId = newPatient.id;
