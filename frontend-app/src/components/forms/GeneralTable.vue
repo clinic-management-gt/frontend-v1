@@ -2,13 +2,13 @@
      <div class="px-4 sm:px-0">
           <div class="mt-4 flow-root">
                <div class="-mx-4 -my-2 overflow-x-auto">
-                    <div class="inline-block min-w-full py-2 align-middle sm:px-4">
+                    <div class="inline-block min-w-full align-middle sm:px-4">
                          <table class="min-w-full divide-y divide-gray-300">
                               <thead>
-                                   <tr>
+                                   <tr class="py-2">
                                         <th v-for="(header, index) in props.data.headers.filter(h => h.visible)"
                                              :key="index" scope="col"
-                                             :class="[header.sortable ? 'px-2 text-left text-sm font-semibold text-gray-400 hover:text-gray-700 truncate' : 'flex text-sm text-gray-400 justify-between py-2 px-2']">
+                                             :class="[header.sortable ? 'px-2 py-4 text-left text-sm font-semibold text-gray-400 hover:text-gray-700 truncate' : 'flex text-sm text-gray-400 justify-between py-2 px-2']">
                                              <button v-if="header.sortable" @click="toggleSort(header.key)"
                                                   :class="['flex items-center focus:outline-none transition-transform duration-300 transform hover:scale-110', header.current ? 'font-bold text-black' : '']">
                                                   <arrow-long-up-icon :class="{
@@ -41,19 +41,9 @@
                                    <tr v-else v-for="(item, index) in displayedItems" :key="index">
                                         <td v-for="header in props.data.headers.filter(h => h.visible)"
                                              :key="header.key"
-                                             :class="[header.key === 'actions' ? 'text-end' : getArrayValue(item[header.key], 'style')]">
-                                             <div v-if="header.key === 'actions'" class="flex justify-start">
-                                                  <action-button-solid-icon v-if="props.data.iconType === 'solidIcon'"
-                                                       v-for="action in item[header.key]" :key="action.type"
-                                                       :icon="action.type"
-                                                       @click="action.action" />
-                                                  <action-button-outlined-icon
-                                                       v-if="props.data.iconType === 'outlineIcon'"
-                                                       v-for="action in item[header.key]" :key="action.type"
-                                                       :icon="action.type"
-                                                       @click="action.action" class="h-6 w-6 mr-1" />
-                                             </div>
-                                             <div v-else>
+                                             :class="[header.key === 'actions' ? 'text-end' : getArrayValue(item[header.key], 'style')]"
+                                             class="cursor-pointer">
+                                             <div @click="item.action">
                                                   <span v-if="Array.isArray(item[header.key])">
                                                        <span
                                                             v-if="getArrayValue(item[header.key], 'hasLabel') === 'true'">
@@ -83,7 +73,6 @@
                               <div class="flex items-center">
                                    <label for="itemsPerPage">{{ $t('general.results-per-page') }}</label>
                                    <select v-model="itemsPerPage" id="itemsPerPage" class="ml-2 border:bg-emerald-500">
-                                        <option value="5">5</option>
                                         <option value="10">10</option>
                                         <option value="15">15</option>
                                         <option value="20">20</option>
@@ -190,7 +179,7 @@ const tableData = computed(() => {
      return sortedData
 })
 
-const itemsPerPage = ref(5)
+const itemsPerPage = ref(10)
 const currentPage = ref(1)
 const displayedItems = computed(() => {
      const perPage = parseInt(itemsPerPage.value, 10)

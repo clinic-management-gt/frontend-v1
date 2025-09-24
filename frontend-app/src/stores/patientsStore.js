@@ -10,8 +10,8 @@ export const usePatientsStore = defineStore(
     const allPatients = ref([]);
     const newPatientData = ref([]);
     const fullRecord = ref([]);
-    const currentPatientSelectedId = ref(undefined);
-    const currentPatientSelectedData = ref(undefined);
+    const currentPatientSelectedId = ref(null);
+    const currentPatientSelectedData = ref(null);
 
     const isLoadingPatientsStore = ref(false);
     const isLoadingAppointments = ref(false);

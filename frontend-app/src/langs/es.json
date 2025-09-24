@@ -60,7 +60,9 @@
     "record-updated-successfully": "Registro actualizado correctamente",
     "record-created-successfully": "Registro creado correctamente",
     "results-per-page": "Resultados por página",
-    "number-of-pages": "Número de páginas"
+    "number-of-pages": "Número de páginas",
+    "filters": "Filtros",
+    "clear-all": "Limpiar todo"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -161,7 +163,8 @@
     "family-background-label": "Antecedentes familiares",
     "evolution-notes-label": "Notas de evolución",
     "empty-data": "No hay pacientes disponibles",
-    "number-of-patients": "Número de pacientes {count}"
+    "number-of-patients": "Número de pacientes {count}",
+    "return-to-patient-table": "Regresar a pacientes"
   },
   "graph": {
     "graph": "Graficar"
