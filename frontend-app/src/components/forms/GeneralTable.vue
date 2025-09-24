@@ -164,7 +164,6 @@ const toggleSort = (key) => {
                     element.current = false;
                }
           });
-          console.log(props.data.headers);
           sortConfig.value.direction = sortConfig.value.direction === 'asc' ? 'desc' : 'asc';
      } else {
           sortConfig.value = { key, direction: 'asc' };

@@ -207,7 +207,6 @@ export const usePatientsLogicStore = defineStore(
     }
 
     function selectPatientById(id){
-      console.log(id)
       currentPatientSelectedId.value = id
     }
 

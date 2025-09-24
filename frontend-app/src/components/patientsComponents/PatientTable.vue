@@ -29,7 +29,6 @@ const patientsStore = usePatientsStore();
 const { isLoadingPatientData } = storeToRefs(patientsStore);
 
 const currentSort = ref({ key: 'name', direction: 'asc' });
-console.log(props.data);
 const patientsHeader = computed(() => ({
      headers: [
           { key: 'name', label: 'general.first-name', current: false, visible: true, sortable: true, sortType: 'string', hasAction: false, valueKey: 'name' },
