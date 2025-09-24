@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+import { defineStore, storeToRefs } from "pinia";
 import { ref } from "vue";
 import { usePatientsStore } from "./patientsStore.js";
 import { useNotificationStore } from "./notificationStore.js";
@@ -22,6 +22,9 @@ export const usePatientsLogicStore = defineStore(
     const selectedRecordForEdit = ref(null);
     const selectedRecipeForEdit = ref(null);
     const fullRecord = ref(null);
+
+    const patientStore = usePatientsStore();
+    const { currentPatientSelectedId, currentPatientSelectedData } = storeToRefs(patientStore)
 
     function openDataSheetPatientDialog() {
       showDataSheetPatientDialog.value = true;
@@ -203,6 +206,15 @@ export const usePatientsLogicStore = defineStore(
       showDownloadPatientRecordDialog.value = false;
     }
 
+    function selectPatientById(id){
+      currentPatientSelectedId.value = id
+    }
+
+    function returnToPatientsTable() {
+      currentPatientSelectedId.value = null;
+      currentPatientSelectedData.value = null;
+    }
+
     return {
       showDataSheetPatientDialog,
       showCreateNewPatientRecordDialog,
@@ -233,6 +245,8 @@ export const usePatientsLogicStore = defineStore(
       closeHistoryLogModals,
       handleMedicalRecordSave,
       handleRecipeSave,
+      selectPatientById,
+      returnToPatientsTable,
     };
   },
   {

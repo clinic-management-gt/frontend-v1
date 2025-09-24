@@ -47,6 +47,7 @@ import {
   KeyIcon,
   ChartBarSquareIcon,
 } from "@heroicons/vue/24/solid";
+
 const props = defineProps({
   icon: {
     type: String,

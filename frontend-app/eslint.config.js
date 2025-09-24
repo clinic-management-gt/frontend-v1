@@ -43,10 +43,10 @@ export default [
       "vue/require-valid-default-prop": "warn",
       "vue/attribute-hyphenation": ["error", "never"],
       "vue/html-self-closing": ["error", { html: { void: "always", normal: "never", component: "always" } }],
-      // 👇 cambio aquí
       "vue/max-attributes-per-line": ["warn", { singleline: 3, multiline: 1 }],
       "vue/html-indent": ["warn", 2],
       "vue/singleline-html-element-content-newline": "off",
+      "semi": ["error", "always"],
     },
   },
 

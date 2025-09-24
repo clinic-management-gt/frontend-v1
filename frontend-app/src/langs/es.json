@@ -55,10 +55,15 @@
     "success": "Éxito",
     "warning": "Advertencia",
     "error": "Error",
+    "actions": "Acciones",
     "medical-record-updated-successfully": "Registro médico actualizado exitosamente",
     "medical-record-created-successfully": "Registro médico creado exitosamente",
     "record-updated-successfully": "Registro actualizado correctamente",
     "record-created-successfully": "Registro creado correctamente",
+    "results-per-page": "Resultados por página",
+    "number-of-pages": "Número de páginas",
+    "filters": "Filtros",
+    "clear-all": "Limpiar todo",
     "confirm-deletion": "Confirmar eliminación",
     "delete-confirmation-message": "¿Estás seguro de que deseas eliminar este registro médico? Esta acción no se puede deshacer."
   },
@@ -77,6 +82,7 @@
   },
   "patients": {
     "patients": "Pacientes",
+    "parents": "Padres",
     "last-visit": "Ultima visita",
     "birth": "Nacimiento",
     "syndrome": "Sindromes",
@@ -158,7 +164,10 @@
     "weight-kg-label": "Peso (kg)",
     "height-cm-label": "Altura (cm)",
     "family-background-label": "Antecedentes familiares",
-    "evolution-notes-label": "Notas de evolución"
+    "evolution-notes-label": "Notas de evolución",
+    "empty-data": "No hay pacientes disponibles",
+    "number-of-patients": "Número de pacientes {count}",
+    "return-to-patient-table": "Regresar a pacientes"
   },
   "graph": {
     "graph": "Graficar"
