@@ -242,7 +242,7 @@ async function handleSubmit() {
     notificationStore.addNotification(
       "warning",
       "general.warning",
-      "Por favor selecciona un paciente"
+      globalI18n.t("dashboard.please-select-patient")
     );
     return;
   }
@@ -251,7 +251,7 @@ async function handleSubmit() {
     notificationStore.addNotification(
       "warning", 
       "general.warning",
-      "Por favor ingresa el nombre del paciente"
+      globalI18n.t("dashboard.please-enter-patient-name")
     );
     return;
   }
@@ -260,7 +260,7 @@ async function handleSubmit() {
     notificationStore.addNotification(
       "warning",
       "general.warning", 
-      "Por favor completa fecha y hora"
+      globalI18n.t("dashboard.please-complete-date-time")
     );
     return;
   }

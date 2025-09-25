@@ -91,7 +91,10 @@
     "appointment-reason": "Motivo de la cita",
     "appointment-reason-placeholder": "Describe brevemente el motivo de la consulta...",
     "appointment-scheduled-successfully": "Cita agendada exitosamente",
-    "error-scheduling-appointment": "Error al agendar la cita. Inténtalo nuevamente."
+    "error-scheduling-appointment": "Error al agendar la cita. Inténtalo nuevamente.",
+    "please-select-patient": "Por favor selecciona un paciente",
+    "please-enter-patient-name": "Por favor ingresa el nombre del paciente",
+    "please-complete-date-time": "Por favor completa fecha y hora"
   },
   "patients": {
     "patients": "Pacientes",
