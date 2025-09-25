@@ -2,6 +2,8 @@
 import styles from "./CalendarMain.module.css";
 import { ref, watch, nextTick, computed } from "vue";
 import { onMounted } from "vue";
+import AppointmentModal from "@components/dashboardComponents/AppointmentModal.vue";
+import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
@@ -9,6 +11,10 @@ const currentYear = ref(today.getFullYear());
 const showYearSelect = ref(false);
 const selectedDayObj = ref(null);
 const events = ref([]); // [{ day, month, year, text, startTime, endTime, color, type }]
+
+// Estados para el modal de agendamiento
+const isAppointmentModalOpen = ref(false);
+const preselectedDate = ref("");
 
 /* Paciente */
 const selectedPatient = ref("");
@@ -150,6 +156,41 @@ function dayClicked(cell) {
   activityStartTime.value = "";
   activityEndTime.value = "";
   activityColor.value = "#ff9800";
+  
+  // Abrir modal de agendamiento con la fecha seleccionada
+  openAppointmentModalForDate(cell);
+}
+
+/**
+ * Abre el modal de agendamiento con la fecha del día seleccionado
+ */
+function openAppointmentModalForDate(dayObj) {
+  if (!dayObj || dayObj.isOtherMonth) return;
+  
+  // Formatear la fecha para el input type="date" (YYYY-MM-DD)
+  const year = dayObj.year;
+  const month = String(dayObj.month + 1).padStart(2, '0'); // Los meses en JS son 0-indexados
+  const day = String(dayObj.day).padStart(2, '0');
+  
+  preselectedDate.value = `${year}-${month}-${day}`;
+  isAppointmentModalOpen.value = true;
+}
+
+/**
+ * Cierra el modal de agendamiento
+ */
+function closeAppointmentModal() {
+  isAppointmentModalOpen.value = false;
+  preselectedDate.value = "";
+}
+
+/**
+ * Maneja cuando se crea una nueva cita desde el calendario
+ */
+function onAppointmentCreated() {
+  closeAppointmentModal();
+  // Recargar las citas para mostrar la nueva en el calendario
+  fetchAppointments();
 }
 
 /* --- Agregar Paciente o Actividad --- */
@@ -848,142 +889,156 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Modal de edición de citas -->
-    <div
-      v-if="showEditModal"
-      :class="styles['modal-overlay']"
-      data-testid="edit-modal-overlay"
-      @click="closeEditModal"
+    <!-- Modal de edición de citas con diseño mejorado -->
+    <general-dialog-modal
+      :isOpen="showEditModal"
+      dialogSize="max-w-2xl"
+      @close-modal="closeEditModal"
     >
-      <div
-        :class="styles['modal-content']"
-        data-testid="edit-modal-content"
-        @click.stop
-      >
-        <div :class="styles['modal-header']">
-          <h3>Editar Cita Médica</h3>
-          <button
-            :class="styles['close-btn']"
-            data-testid="close-modal-btn"
-            @click="closeEditModal"
-          >
-            &times;
-          </button>
-        </div>
+      <template #title>
+        <p class="text-xl font-semibold">
+          Editar Cita Médica
+        </p>
+      </template>
 
-        <div :class="styles['modal-body']">
-          <form
-            data-testid="edit-appointment-form"
-            @submit.prevent="saveAppointment"
-          >
-            <!-- Selector de paciente mejorado -->
-            <div :class="styles['form-group']">
-              <label>Paciente:</label>
-              <div :class="styles['patient-search']">
-                <input
-                  v-model="searchPatient"
-                  placeholder="Escriba para buscar paciente..."
-                  :class="styles['search-input']"
-                  data-testid="patient-search-input"
-                  @input="filterPatients"
-                  @focus="onSearchFocus"
-                  @blur="onSearchBlur"
-                />
+      <template #body>
+        <form
+          class="space-y-6"
+          data-testid="edit-appointment-form"
+          @submit.prevent="saveAppointment"
+        >
+          <!-- Selector de paciente mejorado -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+              Paciente:
+            </label>
+            <div class="relative">
+              <input
+                v-model="searchPatient"
+                placeholder="Escriba para buscar paciente..."
+                class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                data-testid="patient-search-input"
+                @input="filterPatients"
+                @focus="onSearchFocus"
+                @blur="onSearchBlur"
+              />
+              <div
+                v-if="
+                  showPatientDropdown &&
+                    searchPatient &&
+                    searchPatient.length > 2 &&
+                    filteredPatients.length > 0
+                "
+                class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
+                data-testid="patient-dropdown"
+              >
                 <div
-                  v-if="
-                    showPatientDropdown &&
-                      searchPatient &&
-                      searchPatient.length > 2 &&
-                      filteredPatients.length > 0
-                  "
-                  :class="styles['patient-dropdown']"
-                  data-testid="patient-dropdown"
+                  v-for="patient in filteredPatients.slice(0, 5)"
+                  :key="patient.id"
+                  class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-50"
+                  :data-testid="`patient-option-${patient.id}`"
+                  @mousedown="selectPatient(patient)"
                 >
-                  <div
-                    v-for="patient in filteredPatients.slice(0, 5)"
-                    :key="patient.id"
-                    :class="styles['patient-option']"
-                    :data-testid="`patient-option-${patient.id}`"
-                    @mousedown="selectPatient(patient)"
-                  >
-                    <strong>{{ patient.name }}</strong>
-                    <span>{{ patient.email }}</span>
+                  <div class="flex flex-col">
+                    <span class="font-medium text-gray-900">{{ patient.name }}</span>
+                    <span class="text-sm text-gray-500">{{ patient.email }}</span>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Fecha -->
-            <div :class="styles['form-group']">
-              <label>Fecha:</label>
-              <input
-                v-model="editForm.date"
-                type="date"
-                required
-                :class="styles['form-input']"
-                data-testid="edit-date-input"
-              />
-            </div>
+          <!-- Fecha -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Fecha:
+            </label>
+            <input
+              v-model="editForm.date"
+              type="date"
+              required
+              class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+              data-testid="edit-date-input"
+            />
+          </div>
 
-            <!-- Hora -->
-            <div :class="styles['form-group']">
-              <label>Hora:</label>
-              <input
-                v-model="editForm.time"
-                type="time"
-                required
-                :class="styles['form-input']"
-                data-testid="edit-time-input"
-              />
-            </div>
+          <!-- Hora -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Hora:
+            </label>
+            <input
+              v-model="editForm.time"
+              type="time"
+              required
+              class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+              data-testid="edit-time-input"
+            />
+          </div>
 
-            <!-- Estado -->
-            <div :class="styles['form-group']">
-              <label>Estado:</label>
-              <select
-                v-model="editForm.status"
-                :class="styles['form-select']"
-                data-testid="edit-status-select"
+          <!-- Estado -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Estado:
+            </label>
+            <select
+              v-model="editForm.status"
+              class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+              data-testid="edit-status-select"
+            >
+              <option
+                v-for="status in appointmentStatuses"
+                :key="status"
+                :value="status"
               >
-                <option
-                  v-for="status in appointmentStatuses"
-                  :key="status"
-                  :value="status"
-                >
-                  {{ status }}
-                </option>
-              </select>
-            </div>
+                {{ status }}
+              </option>
+            </select>
+          </div>
+        </form>
+      </template>
 
-            <!-- Botones -->
-            <div :class="styles['modal-actions']">
-              <button
-                type="submit"
-                :class="styles['save-btn']"
-                data-testid="save-appointment-btn"
-              >
-                💾 Guardar Cambios
-              </button>
-              <button
-                type="button"
-                :class="styles['delete-btn']"
-                data-testid="delete-appointment-btn"
-                @click="deleteAppointment"
-              >
-                🗑️ Eliminar Cita
-              </button>
-              <button
-                type="button"
-                :class="styles['cancel-btn']"
-                data-testid="cancel-modal-btn"
-                @click="closeEditModal"
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
+      <template #buttons>
+        <div class="flex justify-between space-x-3">
+          <!-- Botón eliminar a la izquierda -->
+          <button
+            type="button"
+            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+            data-testid="delete-appointment-btn"
+            @click="deleteAppointment"
+          >
+            Eliminar Cita
+          </button>
+          
+          <!-- Botones principales a la derecha -->
+          <div class="flex space-x-3">
+            <button
+              type="button"
+              class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors"
+              data-testid="cancel-modal-btn"
+              @click="closeEditModal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+              data-testid="save-appointment-btn"
+              @click="saveAppointment"
+            >
+              Guardar Cambios
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
+      </template>
+    </general-dialog-modal>
   </div>
+
+  <!-- Modal de Agendamiento -->
+  <AppointmentModal
+    :isOpen="isAppointmentModalOpen"
+    :preselectedDate="preselectedDate"
+    @close="closeAppointmentModal"
+    @appointment-created="onAppointmentCreated"
+  />
 </template>
