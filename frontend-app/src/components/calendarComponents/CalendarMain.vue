@@ -4,6 +4,8 @@ import { ref, watch, nextTick, computed } from "vue";
 import { onMounted } from "vue";
 import AppointmentModal from "@components/dashboardComponents/AppointmentModal.vue";
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
+import { useNotificationStore } from "@/stores/notificationStore";
+import { useI18n } from "vue-i18n";
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
@@ -11,6 +13,12 @@ const currentYear = ref(today.getFullYear());
 const showYearSelect = ref(false);
 const selectedDayObj = ref(null);
 const events = ref([]); // [{ day, month, year, text, startTime, endTime, color, type }]
+
+// Store de notificaciones
+const notificationStore = useNotificationStore();
+
+// Instancia de i18n
+const { t } = useI18n();
 
 // Estados para el modal de agendamiento
 const isAppointmentModalOpen = ref(false);
@@ -28,21 +36,31 @@ const activityStartTime = ref("");
 const activityEndTime = ref("");
 const activityColor = ref("#ff9800");
 
-const monthNames = [
-  "Enero",
-  "Febrero",
-  "Marzo",
-  "Abril",
-  "Mayo",
-  "Junio",
-  "Julio",
-  "Agosto",
-  "Septiembre",
-  "Octubre",
-  "Noviembre",
-  "Diciembre",
-];
-const days = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+// Meses y días usando i18n
+const months = computed(() => [
+  t("calendar.january"),
+  t("calendar.february"),
+  t("calendar.march"),
+  t("calendar.april"),
+  t("calendar.may"),
+  t("calendar.june"),
+  t("calendar.july"),
+  t("calendar.august"),
+  t("calendar.september"),
+  t("calendar.october"),
+  t("calendar.november"),
+  t("calendar.december"),
+]);
+
+const days = computed(() => [
+  t("calendar.sunday"),
+  t("calendar.monday"),
+  t("calendar.tuesday"),
+  t("calendar.wednesday"),
+  t("calendar.thursday"),
+  t("calendar.friday"),
+  t("calendar.saturday"),
+]);
 
 function prevMonth() {
   if (currentMonth.value === 0) {
@@ -408,7 +426,11 @@ async function fetchPatients() {
 const showPatientDropdown = ref(false);
 
 function onSearchFocus() {
-  showPatientDropdown.value = true;
+  // En modo edición, solo mostrar dropdown si no hay un paciente ya seleccionado
+  // o si el campo está vacío
+  if (!editingAppointment.value || !searchPatient.value) {
+    showPatientDropdown.value = true;
+  }
 }
 
 function onSearchBlur() {
@@ -483,15 +505,24 @@ async function saveAppointment() {
     closeEditModal();
 
     // Mostrar mensaje de éxito
-    alert("Cita actualizada exitosamente");
+    notificationStore.addNotification(
+      "success",
+      "notifications.success", 
+      t("calendar.appointment-updated-successfully")
+    );
   } catch (e) {
     console.error("Error al guardar la cita:", e);
-    alert("Error al actualizar la cita");
+    notificationStore.addNotification(
+      "error",
+      "notifications.error",
+      t("calendar.error-updating-appointment")
+    );
   }
 }
 
 async function deleteAppointment() {
-  if (!confirm("¿Estás seguro de que quieres eliminar esta cita?")) return;
+  // Mostrar confirmación usando notificación (por ahora mantenemos confirm por simplicidad)
+  if (!confirm(t("calendar.delete-appointment-confirmation"))) return;
 
   try {
     const res = await fetch(
@@ -508,10 +539,18 @@ async function deleteAppointment() {
     closeEditModal();
 
     // Mostrar mensaje de éxito
-    alert("Cita eliminada exitosamente");
+    notificationStore.addNotification(
+      "success",
+      "notifications.success",
+      t("calendar.appointment-deleted-successfully")
+    );
   } catch (e) {
     console.error("Error al eliminar la cita:", e);
-    alert("Error al eliminar la cita");
+    notificationStore.addNotification(
+      "error", 
+      "notifications.error",
+      t("calendar.error-deleting-appointment")
+    );
   }
 }
 
@@ -567,7 +606,7 @@ onMounted(() => {
       </button>
       <div :class="styles['calendar-title']">
         <span data-testid="calendar-month-name">{{
-          monthNames[currentMonth]
+          months[currentMonth]
         }}</span>
         <button
           :class="styles['calendar-year-btn']"
@@ -897,7 +936,7 @@ onMounted(() => {
     >
       <template #title>
         <p class="text-xl font-semibold">
-          Editar Cita Médica
+          {{ t("calendar.edit-appointment") }}
         </p>
       </template>
 
@@ -910,12 +949,12 @@ onMounted(() => {
           <!-- Selector de paciente mejorado -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-3">
-              Paciente:
+              {{ t("calendar.patient") }}:
             </label>
             <div class="relative">
               <input
                 v-model="searchPatient"
-                placeholder="Escriba para buscar paciente..."
+                :placeholder="t('calendar.search-patient-placeholder')"
                 class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
                 data-testid="patient-search-input"
                 @input="filterPatients"
@@ -927,7 +966,8 @@ onMounted(() => {
                   showPatientDropdown &&
                     searchPatient &&
                     searchPatient.length > 2 &&
-                    filteredPatients.length > 0
+                    filteredPatients.length > 0 &&
+                    (!editingAppointment || searchPatient !== editForm.patientName)
                 "
                 class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
                 data-testid="patient-dropdown"
@@ -951,7 +991,7 @@ onMounted(() => {
           <!-- Fecha -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Fecha:
+              {{ t("calendar.date") }}:
             </label>
             <input
               v-model="editForm.date"
@@ -965,7 +1005,7 @@ onMounted(() => {
           <!-- Hora -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Hora:
+              {{ t("calendar.time") }}:
             </label>
             <input
               v-model="editForm.time"
@@ -979,7 +1019,7 @@ onMounted(() => {
           <!-- Estado -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Estado:
+              {{ t("calendar.status") }}:
             </label>
             <select
               v-model="editForm.status"
@@ -991,7 +1031,7 @@ onMounted(() => {
                 :key="status"
                 :value="status"
               >
-                {{ status }}
+                {{ t(status) }}
               </option>
             </select>
           </div>
@@ -1007,7 +1047,7 @@ onMounted(() => {
             data-testid="delete-appointment-btn"
             @click="deleteAppointment"
           >
-            Eliminar Cita
+            {{ t("calendar.delete-appointment") }}
           </button>
           
           <!-- Botones principales a la derecha -->
@@ -1018,7 +1058,7 @@ onMounted(() => {
               data-testid="cancel-modal-btn"
               @click="closeEditModal"
             >
-              Cancelar
+              {{ t("calendar.cancel") }}
             </button>
             <button
               type="button"
@@ -1026,7 +1066,7 @@ onMounted(() => {
               data-testid="save-appointment-btn"
               @click="saveAppointment"
             >
-              Guardar Cambios
+              {{ t("calendar.save-changes") }}
             </button>
           </div>
         </div>
