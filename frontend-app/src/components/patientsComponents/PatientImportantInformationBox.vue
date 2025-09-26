@@ -16,7 +16,7 @@
         {{ birthdate?.longSpanishDate || $t("general.nodata") }}
       </p>
     </div>
-    <div class="mb-2" v-if="Object.keys(alergiesList).length > 0">
+    <div v-if="Object.keys(alergiesList).length > 0" class="mb-2">
       <p class="text-md font-semibold text-gray-500">
         {{ $t("general.alergies") }}
       </p>
@@ -28,7 +28,7 @@
         {{ item.alergyCode }} - {{ item.alergyDescription }}
       </p>
     </div>
-    <div  v-if="Object.keys(chronicDiseases).length > 0">
+    <div v-if="Object.keys(chronicDiseases).length > 0">
       <p class="text-md font-semibold text-gray-600">
         {{ $t("patients.disease") }}
       </p>

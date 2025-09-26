@@ -11,7 +11,7 @@
     <div class="flex flex-col">
       <p>{{ $t("general.age") }}: {{ ageNumber }}</p>
       <p>{{ $t("general.sex") }}: {{ $t(gender) }}</p>
-      <p>{{ $t("patients.blood-type") }}: {{ data.bloodType}}</p>
+      <p>{{ $t("patients.blood-type") }}: {{ data.bloodType }}</p>
       <div>{{ $t("general.status") }}: <span :class="[statusColors[data.patientTypeId]]">{{ data.patientType }}</span></div>
     </div>
     <div class="flex justify-between">
@@ -57,6 +57,6 @@ const statusColors = {
   6: 'inline-flex items-center rounded-full bg-purple-900/20 px-1.5 py-0.5 text-sm font-medium text-purple-400 inset-ring inset-ring-purple-400/30',
   7: 'inline-flex items-center rounded-full bg-indigo-900/20 px-1.5 py-0.5 text-sm font-medium text-indigo-400 inset-ring inset-ring-indigo-400/30',
   8: 'inline-flex items-center rounded-full bg-pink-900/20 px-1.5 py-0.5 text-sm font-medium text-pink-400 inset-ring inset-ring-pink-400/20',
-}
+};
 
 </script>
