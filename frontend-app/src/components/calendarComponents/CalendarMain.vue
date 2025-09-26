@@ -453,11 +453,12 @@ function filterPatients() {
     return;
   }
 
-  filteredPatients.value = patients.value.filter(
-    (patient) =>
-      patient.name.toLowerCase().includes(searchPatient.value.toLowerCase()) ||
-      patient.email.toLowerCase().includes(searchPatient.value.toLowerCase()),
-  );
+  const searchTerm = searchPatient.value.toLowerCase();
+  filteredPatients.value = patients.value.filter((patient) => {
+    const name = (patient.name || '').toLowerCase();
+    const email = (patient.email || '').toLowerCase();
+    return name.includes(searchTerm) || email.includes(searchTerm);
+  });
 }
 
 function openEditModal(appointment) {
@@ -494,7 +495,10 @@ async function saveAppointment() {
       payload.status = editForm.value.status;
     }
 
-    if (editForm.value.notes !== undefined && editForm.value.notes !== null) {
+    const originalNotes =
+      (editingAppointment.value?.notes ?? editingAppointment.value?.Notes ?? '');
+    if (editForm.value.notes !== undefined && editForm.value.notes !== null &&
+      editForm.value.notes !== originalNotes) {
       payload.notes = String(editForm.value.notes);
     }
 
