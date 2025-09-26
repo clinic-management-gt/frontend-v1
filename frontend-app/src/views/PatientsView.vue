@@ -31,8 +31,8 @@
         <arrow-uturn-left-icon class="size-4 mr-2" />
         {{ $t('patients.return-to-patient-table') }}
       </p>
-      <div class="grid grid-cols-5 grid-rows-5 gap-5">
-        <app-panel class="col-span-5">
+      <div class="grid grid-cols-5 grid-rows-5 gap-3">
+        <app-panel class="col-span-5 flex-grow">
           <PatientMainDataBox :data="currentPatientSelectedData" />
         </app-panel>
         <app-panel class="col-span-2 row-span-2 row-start-2">
@@ -41,7 +41,7 @@
         <app-panel class="col-span-2 row-span-2 col-start-1 row-start-4">
           <patient-contact-data-box :data="currentPatientSelectedData" />
         </app-panel>
-        <app-panel class="col-span-3 col-start-3 row-start-2">
+        <app-panel class="col-span-3 col-start-3 row-start-2 flex flex-1 items-center">
           <patient-data-sheet-box :viewDataSheet="openDataSheetPatientDialog" />
         </app-panel>
         <div class="col-span-3 row-span-3 col-start-3 row-start-3">

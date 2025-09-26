@@ -82,6 +82,7 @@
   },
   "patients": {
     "patients": "Pacientes",
+    "status": "Estado",
     "parents": "Padres",
     "last-visit": "Ultima visita",
     "birth": "Nacimiento",
@@ -167,7 +168,10 @@
     "evolution-notes-label": "Notas de evolución",
     "empty-data": "No hay pacientes disponibles",
     "number-of-patients": "Número de pacientes {count}",
-    "return-to-patient-table": "Regresar a pacientes"
+    "return-to-patient-table": "Regresar a pacientes",
+    "patients-contacts": "Contactos del paciente",
+    "disease": "Enfermedades",
+    "blood-type": "Tipo de sangre"
   },
   "graph": {
     "graph": "Graficar"

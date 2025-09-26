@@ -1,5 +1,5 @@
 <template>
-  <div class="flex mx-7 my-4 justify-between items-center">
+  <div class="flex-1 flex  mx-7 my-4 justify-between items-center">
     <h1 class="text-2xl">
       {{ $t("patients.data-sheet") }}
     </h1>
