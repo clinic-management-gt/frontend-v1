@@ -1,35 +1,43 @@
 <template>
-  <div class="flex justify-between items-center mx-4 my-4">
-    <div class="flex flex-col">
-      <span
-        v-for="(item, index) in contactList"
-        :key="index"
-        class="flex my-2"
-      >
-        <action-button-solid-icon
-          icon="PhoneIcon"
-          size="h-10 w-10"
-          color="text-patient-page-color"
-        />
-        <div>
-          <h2 class="text-xl">{{ item?.parent || $t("general.nodata") }}</h2>
-          <h3 class="text-md">{{ item?.phone || $t("general.nodata") }}</h3>
-        </div>
-      </span>
-      <span
-        v-for="(item, index) in gmailList"
-        :key="index"
-        class="flex my-2 items-center"
-      >
-        <action-button-solid-icon
-          icon="EnvelopeIcon"
-          size="h-10 w-10"
-          color="text-patient-page-color"
-        />
-        <div>
-          <h2>{{ item }}</h2>
-        </div>
-      </span>
+  <div class="flex flex-col my-4 mx-4">
+    <div class="text-md font-semibold text-gray-500">
+      {{ $t('patients.patients-contacts') }}
+    </div>
+    <div class="flex justify-between items-center">
+      <div class="flex flex-col">
+        <span v-if="contactList.length == 0">
+          {{ $t('general.nodata') }}
+        </span>
+        <span
+          v-for="(item, index) in contactList"
+          :key="index"
+          class="flex my-2 items-center"
+        >
+          <action-button-solid-icon
+            icon="PhoneIcon"
+            size="h-12 w-12"
+            color="text-patient-page-color"
+          />
+          <div>
+            <h2 class="text-xl">{{ item.parent }}</h2>
+            <h3 class="text-md">{{ item.phone }}</h3>
+          </div>
+        </span>
+        <span
+          v-for="(item, index) in gmailList"
+          :key="index"
+          class="flex my-2 items-center"
+        >
+          <action-button-solid-icon
+            icon="EnvelopeIcon"
+            size="h-10 w-10"
+            color="text-patient-page-color"
+          />
+          <div>
+            <h2>{{ item }}</h2>
+          </div>
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -64,25 +72,13 @@ const gmailList = computed(() => {
 });
 
 const contactList = computed(() => {
-  const values = Array.isArray(props.data)
-    ? props.data
-    : Object.values(props.data);
-
-  const contacts = values
-    .filter(
-      (c) =>
-        c &&
-        typeof c === "object" &&
-        c.contacts &&
-        typeof c.contacts === "object",
-    )
-    .flatMap((c) => Object.values(c.contacts));
+  const contacts = props.data?.contacts || [];
 
   const formattedContacts = contacts
-    .filter((contact) => contact.phone)
+    .filter((contact) => contact.phones && contact.phones.length > 0) 
     .map((contact) => ({
-      parent: [contact.name, contact.lastname].filter(Boolean).join(" "),
-      phone: contact.phone,
+      parent: [contact.name, contact.lastName].filter(Boolean).join(" "),
+      phone: contact.phones[0].replace(/^(\d{4})(\d{4})$/, '$1-$2'),
     }));
 
   return formattedContacts;

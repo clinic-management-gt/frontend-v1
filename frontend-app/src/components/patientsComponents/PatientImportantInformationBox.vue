@@ -16,28 +16,28 @@
         {{ birthdate?.longSpanishDate || $t("general.nodata") }}
       </p>
     </div>
-    <div class="mb-2">
+    <div v-if="Object.keys(alergiesList).length > 0" class="mb-2">
       <p class="text-md font-semibold text-gray-500">
         {{ $t("general.alergies") }}
       </p>
-      <p
+      <p 
         v-for="(item, index) in alergiesList"
         :key="index"
         class="text-xl font-medium"
       >
-        {{ item }}
+        {{ item.alergyCode }} - {{ item.alergyDescription }}
       </p>
     </div>
-    <div>
+    <div v-if="Object.keys(chronicDiseases).length > 0">
       <p class="text-md font-semibold text-gray-600">
-        {{ $t("patients.syndrome") }}
+        {{ $t("patients.disease") }}
       </p>
       <p
-        v-for="(item, index) in syndromeList"
+        v-for="(item, index) in chronicDiseases"
         :key="index"
         class="text-xl font-medium"
       >
-        {{ item }}
+        {{ item.diseaseCode }} - {{ item.description }}
       </p>
     </div>
   </div>
@@ -54,9 +54,10 @@ const props = defineProps({
 const lastVisit = isoFormatDate(props.data.lastVisit);
 const birthdate = isoFormatDate(props.data.birthdate);
 const alergiesList = computed(() => {
-  return props.data.alergies;
+  return props.data.alergies || [];
 });
-const syndromeList = computed(() => {
-  return props.data.syndrome;
+const chronicDiseases = computed(() => {
+  return props.data.patientChronicDiseases || [];
 });
+
 </script>
