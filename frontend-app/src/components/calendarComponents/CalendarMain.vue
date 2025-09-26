@@ -453,11 +453,12 @@ function filterPatients() {
     return;
   }
 
-  filteredPatients.value = patients.value.filter(
-    (patient) =>
-      patient.name.toLowerCase().includes(searchPatient.value.toLowerCase()) ||
-      patient.email.toLowerCase().includes(searchPatient.value.toLowerCase()),
-  );
+  const searchTerm = searchPatient.value.toLowerCase();
+  filteredPatients.value = patients.value.filter((patient) => {
+    const name = (patient.name || '').toLowerCase();
+    const email = (patient.email || '').toLowerCase();
+    return name.includes(searchTerm) || email.includes(searchTerm);
+  });
 }
 
 function openEditModal(appointment) {
@@ -480,21 +481,35 @@ function openEditModal(appointment) {
 
 async function saveAppointment() {
   try {
-    const appointmentData = {
-      patientId: editForm.value.patientId,
-      date: `${editForm.value.date}T${editForm.value.time}:00`,
-      status: editForm.value.status,
-      notes: editForm.value.notes,
-    };
+    const payload = {};
+
+    if (editForm.value.patientId !== null && editForm.value.patientId !== "") {
+      payload.patientId = Number(editForm.value.patientId);
+    }
+
+    if (editForm.value.date && editForm.value.time) {
+      payload.date = `${editForm.value.date}T${editForm.value.time}:00`;
+    }
+
+    if (editForm.value.status) {
+      payload.status = editForm.value.status;
+    }
+
+    const originalNotes =
+      (editingAppointment.value?.notes ?? editingAppointment.value?.Notes ?? '');
+    if (editForm.value.notes !== undefined && editForm.value.notes !== null &&
+      editForm.value.notes !== originalNotes) {
+      payload.notes = String(editForm.value.notes);
+    }
 
     const res = await fetch(
       `http://localhost:9000/appointments/${editingAppointment.value.id}`,
       {
-        method: "PUT",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(appointmentData),
+        body: JSON.stringify(payload),
       },
     );
 
