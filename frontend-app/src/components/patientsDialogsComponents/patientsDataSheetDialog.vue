@@ -23,7 +23,7 @@
     <template #body>
       <div class="grid grid-cols-1 gap-4">
         <div class="col-span-1 flex flex-col space-y-4">
-          <app-panel panelDesign="px-4 py-5 sm:p-">
+          <app-panel panelDesign="overflow-hidden rounded-lg bg-white shadow-md px-4 py-5 sm:p-6">
             <p class="font-bold">
               {{ $t("patients.patients-data") }}
             </p>
