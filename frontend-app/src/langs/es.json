@@ -98,6 +98,7 @@
   },
   "patients": {
     "patients": "Pacientes",
+    "status": "Estado",
     "parents": "Padres",
     "last-visit": "Ultima visita",
     "birth": "Nacimiento",
@@ -188,6 +189,9 @@
     "dosis": "Dosis",
     "application-date": "Fecha de aplicación",
     "application-age": "Edad de aplicación"
+    "patients-contacts": "Contactos del paciente",
+    "disease": "Enfermedades",
+    "blood-type": "Tipo de sangre"
   },
   "graph": {
     "graph": "Graficar"
@@ -212,7 +216,28 @@
     "wed": "M",
     "thu": "J",
     "fri": "V",
-    "sat": "S"
+    "sat": "S",
+    "sunday": "Dom",
+    "monday": "Lun",
+    "tuesday": "Mar",
+    "wednesday": "Mié",
+    "thursday": "Jue",
+    "friday": "Vie",
+    "saturday": "Sáb",
+    "edit-appointment": "Editar Cita Médica",
+    "patient": "Paciente",
+    "search-patient-placeholder": "Escriba para buscar paciente...",
+    "date": "Fecha",
+    "time": "Hora",
+    "status": "Estado",
+    "delete-appointment": "Eliminar Cita",
+    "cancel": "Cancelar",
+    "save-changes": "Guardar Cambios",
+    "delete-appointment-confirmation": "¿Estás seguro de que quieres eliminar esta cita?",
+    "appointment-updated-successfully": "Cita actualizada exitosamente",
+    "appointment-deleted-successfully": "Cita eliminada exitosamente",
+    "error-updating-appointment": "Error al actualizar la cita",
+    "error-deleting-appointment": "Error al eliminar la cita"
   },
   "vee-validate": {
     "required-input": "Este campo es obligatorio"

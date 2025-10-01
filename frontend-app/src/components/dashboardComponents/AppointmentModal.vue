@@ -164,7 +164,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { usePatientsStore } from "@stores/patientsStore";
 import { useNotificationStore } from "@stores/notificationStore.js";
 import { storeToRefs } from "pinia";
@@ -173,10 +173,14 @@ import { globalI18n } from "@/langs/index.js";
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
 import ComboBoxAutocompleteInputSearchPatient from "@components/forms/ComboBoxAutocompleteInputSearchPatient.vue";
 
-defineProps({
+const props = defineProps({
   isOpen: {
     type: Boolean,
     default: false,
+  },
+  preselectedDate: {
+    type: String,
+    default: "",
   },
 });
 
@@ -196,6 +200,20 @@ const appointmentDate = ref("");
 const appointmentTime = ref("");
 const appointmentReason = ref("");
 const isLoading = ref(false);
+
+// Watcher para aplicar fecha preseleccionada
+watch(
+  () => [props.isOpen, props.preselectedDate],
+  ([isOpen, preselectedDate]) => {
+    if (isOpen) {
+      resetForm();
+      if (preselectedDate) {
+        appointmentDate.value = preselectedDate;
+      }
+    }
+  },
+  { immediate: true }
+);
 
 // Fecha mínima (hoy)
 const todayDate = computed(() => {

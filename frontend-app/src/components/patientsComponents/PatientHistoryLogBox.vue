@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex justify-between items-center">
       <p class="text-2xl font-bold">
         {{ $t("patients.patient-history") }}
       </p>
@@ -132,7 +132,7 @@
     <!-- Estado vacío -->
     <div
       v-else
-      class="flex flex-col w-full min-h-screen align-center items-center text-center py-12"
+      class="flex flex-col w-full align-center items-center text-center py-12"
     >
       <document-icon class="text-patient-page-color w-9 h-9" />
       <p class="text-gray-500 text-lg">
@@ -255,7 +255,7 @@ const {
   handleRecipeSave,
 } = patientsLogicStore;
 // Estados locales
-const itemsPerPage = ref(10);
+const itemsPerPage = ref(5);
 const currentPage = ref(1);
 
 // Computados para paginación
