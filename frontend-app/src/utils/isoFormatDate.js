@@ -105,3 +105,14 @@ export function formatDateTime(dateString) {
     second: "2-digit",
   });
 }
+
+export function formatDateShortest(dateString) {
+  if (!dateString) return "Fecha no disponible";
+  const defaultOptions = {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  };
+  return new Date(dateString).toLocaleDateString("es-ES", defaultOptions);
+}
+

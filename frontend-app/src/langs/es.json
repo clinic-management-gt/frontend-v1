@@ -102,7 +102,7 @@
     "last-visit": "Ultima visita",
     "birth": "Nacimiento",
     "syndrome": "Sindromes",
-    "data-sheet": "Ficha de datos",
+    "data-sheet": "Historia Clinica",
     "loading-patients-data": "Cargando datos del paciente",
     "patients-data": "Datos del paciente",
     "record": "Antecedentes",
@@ -183,7 +183,11 @@
     "evolution-notes-label": "Notas de evolución",
     "empty-data": "No hay pacientes disponibles",
     "number-of-patients": "Número de pacientes {count}",
-    "return-to-patient-table": "Regresar a pacientes"
+    "return-to-patient-table": "Regresar a pacientes",
+    "vaccines": "Vacunas",
+    "dosis": "Dosis",
+    "application-date": "Fecha de aplicación",
+    "application-age": "Edad de aplicación"
   },
   "graph": {
     "graph": "Graficar"
