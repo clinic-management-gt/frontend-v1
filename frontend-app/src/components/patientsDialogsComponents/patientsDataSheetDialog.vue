@@ -44,7 +44,7 @@
 
         <div class="w-full flex flex-col space-y-4">
           <div v-for="(item, index) in displayData" :key="index" class="flex flex-col w-full">
-            <Disclosure v-slot="{ open, close }">
+            <Disclosure v-slot="{ open }">
               <DisclosureButton
                 class="flex w-full justify-between rounded-lg bg-white shadow-md px-4 py-2 text-left font-medium text-black hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
                 @click="handleDisclosureClick(index)"
@@ -56,12 +56,12 @@
                 />
               </DisclosureButton>
               <transition
-                enter-active-class="transition duration-100 ease-out"
-                enter-from-class="transform scale-95 opacity-0"
-                enter-to-class="transform scale-100 opacity-100"
-                leave-active-class="transition duration-75 ease-out"
-                leave-from-class="transform scale-100 opacity-100"
-                leave-to-class="transform scale-95 opacity-0"
+                enterActiveClass="transition duration-100 ease-out"
+                enterFromClass="transform scale-95 opacity-0"
+                enterToClass="transform scale-100 opacity-100"
+                leaveActiveClass="transition duration-75 ease-out"
+                leaveFromClass="transform scale-100 opacity-100"
+                leaveToClass="transform scale-95 opacity-0"
               >
                 <DisclosurePanel v-show="displayData[index].isOpen" class="px-4 pb-2 pt-4 text-sm text-gray-500">
                   <div v-for="e in item.value" :key="e.id" class="exam-item mb-4">
@@ -74,9 +74,9 @@
                         <p class="text-sm text-gray-500">{{ formatDateShortest(e.createdAt) }}</p>
                         <button v-if="e.hasAction" @click="downloadExam(e.resultFilePath)">
                           <ActionButtonOutlinedIcon 
-                          icon="ArrowDownTrayIcon"
-                          size="h-6 w-6 mr-1"
-                          color="text-patient-page-color"
+                            icon="ArrowDownTrayIcon"
+                            size="h-6 w-6 mr-1"
+                            color="text-patient-page-color"
                           />
                         </button>
                       </div>
@@ -85,7 +85,7 @@
                       <div>
                         <p class="font-semibold">{{ e.vaccineName }}</p>
                         <p>{{ e.brand }}</p>
-                        <p>{{ $t('patients.dosis')}}: {{ e.dosis }}</p>
+                        <p>{{ $t('patients.dosis') }}: {{ e.dosis }}</p>
                       </div>
                       <div>
                         <p>{{ $t('patients.application-age') }}: {{ e.ageAtApplication }}</p>
@@ -103,12 +103,12 @@
   </general-dialog-modal>
 </template>
 <script setup>
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
-import { ChevronDownIcon } from '@heroicons/vue/20/solid'
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
+import { ChevronDownIcon } from '@heroicons/vue/20/solid';
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { usePatientsStore } from "@stores/patientsStore.js";
 import { useFileStore } from '@stores/FileStore';
-import { computed, ref } from "vue";
+import { computed,  } from "vue";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 import { formatDateShortest } from "@/utils/isoFormatDate.js";
@@ -121,15 +121,12 @@ const { t } = useI18n();
 
 const patientsStore = usePatientsStore();
 const { currentPatientSelectedData } = storeToRefs(patientsStore);
-
-const patientsLogicStore = usePatientsLogicStore();
-const { showDataSheetPatientDialog } = storeToRefs(patientsLogicStore);
 const { closeAllPatientDialog } = usePatientsLogicStore();
 
 
-const { downloadFile } = useFileStore()
+const { downloadFile } = useFileStore();
 
-const props = defineProps({
+defineProps({
   isOpen: {
     type: Boolean,
     default: false,
@@ -176,8 +173,6 @@ const displayData = computed(() => [
   { key: 'exams', title: t('patients.exams'), isOpen: false, value: patientExams.value },
   { key: 'record', title: t('patients.laboratories'), isOpen: false, value: "" },
 ]);
-
-const activeDisclosureIndex = ref(null);
 
 const handleDisclosureClick = (index) => {
   displayData.value.forEach((item, idx) => {

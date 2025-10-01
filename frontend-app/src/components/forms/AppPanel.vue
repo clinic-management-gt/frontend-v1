@@ -4,7 +4,7 @@
   </div>
 </template>
 <script setup>
-const props = defineProps({
+defineProps({
   panelDesign: {
     type: String,
     default: 'overflow-hidden rounded-lg bg-white shadow-md px-4 py-5 sm:p-6'
