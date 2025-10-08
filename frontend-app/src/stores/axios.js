@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { handleHttpError } from "@utils/errorHandler";
 
 const instance = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}`,
+  baseURL: `${import.meta.env.VITE_API_URL}${import.meta.env.VITE_API_HOST_PREFIX}`,
   timeout: 10000,
   withCredentials: false,
 });

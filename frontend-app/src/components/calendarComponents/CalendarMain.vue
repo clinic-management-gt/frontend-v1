@@ -6,6 +6,7 @@ import AppointmentModal from "@components/dashboardComponents/AppointmentModal.v
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
 import { useNotificationStore } from "@/stores/notificationStore";
 import { useI18n } from "vue-i18n";
+import instance from "@stores/axios.js";
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
@@ -337,7 +338,7 @@ const appointments = ref([]);
 
 async function fetchAppointments() {
   try {
-    const res = await fetch("http://localhost:9000/appointments");
+    const res = await instance.get('/appointments');
     if (!res.ok) throw new Error("Error al obtener citas");
     const data = await res.json();
     appointments.value = data;
@@ -413,7 +414,7 @@ const appointmentStatuses = [
 // Nuevas funciones para manejar la edición
 async function fetchPatients() {
   try {
-    const res = await fetch("http://localhost:9000/patients");
+    const res = await instance.get('/patients');
     if (!res.ok) throw new Error("Error al obtener pacientes");
     const data = await res.json();
     patients.value = data;
@@ -502,8 +503,8 @@ async function saveAppointment() {
       payload.notes = String(editForm.value.notes);
     }
 
-    const res = await fetch(
-      `http://localhost:9000/appointments/${editingAppointment.value.id}`,
+    const res = await instance.get(
+      `/appointments/${editingAppointment.value.id}`,
       {
         method: "PATCH",
         headers: {
@@ -540,8 +541,8 @@ async function deleteAppointment() {
   if (!confirm(t("calendar.delete-appointment-confirmation"))) return;
 
   try {
-    const res = await fetch(
-      `http://localhost:9000/appointments/${editingAppointment.value.id}`,
+    const res = await instance.get(
+      `/appointments/${editingAppointment.value.id}`,
       {
         method: "DELETE",
       },
