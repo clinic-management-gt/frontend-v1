@@ -1,4 +1,3 @@
-import { Blob } from 'buffer';
 export class FileAdapter {
   constructor(source, options = {}) {
     this.source = source;
