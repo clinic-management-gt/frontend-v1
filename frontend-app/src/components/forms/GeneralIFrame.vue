@@ -25,18 +25,9 @@ import { useBlobAdapter } from "@/composables/useBlobAdapter";
 import PrimaryButton from "@components/forms/PrimaryButton.vue";
 
 const props = defineProps({
-  source: {
-    type: String,
-    required: true,
-  },
-  width: {
-    type: String,
-    default: "100%",
-  },
-  height: {
-    type: String,
-    default: "900px",
-  },
+  source: { type: [String, Blob, File, ArrayBuffer, Uint8Array], required: true },
+  width: { type: String, default: "100%" },
+  height: { type: String, default: "900px" },
 });
 
 const { blobUrl, generate } = useBlobAdapter(props.source, {
@@ -47,6 +38,7 @@ onMounted(generate);
 watch(() => props.source, generate);
 
 function downloadPdf() {
+  if (!blobUrl.value) return;
   const link = document.createElement("a");
   link.href = blobUrl.value;
   link.download = "document.pdf";

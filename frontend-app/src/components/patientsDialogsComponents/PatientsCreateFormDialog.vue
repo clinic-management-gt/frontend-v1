@@ -7,31 +7,34 @@
   >
     <template #title>
       <div class="flex justify-between items-center px-6 py-2 border-b">
-        <div>
-          <p class="text-xl">
-            {{ $t("patients.fill-out-form") }}
-          </p>
-        </div>
+        <p class="text-xl">{{ $t("patients.fill-out-form") }}</p>
       </div>
     </template>
+
     <template #body>
-      <div class="grid grid-cols-2">
+      <div class="grid grid-cols-2 gap-4">
         <div>
+          <!-- Input para subir PDF -->
           <drag-drop-file-input
             title="patients.drag-or-click-here-to-load-the-PDF-of-the-data-sheet"
             @send-files="handleSendFiles"
           />
+          <!-- Vista previa -->
           <general-i-frame
-            v-if="file"
-            :source="file"
+            v-if="rawFile"
+            :source="rawFile"
+            height="700px"
           />
         </div>
+
         <div class="ml-2 sm:border-l">
           <create-new-patients-form v-if="currentPage === 1" />
           <review-patient-data v-if="currentPage === 2" />
+          <spinning-arrow-loading v-if="currentPage === 3"/>
         </div>
       </div>
     </template>
+
     <template #buttons>
       <primary-button
         v-if="currentPage === 2"
@@ -40,77 +43,76 @@
         class="mr-2"
         @click="backPage()"
       >
-        <div class="uppercase">
-          {{ $t("general.back") }}
-        </div>
+        <div class="uppercase">{{ $t("general.back") }}</div>
       </primary-button>
-      <primary-button
-        type="button"
-        class="mr-2"
-        @click="nextPage()"
-      >
-        <div class="uppercase">
-          {{ $t("general.accept") }}
-        </div>
+
+      <primary-button type="button" class="mr-2" >
+        <div v-if="currentPage === 1" @click="nextPage()" class="uppercase">{{ $t('general.next') }}</div>
+        <div v-if="currentPage === 2" @click="createPatient()" class="uppercase">{{ $t("general.accept") }}</div>
       </primary-button>
     </template>
   </general-dialog-modal>
 </template>
+
 <script setup>
+import { ref } from "vue";
+import { storeToRefs } from "pinia";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { usePatientsStore } from "@stores/patientsStore.js";
-import { useBlobAdapter } from "@/composables/useBlobAdapter";
-import { ref, computed } from "vue";
-import { storeToRefs } from "pinia";
 
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
 import CreateNewPatientsForm from "@components/patientsDialogsComponents/patientsCreateDialogComponents/CreateNewPatientsForm.vue";
 import ReviewPatientData from "@components/patientsDialogsComponents/patientsCreateDialogComponents/ReviewPatientData.vue";
 import DragDropFileInput from "@components/forms/DragDropFileInput.vue";
+import SpinningArrowLoading from "@components/forms/SpinningArrowLoading.vue";
 import PrimaryButton from "@components/forms/PrimaryButton.vue";
 import GeneralIFrame from "@components/forms/GeneralIFrame.vue";
 
 const patientsStore = usePatientsStore();
-const { newPatientData } =
-  storeToRefs(patientsStore);
-
+const { newPatientData } = storeToRefs(patientsStore);
+const { createNewPatient } = patientsStore;
 const patientsLogicStore = usePatientsLogicStore();
 const { showCreateFormDialog } = storeToRefs(patientsLogicStore);
 
+const currentPage = ref(1);
+const rawFile = ref(newPatientData.value.file ?? null);
+
+defineProps({
+  isOpen: { type: Boolean, default: false },
+});
+
 const handleClose = (closeModal) => {
   showCreateFormDialog.value = closeModal;
+  currentPage.value = 1;
 };
 
-const rawFile = ref(newPatientData.value.file ?? null);
-const file = computed(() => blobUrl.value);
-const { blobUrl, generate } = useBlobAdapter(rawFile, {
-  mimeType: "application/pdf",
-});
-const currentPage = ref(1);
-
-function handleSendFiles(fileReceived) {
+async function handleSendFiles(fileReceived) {
   rawFile.value = fileReceived;
-  patientsStore.uploadFile(
-    fileReceived,
-    "laboratorios",
-    1,
-    "descripcion de prueba",
-    1,
-  );
+  console.log(fileReceived);
+
   if (fileReceived) {
-    generate();
-    newPatientData.value.file = fileReceived;
+    const reader = new FileReader();
+    
+    reader.onload = () => {
+      const base64String = reader.result; // Obtienes el base64 del archivo
+      console.log(base64String); // Base64 del archivo
+
+      // Asigna el base64 al objeto `newPatientData.value`
+      Object.assign(newPatientData.value, { InfoSheetFile: base64String });
+    };
+    
+    // Lee el archivo como una URL base64
+    reader.readAsDataURL(fileReceived);  // Usa readAsDataURL para obtener base64
   } else {
-    blobUrl.value && URL.revokeObjectURL(blobUrl.value);
-    blobUrl.value = null;
-    newPatientData.value.file = null;
+    newPatientData.value.InfoSheetFile = null;
   }
 }
 
-function nextPage() {
-  currentPage.value += 1;
-}
-function backPage() {
-  currentPage.value -= 1;
+function nextPage() { currentPage.value += 1; }
+function backPage() { currentPage.value -= 1; }
+
+async function createPatient() {
+  await createNewPatient(newPatientData.value);
+  handleClose(false);
 }
 </script>

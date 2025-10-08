@@ -1,9 +1,5 @@
 <template>
   <div>
-    <h1 class="text-xl font-bold text-back mb-8">
-      Pacientes para hoy — {{ todayFormatted }}
-    </h1>
-
     <div v-if="isLoadingAppointmentsToday" class="text-center py-6">
       <basic-spinner-loading color="#489FB5" class="mx-auto" />
     </div>
@@ -64,7 +60,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from "vue";
+import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import { usePatientsStore } from "../../stores/patientsStore";
@@ -78,13 +74,6 @@ onMounted(() => {
   patientsStore.fetchAppointmentsToday();
 });
 
-const todayFormatted = computed(() =>
-  new Date().toLocaleDateString("es-GT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }),
-);
 
 const statuses = [
   { key: "pendiente",   label: "Pendiente",   class: "bg-[#F4A261] text-yellow-900" },
