@@ -1,4 +1,3 @@
-// FileAdapter.js (versión navegador)
 export class FileAdapter {
   constructor(source, options = {}) {
     this.source = source;
