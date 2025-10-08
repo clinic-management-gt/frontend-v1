@@ -46,6 +46,7 @@
     "no-medical-records": "No hay registros médicos disponibles",
     "delete": "Eliminar",
     "update": "Actualizar",
+    "next": "Siguiente",
     "save": "Guardar",
     "confirmed": "Confirmado",
     "completed": "Completado",
@@ -191,7 +192,18 @@
     "application-age": "Edad de aplicación",
     "patients-contacts": "Contactos del paciente",
     "disease": "Enfermedades",
-    "blood-type": "Tipo de sangre"
+    "blood-type": "Tipo de sangre",
+    "blood-type-placeholder": "Seleccione el tipo de sangre",
+    "patient-type": "Tipo de paciente",
+    "patient-type-placeholder": "Seleccione el tipo de paciente",
+    "regular": "Regular",
+    "emergency": "Emergencia",
+    "cronic": "Crónico",
+    "growth-control": "Control de crecimiento",
+    "vaccination": "Vacunación",
+    "neonatal": "Neonatal",
+    "teenager": "Adolescente",
+    "specialty": "Especialidad"
   },
   "graph": {
     "graph": "Graficar"

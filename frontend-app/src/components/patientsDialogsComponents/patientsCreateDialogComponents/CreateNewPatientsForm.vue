@@ -175,12 +175,29 @@
       class="mt-2 sm:col-span-2"
       inputColor="patient-page-color"
     />
+
+    <!-- bloodtype selector -->
+    <comboboxes-input
+      v-model:currentSelected="currentBloodType"
+      :data="bloodType"
+      title="patients.blood-type"
+      placeholder="patients.blood-type-placeholder"
+      class="mt-2 sm:col-span-2"
+    />
+    <comboboxes-input
+      v-model:currentSelected="currentPatientType"
+      :data="patientType"
+      title="patients.patient-type"
+      placeholder="patients.patient-type-placeholder"
+      class="mt-2 sm:col-span-2"
+    />
   </div>
 </template>
 <script setup>
 import { useForm } from "vee-validate";
 import { ref, watchEffect, computed } from "vue";
 import { usePatientsStore } from "@stores/patientsStore.js";
+import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
 import * as yup from "yup";
 
@@ -190,12 +207,34 @@ import TextInput from "@components/forms/TextInput.vue";
 import RadioGroup from "@components/forms/RadioGroup.vue";
 import ComboboxesInput from "@components/forms/ComboboxesInput.vue";
 
+const { t } = useI18n();
+
 const patientsStore = usePatientsStore();
 const { newPatientData } = storeToRefs(patientsStore);
 
 const genders = [
   { id: 0, name: "patients.male" },
   { id: 1, name: "patients.female" },
+];
+const bloodType = [
+  { id: 1, name: "A+" },
+  { id: 2, name: "A-" },
+  { id: 3, name: "B+" },
+  { id: 4, name: "B-" },
+  { id: 5, name: "AB+" },
+  { id: 6, name: "AB-" },
+  { id: 7, name: "O+" },
+  { id: 8, name: "O-" },
+];
+const patientType = [
+  { id: 1, name: t("patients.regular") },
+  { id: 2, name: t("patients.emergency") },
+  { id: 3, name: t("patients.cronic") },
+  { id: 4, name: t("patients.growth-control") },
+  { id: 5, name: t("patients.vaccination") },
+  { id: 6, name: t("patients.neonatal") },
+  { id: 7, name: t("patients.teenager") },
+  { id: 8, name: t("patients.specialty") },
 ];
 const insurances = [
   { id: 0, name: "insurance 1" },
@@ -251,6 +290,7 @@ const currentGender = ref(newPatientData.value.currentGender ?? null);
 const currentAlergies = ref(newPatientData.value.currentAlergies ?? []);
 const currentSyndromes = ref(newPatientData.value.currentSyndromes ?? []);
 const currentInsurance = ref(newPatientData.value.currentInsurance ?? []);
+const currentBloodType = ref(newPatientData.value.currentBloodType ?? []);
 const phoneList = ref(newPatientData.value.phoneList ?? []);
 const hasAlergies = ref(newPatientData.value.hasAlergies ?? null);
 const hasSyndromes = ref(newPatientData.value.hasSyndromes ?? null);
@@ -295,21 +335,21 @@ const isFormValid = computed(() => {
 
 watchEffect(() => {
   newPatientData.value = {
-    names: values.names,
-    lastNames: values.lastNames,
-    birthdate: values.birthdate,
-    currentGender: currentGender.value,
-    hasAlergies: hasAlergies.value,
-    currentAlergies: currentAlergies.value,
-    currentSyndromes: currentSyndromes.value,
-    hasSyndromes: hasSyndromes.value,
-    pediatrician: values.pediatrician,
-    mother: values.mother,
-    father: values.father,
-    phoneList: phoneList.value,
-    currentInsurance: currentInsurance.value,
-    residence: values.residence,
-    gmail: values.gmail,
+    Name: values.names,
+    LastName: values.lastNames,
+    Birthdate: values.birthdate,
+    Gender: currentGender.value,
+    HasAlergies: hasAlergies.value,
+    HasSyndromes: hasSyndromes.value,
+    Pediatrician: values.pediatrician,
+    MotherInfo: values.mother,
+    FatherInfo: values.father,
+    ContactPhones: phoneList.value,
+    Insurance: currentInsurance.value,
+    ResidenceAddress: values.residence,
+    ContactEmail: values.gmail,
+    BloodTypeId: values.gmail,
+    PatientTypeId: values.gmail,
     isFormValid: isFormValid.value,
   };
 });
