@@ -14,9 +14,6 @@
       >
         {{ $t("login.login") }}
       </h2>
-      <p class="mt-2 text-sm text-green-600 font-semibold">
-        ✅ Prueba 2 de github actions
-      </p>
     </div>
     <form
       class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm space-y-4"
