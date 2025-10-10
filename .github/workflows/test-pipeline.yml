@@ -45,4 +45,3 @@ jobs:
             docker-compose pull frontend
             docker-compose up -d
             docker image prune -f
-
