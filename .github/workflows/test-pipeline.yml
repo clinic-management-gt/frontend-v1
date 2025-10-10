@@ -28,6 +28,9 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          build-args: |
+            VITE_API_URL=${{ secrets.VITE_API_URL_TEST }}
+            VITE_API_HOST_PREFIX=${{ secrets.VITE_API_HOST_PREFIX_TEST }}
           tags: |
             escuarch/test-software:frontend-latest
             escuarch/test-software:frontend-${{ github.sha }}
