@@ -15,7 +15,7 @@
         {{ $t("login.login") }}
       </h2>
       <p class="mt-2 text-sm text-green-600 font-semibold">
-        ✅ Desplegado con GitHub Actions
+        ✅ Prueba 2 de github actions
       </p>
     </div>
     <form
