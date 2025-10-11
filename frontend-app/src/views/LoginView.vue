@@ -14,6 +14,9 @@
       >
         {{ $t("login.login") }}
       </h2>
+      <p class="text-sm text-gray-500">
+        PRUEBA EN PROD
+      </p>
     </div>
     <form
       class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm space-y-4"
