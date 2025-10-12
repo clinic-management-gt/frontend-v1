@@ -4,6 +4,7 @@ import { ref, watch, nextTick, computed } from "vue";
 import { onMounted } from "vue";
 import AppointmentModal from "@components/dashboardComponents/AppointmentModal.vue";
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
+import ConfirmationModal from "@components/forms/ConfirmationModal.vue";
 import { useNotificationStore } from "@/stores/notificationStore";
 import { useI18n } from "vue-i18n";
 import instance from "@stores/axios.js";
@@ -191,6 +192,7 @@ function openAppointmentModalForDate(dayObj) {
   const month = String(dayObj.month + 1).padStart(2, '0'); // Los meses en JS son 0-indexados
   const day = String(dayObj.day).padStart(2, '0');
   
+  // Asignar la fecha formateada
   preselectedDate.value = `${year}-${month}-${day}`;
   isAppointmentModalOpen.value = true;
 }
@@ -521,10 +523,18 @@ async function saveAppointment() {
   }
 }
 
-async function deleteAppointment() {
-  // Mostrar confirmación usando notificación (por ahora mantenemos confirm por simplicidad)
-  if (!confirm(t("calendar.delete-appointment-confirmation"))) return;
+// Estado para el modal de confirmación de eliminación
+const showDeleteConfirmation = ref(false);
 
+async function deleteAppointment() {
+  // Mostrar modal de confirmación en lugar de usar confirm nativo
+  showDeleteConfirmation.value = true;
+}
+
+// Función para confirmar la eliminación
+async function confirmDelete() {
+  showDeleteConfirmation.value = false;
+  
   try {
     const res = await instance.get(
       `/appointments/${editingAppointment.value.id}`,
@@ -1081,5 +1091,17 @@ onMounted(() => {
     :preselectedDate="preselectedDate"
     @close="closeAppointmentModal"
     @appointment-created="onAppointmentCreated"
+  />
+
+  <!-- Modal de Confirmación para eliminar cita -->
+  <ConfirmationModal
+    :isOpen="showDeleteConfirmation"
+    type="danger"
+    :title="t('calendar.delete-appointment')"
+    :message="t('calendar.delete-appointment-confirmation')"
+    :confirmText="t('general.delete')"
+    :cancelText="t('general.cancel')"
+    @close="showDeleteConfirmation = false"
+    @confirm="confirmDelete"
   />
 </template>
