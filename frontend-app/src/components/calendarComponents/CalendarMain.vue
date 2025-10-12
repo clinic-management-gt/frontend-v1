@@ -340,9 +340,8 @@ const appointments = ref([]);
 
 async function fetchAppointments() {
   try {
-    const res = await instance.get('/appointments');
-    if (!res.ok) throw new Error("Error al obtener citas");
-    const data = await res.json();
+    const response = await instance.get('/appointments');
+    const data = response.data;
     appointments.value = data;
 
     // Limpia eventos previos de tipo 'Cita'
@@ -416,9 +415,8 @@ const appointmentStatuses = [
 // Nuevas funciones para manejar la edición
 async function fetchPatients() {
   try {
-    const res = await instance.get('/patients');
-    if (!res.ok) throw new Error("Error al obtener pacientes");
-    const data = await res.json();
+    const response = await instance.get('/patients');
+    const data = response.data;
     patients.value = data;
     filteredPatients.value = data;
   } catch (e) {
@@ -490,18 +488,10 @@ async function saveAppointment() {
       notes: editForm.value.notes,
     };
 
-    const res = await instance.get(
+    await instance.put(
       `/appointments/${editingAppointment.value.id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(appointmentData),
-      },
+      appointmentData
     );
-
-    if (!res.ok) throw new Error("Error al actualizar la cita");
 
     // Refrescar las citas
     await fetchAppointments();
@@ -536,14 +526,9 @@ async function confirmDelete() {
   showDeleteConfirmation.value = false;
   
   try {
-    const res = await instance.get(
-      `/appointments/${editingAppointment.value.id}`,
-      {
-        method: "DELETE",
-      },
+    await instance.delete(
+      `/appointments/${editingAppointment.value.id}`
     );
-
-    if (!res.ok) throw new Error("Error al eliminar la cita");
 
     // Refrescar las citas
     await fetchAppointments();
@@ -943,6 +928,7 @@ onMounted(() => {
     <general-dialog-modal
       :isOpen="showEditModal"
       dialogSize="max-w-2xl"
+      :cancelButton="true"
       @close-modal="closeEditModal"
     >
       <template #title>

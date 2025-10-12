@@ -2,6 +2,7 @@
   <general-dialog-modal
     :isOpen="isOpen"
     :dialogSize="dialogSize"
+    :cancelButton="true"
     @close-modal="handleClose"
   >
     <template #title>
