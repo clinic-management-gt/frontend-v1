@@ -350,17 +350,22 @@ async function fetchAppointments() {
     // Agrega las citas como eventos
     data.forEach((app) => {
       const date = new Date(app.date || app.appointment_date);
+      const timeStr = date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      
+      // Usar solo la hora como texto visible en el calendario
+      // Pero mantener la información completa para la edición
       events.value.push({
         day: date.getDate(),
         month: date.getMonth(),
         year: date.getFullYear(),
-        text: `Cita: ${app.PatientName || app.patientName} (${app.Status || app.status})`,
-        startTime: date.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+        text: `${app.PatientName || app.patientName}`,  // Guardamos nombre del paciente
+        displayText: timeStr,  // Solo mostramos la hora en el calendario
+        startTime: timeStr,
         endTime: null,
-        color: "#1976d2",
+        color: getColorByStatus(app.Status || app.status),  // Color según estado
         type: "Cita",
       });
     });
@@ -515,8 +520,31 @@ async function saveAppointment() {
 
 // Estado para el modal de confirmación de eliminación
 const showDeleteConfirmation = ref(false);
+// Variable para guardar la cita a eliminar (independiente de editingAppointment)
+const appointmentToDelete = ref(null);
+
+// Función para obtener color según estado de la cita
+function getColorByStatus(status) {
+  switch(status.toLowerCase()) {
+    case 'confirmado':
+      return "#4caf50";  // verde
+    case 'pendiente':
+      return "#1976d2";  // azul
+    case 'cancelado':
+      return "#f44336";  // rojo
+    case 'completado':
+      return "#9c27b0";  // morado
+    case 'espera':
+      return "#ff9800";  // naranja
+    default:
+      return "#1976d2";  // azul por defecto
+  }
+}
 
 async function deleteAppointment() {
+  // Guardar la cita actual para eliminar
+  appointmentToDelete.value = {...editingAppointment.value};
+  
   // Mostrar modal de confirmación en lugar de usar confirm nativo
   showDeleteConfirmation.value = true;
 }
@@ -526,13 +554,25 @@ async function confirmDelete() {
   showDeleteConfirmation.value = false;
   
   try {
-    await instance.delete(
-      `/appointments/${editingAppointment.value.id}`
-    );
+    // Verificar si usa ID o id y asegurarse de que existe
+    const appointmentId = appointmentToDelete.value.ID || 
+                          appointmentToDelete.value.id || 
+                          appointmentToDelete.value.AppointmentID || 
+                          appointmentToDelete.value.appointmentId;
+    
+    if (!appointmentId) {
+      throw new Error("No se pudo obtener el ID de la cita para eliminar");
+    }
+    
+    // Intentar eliminar la cita
+    await instance.delete(`/appointments/${appointmentId}`);
 
     // Refrescar las citas
     await fetchAppointments();
     closeEditModal();
+    
+    // Limpiar la referencia a la cita eliminada
+    appointmentToDelete.value = null;
 
     // Mostrar mensaje de éxito
     notificationStore.addNotification(
@@ -540,19 +580,21 @@ async function confirmDelete() {
       "notifications.success",
       t("calendar.appointment-deleted-successfully")
     );
-  } catch (e) {
-    console.error("Error al eliminar la cita:", e);
+  } catch {
     notificationStore.addNotification(
       "error", 
       "notifications.error",
-      t("calendar.error-deleting-appointment")
+      t("calendar.error-deleting-appointment") || "Error al eliminar la cita"
     );
   }
 }
 
 function closeEditModal() {
   showEditModal.value = false;
-  editingAppointment.value = null;
+  // Solo limpiamos editingAppointment si no estamos en proceso de eliminación
+  if (!showDeleteConfirmation.value) {
+    editingAppointment.value = null;
+  }
   editForm.value = {
     patientId: "",
     patientName: "",
@@ -569,8 +611,10 @@ function openAppointmentEdit(event) {
   if (event.type === "Cita") {
     // Buscar la cita original en appointments
     const appointment = appointments.value.find((app) =>
-      event.text.includes(app.PatientName || app.patientName),
+      // Ahora comparamos con el nombre del paciente directamente
+      (app.PatientName || app.patientName) === event.text
     );
+    
     if (appointment) {
       openEditModal(appointment);
     }
@@ -693,7 +737,9 @@ onMounted(() => {
                         : "📋"
                   }}
                 </span>
+                <!-- Mostramos la hora solo para eventos que no son citas -->
                 <span
+                  v-if="event.type !== 'Cita'"
                   :class="styles['event-time']"
                   data-testid="event-time"
                 >
@@ -706,8 +752,8 @@ onMounted(() => {
                 data-testid="event-text"
               >
                 {{
-                  event.type === "Cita"
-                    ? event.text.replace("Cita: ", "")
+                  event.type === "Cita" && event.displayText
+                    ? event.displayText
                     : event.text
                 }}
               </div>
