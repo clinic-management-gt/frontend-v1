@@ -523,22 +523,9 @@ const showDeleteConfirmation = ref(false);
 // Variable para guardar la cita a eliminar (independiente de editingAppointment)
 const appointmentToDelete = ref(null);
 
-// Función para obtener color según estado de la cita
-function getColorByStatus(status) {
-  switch(status.toLowerCase()) {
-    case 'confirmado':
-      return "#4caf50";  // verde
-    case 'pendiente':
-      return "#1976d2";  // azul
-    case 'cancelado':
-      return "#f44336";  // rojo
-    case 'completado':
-      return "#9c27b0";  // morado
-    case 'espera':
-      return "#ff9800";  // naranja
-    default:
-      return "#1976d2";  // azul por defecto
-  }
+// Función para obtener color de las citas (todas azules)
+function getColorByStatus() {  // Sin parámetros
+  return "#1976d2";  // azul para todas las citas
 }
 
 async function deleteAppointment() {
@@ -882,7 +869,7 @@ onMounted(() => {
           v-if="getEventsForDay(selectedDayObj).length === 0"
           data-testid="no-events-message"
         >
-          No hay actividades ni pacientes.
+          {{ t("calendar.no-events") }}
         </li>
       </ul>
 
