@@ -127,7 +127,7 @@ export const usePatientsStore = defineStore(
       isLoadingMedicalRecords.value = true;
       try {
         const dataToSend = { ...recordData, PatientId: patientId };
-        const res = await instance.post(`/medicalrecorddddds`, dataToSend);
+        const res = await instance.post(`/medicalrecords`, dataToSend);
         return res.data;
       } finally {
         isLoadingMedicalRecords.value = false;
@@ -217,6 +217,18 @@ export const usePatientsStore = defineStore(
       });
       return res.data;
     }
+    
+    async function createBasicPatient(patientData) {
+      isLoadingPendingPatients.value = true;
+      try {
+        const res = await instance.post(`/patients/basic`, patientData);
+        // Actualizar la lista de pacientes pendientes
+        await fetchPendingPatients();
+        return res.data;
+      } finally {
+        isLoadingPendingPatients.value = false;
+      }
+    }
 
     async function createAppointment(appointmentData) {
       isLoadingAppointments.value = true;
@@ -268,6 +280,7 @@ export const usePatientsStore = defineStore(
       fetchMedicalRecordDetails,
       uploadFile,
       downloadFile,
+      createBasicPatient,
       createAppointment,
       clearFullRecord
     };
