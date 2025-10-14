@@ -1,15 +1,13 @@
 <template>
-  <div
-    v-if="isOpen"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+  <general-dialog-modal
+    ref="detailsDialog"
+    :isOpen="isOpen"
+    dialogSize="max-w-4xl"
+    @close-modal="$emit('close')"
   >
-    <div
-      class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden"
-    >
-      <!-- Header -->
-      <div
-        class="flex justify-between items-center p-6 border-b bg-gradient-to-r from-blue-500 to-blue-600 text-white"
-      >
+    <!-- Header -->
+    <template #title>
+      <div class="flex justify-between items-center px-6 py-2 border-b bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-t-2xl -mx-6 -mt-6 mb-4">
         <div>
           <h2 class="text-2xl font-bold">
             {{ $t("patients.consult-detail") }}
@@ -25,10 +23,12 @@
           &times;
         </button>
       </div>
+    </template>
 
-      <!-- Contenido scrolleable -->
-      <div class="overflow-y-auto max-h-[calc(90vh-80px)]">
-        <div class="p-6 space-y-6">
+    <!-- Body -->
+    <template #body>
+      <div class="overflow-y-auto max-h-[calc(90vh-240px)]">
+        <div class="space-y-6">
           <!-- Información general -->
           <div class="bg-gray-50 rounded-lg p-4">
             <h3 class="text-lg font-semibold mb-3 text-gray-800">
@@ -196,44 +196,42 @@
           </div>
         </div>
       </div>
+    </template>
 
-      <!-- Footer con acciones -->
-      <div class="flex justify-end gap-3 p-6 border-t bg-gray-50">
-        <button
-          class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
-          @click="editRecord"
-        >
-          <action-button-solid-icon
-            icon="PencilIcon"
-            size="h-4 w-4"
-            color="text-white"
-          />
-          {{ $t("general.edit") }}
-        </button>
-        <button
-          class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2"
-          @click="downloadRecord"
-        >
-          <action-button-solid-icon
-            icon="ArrowDownTrayIcon"
-            size="h-4 w-4"
-            color="text-white"
-          />
-          {{ $t("general.download") }}
-        </button>
-        <button
-          class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-          @click="$emit('close')"
-        >
-          {{ $t("general.close") }}
-        </button>
-      </div>
-    </div>
-  </div>
+    <!-- Footer -->
+    <template #buttons>
+      <primary-button
+        class="mr-2"
+        bgColor="blue"
+        @click="editRecord"
+      >
+        <action-button-solid-icon
+          icon="PencilIcon"
+          size="h-4 w-4"
+          color="text-white"
+        />
+        <span class="ml-2 uppercase">{{ $t("general.edit") }}</span>
+      </primary-button>
+      <primary-button
+        class="mr-2"
+        bgColor="green"
+        @click="downloadRecord"
+      >
+        <action-button-solid-icon
+          icon="ArrowDownTrayIcon"
+          size="h-4 w-4"
+          color="text-white"
+        />
+        <span class="ml-2 uppercase">{{ $t("general.download") }}</span>
+      </primary-button>
+    </template>
+  </general-dialog-modal>
 </template>
 
 <script setup>
 import ActionButtonSolidIcon from "@components/forms/ActionButtonSolidIcon.vue";
+import PrimaryButton from "@components/forms/PrimaryButton.vue";
+import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 
 const props = defineProps({
@@ -264,7 +262,7 @@ function formatRecordDate(dateString) {
       minute: "2-digit",
     });
   } catch (error) {
-    return error;
+    return "Fecha no disponible";
   }
 }
 

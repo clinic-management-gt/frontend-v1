@@ -162,7 +162,7 @@
     />
 
     <!-- Modal de formulario de recetas -->
-    <recipe-form-modal
+    <!-- <recipe-form-modal
       v-if="showRecipeFormModal"
       :isOpen="showRecipeFormModal"
       :recipe="selectedRecipeForEdit"
@@ -170,7 +170,7 @@
       :treatmentId="getFirstTreatmentId()"
       @close="closeHistoryLogModals"
       @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)"
-    />
+    /> -->
 
     <!-- Modal de confirmación de eliminación -->
     <div

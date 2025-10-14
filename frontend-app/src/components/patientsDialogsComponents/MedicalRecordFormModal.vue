@@ -3,6 +3,7 @@
     :isOpen="isOpen"
     dialogSize="max-w-4xl"
     @close-modal="handleClose"
+    @open="handleOpen"
   >
     <template #title>
       <p class="text-xl">
@@ -17,12 +18,10 @@
     </template>
     <template #body>
       <div class="space-y-6 max-h-[70vh] overflow-y-auto">
-        <!-- Formulario principal -->
         <form
           class="space-y-4"
           @submit.prevent="handleSubmit"
         >
-          <!-- Información básica -->
           <div class="bg-gray-50 p-4 rounded-lg">
             <h3 class="text-lg font-semibold mb-4">
               {{ $t("medical-records.basic-info") }}
@@ -30,111 +29,219 @@
 
             <!-- Peso y Altura -->
             <div class="grid grid-cols-2 gap-4 mb-4">
+              <!-- Peso -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{
-                  $t("medical-records.weight")
-                }}</label>
-                <!-- Mostrar valor actual como referencia -->
                 <div
                   v-if="isEditing && originalValues.weight"
-                  class="mb-2 text-xs text-gray-500 bg-gray-50 p-2 rounded border"
+                  class="mb-2 text-xs text-gray-500 bg-white p-2 rounded border"
                 >
                   📊 {{ $t("medical-records.current-value") }}:
                   {{ originalValues.weight }} kg
                 </div>
-                <input
-                  v-model="formData.weight"
+                <text-input
+                  name="weight"
                   type="number"
                   step="0.1"
-                  :placeholder="$t('medical-records.weight-placeholder')"
-                  class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm sm:leading-6"
+                  title="medical-records.weight"
+                  inputPlaceholder="medical-records.weight-placeholder"
+                  inputColor="patient-page-color"
+                  labelCss="text-sm font-medium text-gray-700"
                 />
               </div>
+
+              <!-- Altura -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">{{
-                  $t("medical-records.height")
-                }}</label>
-                <!-- Mostrar valor actual como referencia -->
                 <div
                   v-if="isEditing && originalValues.height"
-                  class="mb-2 text-xs text-gray-500 bg-gray-50 p-2 rounded border"
+                  class="mb-2 text-xs text-gray-500 bg-white p-2 rounded border"
                 >
                   📊 {{ $t("medical-records.current-value") }}:
                   {{ originalValues.height }} cm
                 </div>
-                <input
-                  v-model="formData.height"
+                <text-input
+                  name="height"
                   type="number"
                   step="0.1"
-                  :placeholder="$t('medical-records.height-placeholder')"
-                  class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm sm:leading-6"
+                  title="medical-records.height"
+                  inputPlaceholder="medical-records.height-placeholder"
+                  inputColor="patient-page-color"
+                  labelCss="text-sm font-medium text-gray-700"
                 />
               </div>
             </div>
 
             <!-- Antecedentes familiares -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">{{
-                $t("medical-records.family-history")
-              }}</label>
-              <textarea
-                v-model="formData.familyHistory"
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                rows="3"
-                :placeholder="$t('medical-records.family-history-placeholder')"
-              ></textarea>
+              <textarea-input
+                name="familyHistory"
+                title="medical-records.family-history"
+                inputPlaceholder="medical-records.family-history-placeholder"
+                inputColor="patient-page-color"
+                labelCss="text-sm font-medium text-gray-700"
+                :rows="3"
+              />
             </div>
 
             <!-- Notas de evolución -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">{{
-                $t("medical-records.evolution-notes")
-              }}</label>
-              <textarea
-                v-model="formData.notes"
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                rows="4"
-                :placeholder="$t('medical-records.evolution-notes-placeholder')"
-              ></textarea>
+            <div class="mb-4">
+              <textarea-input
+                name="notes"
+                title="medical-records.evolution-notes"
+                inputPlaceholder="medical-records.evolution-notes-placeholder"
+                inputColor="patient-page-color"
+                labelCss="text-sm font-medium text-gray-700"
+                :rows="4"
+                :required="true"
+              />
+            </div>
+
+            <!-- Subir archivos -->
+            <div class="mb-4">
+              <h4 class="block text-sm font-medium text-gray-700 mb-3">
+                {{ $t("files.upload-file") }}
+              </h4>
+
+              <!-- Sección de Laboratorio -->
+              <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div class="flex items-center justify-between mb-2">
+                  <label class="text-sm font-medium text-blue-900 flex items-center">
+                    <DocumentTextIcon class="w-5 h-5 mr-2" />
+                    {{ $t("files.upload-laboratory") }}
+                  </label>
+                  <span
+                    v-if="fileStore.laboratoryFile"
+                    class="text-xs text-green-600 font-medium flex items-center"
+                  >
+                    <CheckIcon class="w-4 h-4 mr-1" />
+                    {{ $t("files.file-selected") }}
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <input
+                    ref="laboratoryInput"
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    class="hidden"
+                    @change="handleLaboratoryFileChange"
+                  />
+                  <button
+                    type="button"
+                    class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors flex items-center"
+                    @click="$refs.laboratoryInput.click()"
+                  >
+                    <ArrowUpTrayIcon class="w-4 h-4 mr-1" />
+                    {{ $t("files.select-file") }}
+                  </button>
+                  <span
+                    v-if="fileStore.laboratoryFile"
+                    class="text-sm text-gray-700 truncate max-w-xs flex items-center"
+                  >
+                    <DocumentIcon class="w-4 h-4 mr-1" />
+                    {{ fileStore.laboratoryFile.name }}
+                  </span>
+                  <button
+                    v-if="fileStore.laboratoryFile"
+                    type="button"
+                    class="ml-auto p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
+                    @click="fileStore.clearLaboratoryFile()"
+                  >
+                    <XMarkIcon class="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div class="mt-3">
+                  <input
+                    v-model="fileStore.laboratoryDescription"
+                    type="text"
+                    :placeholder="$t('files.description-placeholder')"
+                    class="w-full px-3 py-2 text-sm border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              <!-- Sección de Examen -->
+              <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                <div class="flex items-center justify-between mb-2">
+                  <label class="text-sm font-medium text-green-900 flex items-center">
+                    <DocumentTextIcon class="w-5 h-5 mr-2" />
+                    {{ $t("files.upload-exam") }}
+                  </label>
+                  <span
+                    v-if="fileStore.examFile"
+                    class="text-xs text-green-600 font-medium flex items-center"
+                  >
+                    <CheckIcon class="w-4 h-4 mr-1" />
+                    {{ $t("files.file-selected") }}
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <input
+                    ref="examInput"
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                    class="hidden"
+                    @change="handleExamFileChange"
+                  />
+                  <button
+                    type="button"
+                    class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center"
+                    @click="$refs.examInput.click()"
+                  >
+                    <ArrowUpTrayIcon class="w-4 h-4 mr-1" />
+                    {{ $t("files.select-file") }}
+                  </button>
+                  <span
+                    v-if="fileStore.examFile"
+                    class="text-sm text-gray-700 truncate max-w-xs flex items-center"
+                  >
+                    <DocumentIcon class="w-4 h-4 mr-1" />
+                    {{ fileStore.examFile.name }}
+                  </span>
+                  <button
+                    v-if="fileStore.examFile"
+                    type="button"
+                    class="ml-auto p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
+                    @click="fileStore.clearExamFile()"
+                  >
+                    <XMarkIcon class="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div class="mt-3">
+                  <input
+                    v-model="fileStore.examDescription"
+                    type="text"
+                    :placeholder="$t('files.description-placeholder')"
+                    class="w-full px-3 py-2 text-sm border border-green-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              <div class="mt-3 text-xs text-gray-500 flex items-start">
+                <InformationCircleIcon class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+                <span>{{ $t("files.file-format-help") }}</span>
+              </div>
             </div>
           </div>
         </form>
       </div>
     </template>
 
-    <!-- Botones de acción -->
     <template #buttons>
       <primary-button
-        v-if="isLoading"
-        :disabled="isLoading"
+        v-if="isLoading || fileStore.isLoadingUpload"
+        :disabled="true"
       >
         <span class="flex items-center">
-          <svg
-            class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            />
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-          {{ $t("medical-records.saving") }}
+          <ArrowPathIcon class="animate-spin -ml-1 mr-2 h-4 w-4" />
+          {{ $t(fileStore.isLoadingUpload ? "files.uploading" : "medical-records.saving") }}
         </span>
       </primary-button>
       <primary-button
         v-else
-        :disabled="isLoading"
+        :disabled="!isFormValid || isLoading"
         @click="handleSubmit"
       >
         <p class="uppercase">
@@ -144,14 +251,31 @@
     </template>
   </general-dialog-modal>
 </template>
+
 <script setup>
-import { ref, watch, nextTick } from "vue";
+import { ref, computed } from "vue";
+import { useForm } from "vee-validate";
+import * as yup from "yup";
+import { useI18n } from "vue-i18n";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
+import { useMedicalRecordStore } from "@stores/medicalRecordStore.js";
+import { useFileStore } from "@stores/FileStore.js";
 import { useNotificationStore } from "@stores/notificationStore.js";
+import { storeToRefs } from "pinia";
+import {
+  DocumentTextIcon,
+  ArrowUpTrayIcon,
+  XMarkIcon,
+  CheckIcon,
+  DocumentIcon,
+  InformationCircleIcon,
+  ArrowPathIcon,
+} from "@heroicons/vue/24/outline";
 
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
 import PrimaryButton from "@components/forms/PrimaryButton.vue";
-import { storeToRefs } from "pinia";
+import TextInput from "@components/forms/TextInput.vue";
+import TextareaInput from "@components/forms/TextareaInput.vue";
 
 const props = defineProps({
   isOpen: {
@@ -170,22 +294,25 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "save"]);
 
+const { t } = useI18n();
 const patientsLogicStore = usePatientsLogicStore();
+const medicalRecordStore = useMedicalRecordStore();
+const fileStore = useFileStore();
 const notificationStore = useNotificationStore();
 
-const { isEditing } = storeToRefs(patientsLogicStore);
+const { isEditing, currentMedicalRecordId } = storeToRefs(patientsLogicStore);
 const { closeHistoryLogModals } = patientsLogicStore;
+const { handleMedicalRecordSave } = medicalRecordStore;
+const { uploadFile } = fileStore;
 
 // Estados
 const isLoading = ref(false);
-const formData = ref({
-  weight: "",
-  height: "",
-  familyHistory: "",
-  notes: "",
-});
 
-// Valores originales para mostrar como referencia
+// Referencias a inputs
+const laboratoryInput = ref(null);
+const examInput = ref(null);
+
+// Valores originales para referencia
 const originalValues = ref({
   weight: "",
   height: "",
@@ -193,78 +320,134 @@ const originalValues = ref({
   notes: "",
 });
 
-// Función para cerrar el modal
+// Schema de validación con yup (mensajes i18n)
+const validationSchema = yup.object({
+  weight: yup
+    .number()
+    .nullable()
+    .transform((value, originalValue) => 
+      originalValue === "" ? null : value
+    )
+    .positive(t("medical-records.weight-must-be-positive")),
+  height: yup
+    .number()
+    .nullable()
+    .transform((value, originalValue) => 
+      originalValue === "" ? null : value
+    )
+    .positive(t("medical-records.height-must-be-positive")),
+  familyHistory: yup.string().nullable(),
+  notes: yup.string().required(t("medical-records.notes-required")),
+});
+
+// Configurar vee-validate
+const { values, errors, resetForm, validate } = useForm({
+  validationSchema,
+  initialValues: {
+    weight: "",
+    height: "",
+    familyHistory: "",
+    notes: "",
+  },
+});
+
+// Validación del formulario
+const isFormValid = computed(() => {
+  const hasNoErrors = Object.keys(errors.value).length === 0;
+  const hasRequiredField = values.notes && values.notes.trim() !== "";
+  return hasNoErrors && hasRequiredField;
+});
+
 function handleClose() {
   closeHistoryLogModals();
+  fileStore.clearAllFiles();
+  resetForm();
 }
 
-// Cargar datos del record cuando se abre en modo edición
+function handleOpen() {
+  loadRecordData();
+}
+
 function loadRecordData() {
   if (isEditing.value && props.record) {
-    // Acceder a los datos según la estructura del backend
     const record = props.record.medicalRecord || props.record;
-
-    // Guardar valores originales para mostrar como referencia
+    
     originalValues.value = {
       weight: record.weight ? String(record.weight) : "",
       height: record.height ? String(record.height) : "",
       familyHistory: record.familyHistory || "",
       notes: record.notes || "",
     };
-
-    // Para peso y altura: dejar campos en blanco para nuevos valores
-    // Para texto: mantener valores actuales para editarlos
-    formData.value = {
-      weight: "", // Campo en blanco para nuevo peso
-      height: "", // Campo en blanco para nueva altura
-      familyHistory: record.familyHistory || "", // Mantener para editar
-      notes: record.notes || "", // Mantener para editar
-    };
+    
+    resetForm({
+      values: {
+        weight: "",
+        height: "",
+        familyHistory: record.familyHistory || "",
+        notes: record.notes || "",
+      },
+    });
   } else {
-    // Resetear formulario para nuevo registro
     originalValues.value = {
       weight: "",
       height: "",
       familyHistory: "",
       notes: "",
     };
-    formData.value = {
-      weight: "",
-      height: "",
-      familyHistory: "",
-      notes: "",
-    };
+    
+    resetForm({
+      values: {
+        weight: "",
+        height: "",
+        familyHistory: "",
+        notes: "",
+      },
+    });
+  }
+  
+  fileStore.clearAllFiles();
+}
+
+function handleLaboratoryFileChange(event) {
+  const file = event.target.files[0];
+  if (file) {
+    fileStore.setLaboratoryFile(file);
   }
 }
 
-// Manejar envío del formulario
+function handleExamFileChange(event) {
+  const file = event.target.files[0];
+  if (file) {
+    fileStore.setExamFile(file);
+  }
+}
+
 async function handleSubmit() {
+  const { valid } = await validate();
+  
+  if (!valid) {
+    notificationStore.addNotification(
+      "warning",
+      "general.warning",
+      t("medical-records.notes-required")
+    );
+    return;
+  }
+  
   isLoading.value = true;
 
   try {
-    // Preparar datos para enviar según la estructura del backend
-    // Si se ingresa nuevo valor, usar ese; si no, mantener el original (si existe)
     let weightToSend = null;
     let heightToSend = null;
 
-    // Para peso: usar nuevo valor si se ingresó, sino mantener original
-    if (
-      formData.value.weight !== "" &&
-      formData.value.weight !== null &&
-      formData.value.weight !== undefined
-    ) {
-      weightToSend = parseFloat(formData.value.weight);
+    if (values.weight !== "" && values.weight !== null && values.weight !== undefined) {
+      weightToSend = parseFloat(values.weight);
     } else if (isEditing.value && originalValues.value.weight) {
       weightToSend = parseFloat(originalValues.value.weight);
     }
 
-    // Para altura: usar nuevo valor si se ingresó, sino mantener original
-    if (
-      formData.value.height !== "" &&
-      formData.value.height !== null &&
-      formData.value.height !== undefined
-    ) {
-      heightToSend = parseFloat(formData.value.height);
+    if (values.height !== "" && values.height !== null && values.height !== undefined) {
+      heightToSend = parseFloat(values.height);
     } else if (isEditing.value && originalValues.value.height) {
       heightToSend = parseFloat(originalValues.value.height);
     }
@@ -272,64 +455,86 @@ async function handleSubmit() {
     const dataToSend = {
       Weight: weightToSend,
       Height: heightToSend,
-      FamilyHistory: formData.value.familyHistory || null,
-      Notes: formData.value.notes || null,
+      FamilyHistory: values.familyHistory || null,
+      Notes: values.notes || null,
     };
 
-    // Validar que tenemos los datos mínimos necesarios
-    if (
-      !dataToSend.Weight &&
-      !dataToSend.Height &&
-      !dataToSend.FamilyHistory &&
-      !dataToSend.Notes
-    ) {
-      notificationStore.addNotification(
-        "warning",
-        "general.warning",
-        "Por favor completa al menos un campo",
-      );
-      return;
+    // Llamar a handleMedicalRecordSave del medicalRecordStore
+    const result = await handleMedicalRecordSave(
+      dataToSend,
+      props.patientId,
+      isEditing.value,
+      currentMedicalRecordId.value
+    );
+
+    console.log("Resultado de guardar:", result);
+
+    // Obtener el ID del registro
+    let recordId = null;
+    if (isEditing.value && currentMedicalRecordId.value) {
+      recordId = currentMedicalRecordId.value;
+    } else if (result && result.id) {
+      recordId = result.id;
     }
 
-    if (isEditing.value && props.record) {
-      // Actualizar registro existente - usar el store de lógica
-      await patientsLogicStore.handleMedicalRecordSave(
-        dataToSend,
-        props.patientId,
-      );
-    } else if (!isEditing.value && props.patientId) {
-      // Crear nuevo registro usando el store de lógica
-      await patientsLogicStore.handleMedicalRecordSave(
-        dataToSend,
-        props.patientId,
-      );
+    console.log("Record ID para archivos:", recordId);
+
+    // Subir archivos si existen y tenemos el ID del registro
+    if (recordId) {
+      const uploadPromises = [];
+
+      if (fileStore.laboratoryFile) {
+        console.log("Subiendo laboratorio...");
+        uploadPromises.push(
+          uploadFile(
+            fileStore.laboratoryFile,
+            "Laboratory",
+            props.patientId,
+            fileStore.laboratoryDescription || t("files.upload-laboratory"),
+            recordId,
+          ),
+        );
+      }
+
+      if (fileStore.examFile) {
+        console.log("Subiendo examen...");
+        uploadPromises.push(
+          uploadFile(
+            fileStore.examFile,
+            "Exam",
+            props.patientId,
+            fileStore.examDescription || t("files.upload-exam"),
+            recordId,
+          ),
+        );
+      }
+
+      if (uploadPromises.length > 0) {
+        await Promise.all(uploadPromises);
+        console.log("Archivos subidos exitosamente");
+      }
     } else {
-      // No hacer nada si no hay condiciones válidas
+      console.error("No se pudo obtener el ID del registro médico");
       notificationStore.addNotification(
         "warning",
         "general.warning",
-        "No se puede procesar la solicitud",
+        t("medical-records.error-getting-record-id")
       );
-      return;
     }
 
-    // El store de lógica ya maneja el cierre del modal y recarga de datos
-    emit("save", dataToSend);
+    fileStore.clearAllFiles();
+    resetForm();
+    closeHistoryLogModals();
+    emit("save", result || dataToSend);
+  } catch (error) {
+    console.error("Error en handleSubmit:", error);
+    notificationStore.addNotification(
+      "error",
+      "notifications.error",
+      error.message || t("general.error")
+    );
   } finally {
     isLoading.value = false;
   }
 }
-
-// Observar cambios en props para cargar datos
-watch(
-  [() => props.isOpen, () => props.record, () => isEditing.value],
-  () => {
-    if (props.isOpen) {
-      nextTick(() => {
-        loadRecordData();
-      });
-    }
-  },
-  { immediate: true },
-);
 </script>

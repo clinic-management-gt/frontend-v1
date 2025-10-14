@@ -12,9 +12,6 @@
           <h2 class="text-2xl font-bold">
             {{ $t("patients.consult-detail") }}
           </h2>
-          <p class="text-opacity-90 mt-1">
-            {{ formatDate(displayRecord?.createdAt) }}
-          </p>
         </div>
         <button
           class="text-black hover:text-gray-400 text-3xl font-bold leading-none"
@@ -53,19 +50,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <span class="text-sm text-gray-600 font-semibold">{{ $t("general.date") }}:</span>
-                <p class="text-gray-800 font-medium">
-                  {{ formatDate(displayRecord.createdAt) }}
-                </p>
-              </div>
-              <div v-if="displayRecord.patient">
-                <span class="text-sm text-gray-600 font-semibold">{{ $t("general.patient") }}:</span>
-                <p class="text-gray-800 font-medium">
-                  {{
-                    displayRecord.patient.name ||
-                      displayRecord.patient.firstName
-                  }}
-                  {{ displayRecord.patient.lastName }}
-                </p>
+                <span class="text-gray-800 font-medium">
+                  {{ formatDateShortest(displayRecord.medicalRecord.createdAt) }}
+                </span>
               </div>
               <div>
                 <span class="text-sm text-gray-600 font-semibold">{{ $t("general.status") }}:</span>
@@ -406,18 +393,29 @@
       </primary-button>
     </template>
   </general-dialog-modal>
+  <recipe-form-modal
+      v-if="showRecipeFormModal"
+      :isOpen="showRecipeFormModal"
+      :recipe="selectedRecipeForEdit"
+      :isEditing="isEditingRecipe"
+      :treatmentId="displayRecord.medicalRecord.id"
+      @close="closeHistoryLogModals"
+      @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)"
+    />
 </template>
 
 <script setup>
-import { onMounted, watch, computed, nextTick } from "vue";
+import { onMounted, watch, computed, nextTick, ref } from "vue";
 import { usePatientsStore } from "@stores/patientsStore";
 import { usePatientsLogicStore } from "../../stores/patientsLogicStore";
 import { storeToRefs } from "pinia";
+import { formatDateShortest } from "@/utils/isoFormatDate.js";
 
 import { formatDate } from "@/utils/isoFormatDate.js";
 
 import PrimaryButton from "@components/forms/PrimaryButton.vue";
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
+import RecipeFormModal from "../patientsDialogsComponents/RecipeFormModal.vue";
 
 const props = defineProps({
   record: {
@@ -433,8 +431,9 @@ const props = defineProps({
 const emit = defineEmits(["close", "view-recipe", "edit", "download"]);
 
 const patientsStore = usePatientsStore();
-const { fullRecord, isLoadingMedicalRecords, hasError } =
+const { fullRecord, isLoadingMedicalRecords, hasError, currentPatientMedicalRecords} =
   storeToRefs(patientsStore);
+
 
 const patientsLogicStore = usePatientsLogicStore();
 const { selectedRecord } = storeToRefs(patientsLogicStore);
@@ -443,6 +442,39 @@ const {
   openMedicalRecordEditModal,
   openRecipeFormModal,
 } = patientsLogicStore;
+
+const showDeleteConfirmation = ref(false);
+const {
+  showFormModal,
+  showDetailsModal,
+  showRecipeFormModal,
+  // selectedRecord,
+  selectedRecordForEdit,
+  selectedRecipeForEdit,
+  isEditing,
+  isEditingRecipe,
+} = storeToRefs(patientsLogicStore);
+
+
+function getFirstTreatmentId() {
+  // Si estamos editando una receta existente, usar su treatmentId
+  if (selectedRecipeForEdit.value?.treatmentId) {
+    return selectedRecipeForEdit.value.treatmentId;
+  }
+
+  // Si hay registros médicos con tratamientos, buscar el primer tratamiento disponible
+  if (currentPatientMedicalRecords.value) {
+    const records = Object.values(currentPatientMedicalRecords.value);
+    for (const record of records) {
+      if (record.treatments && record.treatments.length > 0) {
+        return record.treatments[0].id;
+      }
+    }
+  }
+
+  // Si no hay tratamientos, retornar null para indicar que no se puede crear receta
+  return null;
+}
 
 const handleClose = () => {
   closeHistoryLogModals();

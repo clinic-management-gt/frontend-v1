@@ -8,23 +8,22 @@
       :textClass="labelCss"
     />
     <div :class="{ 'mt-2': title && title !== 'general.empty' }"></div>
-    <!-- Input -->
+    <!-- Textarea -->
     <div class="relative w-full">
-      <input
+      <textarea
         :id="name"
         v-model="value"
         :name="name"
-        :type="type"
         :placeholder="$t(inputPlaceholder)"
         :required="required"
-        :step="step"
+        :rows="rows"
         :class="[
-          'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow ring-1 ring-inset sm:text-sm sm:leading-6 px-2',
+          'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow ring-1 ring-inset sm:text-sm sm:leading-6 px-3 resize-none',
           ringColorClass,
           focusOutlineClass,
         ]"
         @blur="handleBlur"
-      />
+      ></textarea>
     </div>
     <!-- Mensaje de error -->
     <p
@@ -46,10 +45,6 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  type: {
-    type: String,
-    default: "text",
-  },
   inputPlaceholder: {
     type: String,
     default: "general.empty",
@@ -70,9 +65,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  step: {
-    type: String,
-    default: "any",
+  rows: {
+    type: Number,
+    default: 4,
   },
 });
 

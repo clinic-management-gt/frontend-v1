@@ -41,7 +41,7 @@
                   props.dialogSize,
                 ]"
               >
-                <dialog-title class="mb-4">
+                <dialog-title class="mb-2">
                   <slot name="title">
                   </slot>
                 </dialog-title>

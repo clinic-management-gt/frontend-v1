@@ -309,7 +309,9 @@
     "error-no-treatment": "No se puede crear la receta: falta treatmentId",
     "date-not-available": "Fecha no disponible",
     "invalid-date": "Fecha inválida",
-    "unknown-error": "Error desconocido"
+    "unknown-error": "Error desconocido",
+    "medical-recipe": "Receta médica",
+    "medical-recipe-for-patient": "Receta médica para paciente..."
   },
   "medical-records": {
     "edit-record": "Editar registro médico",
@@ -324,6 +326,28 @@
     "family-history-placeholder": "Antecedentes familiares del paciente...",
     "evolution-notes": "Notas de evolución",
     "evolution-notes-placeholder": "Notas de evolución del paciente...",
-    "saving": "Guardando..."
+    "saving": "Guardando...",
+    "weight-must-be-positive": "El peso debe ser un número positivo",
+    "height-must-be-positive": "La altura debe ser un número positivo",
+    "notes-required": "Las notas de evolución son obligatorias",
+    "at-least-one-field": "Debe completar al menos un campo"
+  },
+  "files": {
+    "upload-document": "Subir documento",
+    "upload-exam": "Subir examen",
+    "upload-laboratory": "Subir laboratorio",
+    "upload-file": "Subir archivo",
+    "select-file": "Seleccionar archivo",
+    "file-selected": "Archivo seleccionado",
+    "description-placeholder": "Descripción del archivo (opcional)",
+    "file-format-help": "Formatos permitidos: PDF, JPG, PNG, DOC, DOCX (máx. 10MB)",
+    "drag-and-drop-file": "Arrastra y suelta el archivo aquí, o haz clic para seleccionar",
+    "file-uploaded-successfully": "Archivo subido exitosamente",
+    "error-uploading-file": "Error al subir el archivo. Inténtalo nuevamente.",
+    "error-downloading-file": "Error al descargar el archivo. Inténtalo nuevamente.",
+    "invalid-file-type": "Tipo de archivo inválido. Solo se permiten archivos PDF.",
+    "file-too-large": "El archivo es demasiado grande. El tamaño máximo permitido es {maxSize} MB.",
+    "no-file-selected": "No se seleccionó ningún archivo.",
+    "uploading": "Subiendo..."
   }
 }
