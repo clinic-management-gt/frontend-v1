@@ -231,8 +231,9 @@ function onPatientSelected(patientId) {
  * Cierra el modal y resetea el formulario
  */
 function handleClose() {
-  resetForm();
   emit("close");
+  // Reseteamos después de cerrar para no perder valores durante la animación de cierre
+  setTimeout(() => resetForm(), 300);
 }
 
 /**
@@ -243,7 +244,12 @@ function resetForm() {
   selectedPatientId.value = null;
   newPatientName.value = "";
   newPatientGender.value = "no_especificado";
-  appointmentDate.value = "";
+  
+  // Mantenemos la fecha preseleccionada si existe, si no la reseteamos
+  if (!props.preselectedDate) {
+    appointmentDate.value = "";
+  }
+  
   appointmentTime.value = "";
   appointmentReason.value = "";
   isLoading.value = false;

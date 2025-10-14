@@ -237,7 +237,8 @@
     "appointment-updated-successfully": "Cita actualizada exitosamente",
     "appointment-deleted-successfully": "Cita eliminada exitosamente",
     "error-updating-appointment": "Error al actualizar la cita",
-    "error-deleting-appointment": "Error al eliminar la cita"
+    "error-deleting-appointment": "Error al eliminar la cita",
+    "no-events": "No hay actividades ni pacientes."
   },
   "vee-validate": {
     "required-input": "Este campo es obligatorio"

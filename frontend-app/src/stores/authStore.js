@@ -21,6 +21,7 @@ export const useAuthStore = defineStore(
         const res = await instance.post("/auth/login", { email, password });
         token.value = res.data.token;
         user.value = res.data.user;
+        
         isAuth.value = true;
         router.push({ path: "/dashboard" });
       } catch (err) {
@@ -42,6 +43,7 @@ export const useAuthStore = defineStore(
       token.value = null;
       user.value = null;
       isAuth.value = false;
+      
       router.push("/login");
     }
 
