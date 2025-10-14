@@ -206,7 +206,7 @@ export const usePatientsStore = defineStore(
       });
       return res.data;
     }
-
+    
     async function createBasicPatient(patientData) {
       isLoadingAllPatients.value = true;
       try {
