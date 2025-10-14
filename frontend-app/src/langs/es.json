@@ -65,7 +65,8 @@
     "filters": "Filtros",
     "clear-all": "Limpiar todo",
     "confirm-deletion": "Confirmar eliminación",
-    "delete-confirmation-message": "¿Estás seguro de que deseas eliminar este registro médico? Esta acción no se puede deshacer."
+    "delete-confirmation-message": "¿Estás seguro de que deseas eliminar este registro médico? Esta acción no se puede deshacer.",
+    "refresh": "Actualizar"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -191,7 +192,11 @@
     "application-age": "Edad de aplicación",
     "patients-contacts": "Contactos del paciente",
     "disease": "Enfermedades",
-    "blood-type": "Tipo de sangre"
+    "blood-type": "Tipo de sangre",
+    "pending-patients": "Pacientes pendientes",
+    "created-at": "Fecha de registro",
+    "no-pending-patients": "No hay pacientes pendientes"
+
   },
   "graph": {
     "graph": "Graficar"

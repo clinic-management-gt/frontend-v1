@@ -10,6 +10,7 @@ export const usePatientsStore = defineStore(
     const appointments = ref([]);
     const appointmentsToday = ref([]);
     const allPatients = ref([]);
+    const pendingPatients = ref([]);
     const newPatientData = ref([]);
     const fullRecord = ref([]);
     const currentPatientSelectedId = ref(null);
@@ -19,6 +20,7 @@ export const usePatientsStore = defineStore(
     const isLoadingAppointments = ref(false);
     const isLoadingAppointmentsToday = ref(false);
     const isLoadingAllPatients = ref(false);
+    const isLoadingPendingPatients = ref(false);
     const isLoadingPatientData = ref(false);
 
     const currentPatientMedicalRecords = ref(undefined);
@@ -51,7 +53,6 @@ export const usePatientsStore = defineStore(
       }
     }
 
-    // patientsStore.js
     async function updateAppointmentStatus(id, newStatus) {
       isLoadingAppointmentsToday.value = true;
       try {
@@ -78,6 +79,20 @@ export const usePatientsStore = defineStore(
       }
     }
 
+    async function fetchPendingPatients() {
+      isLoadingPendingPatients.value = true;
+      try {
+        const res = await instance.get("/patients/basic");
+        pendingPatients.value = res.data;
+        return res.data;
+      } catch (error) {
+        console.error("Error fetching pending patients:", error);
+        throw error;
+      } finally {
+        isLoadingPendingPatients.value = false;
+      }
+    }
+
     async function fetchPatientData() {
       isLoadingPatientData.value = true;
       if (!currentPatientSelectedId.value) {
@@ -93,7 +108,6 @@ export const usePatientsStore = defineStore(
       }
     }
 
-    // Busca la función fetchPatientMedicalRecords y modifícala para manejar mejor el error 404
     async function fetchPatientMedicalRecords(patientId) {
       isLoadingMedicalRecords.value = true;
       patientId = patientId || currentPatientSelectedId.value;
@@ -112,9 +126,8 @@ export const usePatientsStore = defineStore(
     async function createMedicalRecord(patientId, recordData) {
       isLoadingMedicalRecords.value = true;
       try {
-        // Asegurar que el PatientId esté en los datos (backend espera PascalCase)
         const dataToSend = { ...recordData, PatientId: patientId };
-        const res = await instance.post(`/medicalrecords`, dataToSend);
+        const res = await instance.post(`/medicalrecorddddds`, dataToSend);
         return res.data;
       } finally {
         isLoadingMedicalRecords.value = false;
@@ -141,7 +154,6 @@ export const usePatientsStore = defineStore(
       try {
         await instance.delete(`/medicalrecords/${recordId}`);
         
-        // Mostrar notificación de éxito usando i18n
         notificationStore.addNotification(
           "success",
           "notifications.success",
@@ -150,7 +162,6 @@ export const usePatientsStore = defineStore(
         
         return true;
       } catch {
-        // El manejo de errores se hace en el backend
         throw new Error(globalI18n.t("notifications.error-deleting-record"));
       } finally {
         isLoadingMedicalRecords.value = false;
@@ -206,24 +217,11 @@ export const usePatientsStore = defineStore(
       });
       return res.data;
     }
-    
-    async function createBasicPatient(patientData) {
-      isLoadingAllPatients.value = true;
-      try {
-        const res = await instance.post(`/patients/basic`, patientData);
-        // Actualizar la lista de pacientes para incluir el nuevo
-        await fetchAllPatients();
-        return res.data;
-      } finally {
-        isLoadingAllPatients.value = false;
-      }
-    }
 
     async function createAppointment(appointmentData) {
       isLoadingAppointments.value = true;
       try {
         const res = await instance.post(`/appointments`, appointmentData);
-        // Recargar las citas para reflejar el cambio
         await fetchAppointments();
         await fetchAppointmentsToday();
         return res.data;
@@ -243,12 +241,14 @@ export const usePatientsStore = defineStore(
       appointments,
       appointmentsToday,
       allPatients,
+      pendingPatients,
       currentPatientSelectedId,
       currentPatientSelectedData,
       isLoadingPatientsStore,
       isLoadingAppointments,
       isLoadingAppointmentsToday,
       isLoadingAllPatients,
+      isLoadingPendingPatients,
       isLoadingPatientData,
       currentPatientMedicalRecords,
       isLoadingMedicalRecords,
@@ -260,6 +260,7 @@ export const usePatientsStore = defineStore(
       fetchAppointmentsToday,
       updateAppointmentStatus,
       fetchAllPatients,
+      fetchPendingPatients,
       fetchPatientData,
       createMedicalRecord,
       updateMedicalRecord,
@@ -267,11 +268,6 @@ export const usePatientsStore = defineStore(
       fetchMedicalRecordDetails,
       uploadFile,
       downloadFile,
-      // ❌ Eliminar estas exports
-      // fetchRecipe,
-      // updateRecipe,
-      // createRecipe,
-      createBasicPatient,
       createAppointment,
       clearFullRecord
     };
@@ -282,6 +278,7 @@ export const usePatientsStore = defineStore(
         "appointments",
         "appointmentsToday",
         "allPatients",
+        "pendingPatients",
         "currentPatientSelectedId",
         "currentPatientSelectedData",
         "newPatientData",
