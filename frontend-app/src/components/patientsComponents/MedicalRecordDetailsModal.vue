@@ -253,17 +253,13 @@ const { openEditModal, openRecipeFormModal } = patientsLogicStore;
 function formatRecordDate(dateString) {
   if (!dateString) return "Fecha no disponible";
 
-  try {
-    return new Date(dateString).toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch (error) {
-    return "Fecha no disponible";
-  }
+  return new Date(dateString).toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function editRecord() {

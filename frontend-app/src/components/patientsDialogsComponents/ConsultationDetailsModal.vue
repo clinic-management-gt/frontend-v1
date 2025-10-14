@@ -394,18 +394,18 @@
     </template>
   </general-dialog-modal>
   <recipe-form-modal
-      v-if="showRecipeFormModal"
-      :isOpen="showRecipeFormModal"
-      :recipe="selectedRecipeForEdit"
-      :isEditing="isEditingRecipe"
-      :treatmentId="displayRecord.medicalRecord.id"
-      @close="closeHistoryLogModals"
-      @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)"
-    />
+    v-if="showRecipeFormModal"
+    :isOpen="showRecipeFormModal"
+    :recipe="selectedRecipeForEdit"
+    :isEditing="isEditingRecipe"
+    :treatmentId="displayRecord.medicalRecord.id"
+    @close="closeHistoryLogModals"
+    @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)"
+  />
 </template>
 
 <script setup>
-import { onMounted, watch, computed, nextTick, ref } from "vue";
+import { onMounted, watch, computed, nextTick } from "vue";
 import { usePatientsStore } from "@stores/patientsStore";
 import { usePatientsLogicStore } from "../../stores/patientsLogicStore";
 import { storeToRefs } from "pinia";
@@ -431,7 +431,7 @@ const props = defineProps({
 const emit = defineEmits(["close", "view-recipe", "edit", "download"]);
 
 const patientsStore = usePatientsStore();
-const { fullRecord, isLoadingMedicalRecords, hasError, currentPatientMedicalRecords} =
+const { fullRecord, isLoadingMedicalRecords, hasError } =
   storeToRefs(patientsStore);
 
 
@@ -443,38 +443,11 @@ const {
   openRecipeFormModal,
 } = patientsLogicStore;
 
-const showDeleteConfirmation = ref(false);
 const {
-  showFormModal,
-  showDetailsModal,
   showRecipeFormModal,
-  // selectedRecord,
-  selectedRecordForEdit,
   selectedRecipeForEdit,
-  isEditing,
   isEditingRecipe,
 } = storeToRefs(patientsLogicStore);
-
-
-function getFirstTreatmentId() {
-  // Si estamos editando una receta existente, usar su treatmentId
-  if (selectedRecipeForEdit.value?.treatmentId) {
-    return selectedRecipeForEdit.value.treatmentId;
-  }
-
-  // Si hay registros médicos con tratamientos, buscar el primer tratamiento disponible
-  if (currentPatientMedicalRecords.value) {
-    const records = Object.values(currentPatientMedicalRecords.value);
-    for (const record of records) {
-      if (record.treatments && record.treatments.length > 0) {
-        return record.treatments[0].id;
-      }
-    }
-  }
-
-  // Si no hay tratamientos, retornar null para indicar que no se puede crear receta
-  return null;
-}
 
 const handleClose = () => {
   closeHistoryLogModals();
