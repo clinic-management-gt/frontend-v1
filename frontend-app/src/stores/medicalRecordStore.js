@@ -81,7 +81,7 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
         loading.value = true;
         error.value = null;
         try {
-            const res = await instance.get(`/medical-records/patient/${patientId}`);
+            const res = await instance.get(`/patients/${patientId}/medicalrecords`);
             medicalRecords.value = res.data;
             return res.data;
         } catch (err) {
@@ -96,7 +96,7 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
         loading.value = true;
         error.value = null;
         try {
-            const res = await instance.get(`/medical-records/${recordId}`);
+            const res = await instance.get(`/medicalrecords/${recordId}`);
             selectedRecord.value = res.data;
             return res.data;
         } catch (err) {
@@ -112,8 +112,8 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
         error.value = null;
         try {
             const res = await instance.post(
-                `/medical-records/${patientId}`,
-                recordData
+                `/medicalrecords`,
+                { ...recordData, patientId }
             );
             
             // Agregar el nuevo registro a la lista
@@ -135,7 +135,7 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
         error.value = null;
         try {
             const res = await instance.patch(
-                `/medical-records/${recordId}`,
+                `/medicalrecords/${recordId}`,
                 recordData
             );
             
@@ -160,7 +160,7 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
         error.value = null;
         
         try {
-            await instance.delete(`/medical-records/${recordId}`);
+            await instance.delete(`/medicalrecords/${recordId}`);
             
             // Eliminar el registro de la lista
             medicalRecords.value = medicalRecords.value.filter(r => r.id !== recordId);

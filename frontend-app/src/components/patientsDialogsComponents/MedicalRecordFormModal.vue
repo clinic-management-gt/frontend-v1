@@ -484,7 +484,6 @@ async function handleSubmit() {
       const uploadPromises = [];
 
       if (fileStore.laboratoryFile) {
-        console.log("Subiendo laboratorio...");
         uploadPromises.push(
           uploadFile(
             fileStore.laboratoryFile,
