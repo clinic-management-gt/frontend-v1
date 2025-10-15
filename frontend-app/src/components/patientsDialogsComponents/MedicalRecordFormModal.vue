@@ -386,9 +386,8 @@ async function handleSubmit() {
 
     // El store de lógica ya maneja el cierre del modal y recarga de datos
     emit("save", dataToSend);
-  } catch (error) {
-    // El manejo de errores lo hace el store de lógica, pero podríamos agregar lógica adicional aquí si es necesario
-    console.error("Error al guardar el registro médico o receta:", error);
+  } catch {
+    // El manejo de errores lo hace el store de lógica
   } finally {
     isLoading.value = false;
   }

@@ -94,9 +94,6 @@ export const usePatientsStore = defineStore(
           currentPatientSelectedData.value = res.data;
         }
         return res.data;
-      } catch (error) {
-        console.error("Error al obtener datos del paciente:", error);
-        throw error;
       } finally {
         isLoadingPatientData.value = false;
       }
@@ -174,7 +171,7 @@ export const usePatientsStore = defineStore(
         fullRecord.value = res.data;
         return res.data; // Devolver los datos para que puedan ser usados directamente
       } catch (error) {
-        console.error("Error al obtener detalles del registro médico:", error);
+        hasError.value = true;
         throw error;
       } finally {
         isLoadingMedicalRecords.value = false;

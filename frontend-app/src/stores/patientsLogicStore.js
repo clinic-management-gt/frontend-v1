@@ -130,8 +130,8 @@ export const usePatientsLogicStore = defineStore(
                     treatmentId = details.treatments[0].id;
                   }
                 }
-              } catch (error) {
-                console.error("Error al obtener tratamientos del paciente:", error);
+              } catch {
+                // Error silencioso - ya manejamos el caso de fallo con notificación
               }
               
               // Si no se encontró un tratamiento, mostramos una notificación
@@ -141,7 +141,6 @@ export const usePatientsLogicStore = defineStore(
                   "recipes.warning",
                   "recipes.warning-no-treatment"
                 );
-                console.warn("No se pudo crear la receta: No hay tratamientos asociados al paciente");
                 return; // No continuamos con la creación de la receta
               }
               
@@ -153,12 +152,11 @@ export const usePatientsLogicStore = defineStore(
               
               // Crear la receta
               await patientsStore.createRecipe(recipeData);
-            } catch (error) {
-              console.error("Error al crear la receta:", error);
+            } catch {
               notificationStore.addNotification(
                 "error",
                 "general.error",
-                "Error al crear la receta: " + (error.message || "Error desconocido")
+                "recipes.error-saving"
               );
               // Seguimos adelante, al menos el registro médico se creó correctamente
             }
