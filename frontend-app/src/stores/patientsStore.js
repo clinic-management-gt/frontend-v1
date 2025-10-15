@@ -80,16 +80,20 @@ export const usePatientsStore = defineStore(
       }
     }
 
-    async function fetchPatientData() {
+    async function fetchPatientData(patientId) {
       isLoadingPatientData.value = true;
-      if (!currentPatientSelectedId.value) {
-        return;
+      // Usar el ID proporcionado o el guardado en el store
+      const id = patientId || currentPatientSelectedId.value;
+      if (!id) {
+        return null;
       }
       try {
-        const res = await instance.get(
-          `/patients/${currentPatientSelectedId.value}`,
-        );
-        currentPatientSelectedData.value = res.data;
+        const res = await instance.get(`/patients/${id}`);
+        // Si estamos obteniendo datos para el paciente seleccionado, actualizar el store
+        if (id === currentPatientSelectedId.value) {
+          currentPatientSelectedData.value = res.data;
+        }
+        return res.data;
       } finally {
         isLoadingPatientData.value = false;
       }
@@ -165,6 +169,10 @@ export const usePatientsStore = defineStore(
       try {
         const res = await instance.get(`/medicalrecords/${recordId}/details`);
         fullRecord.value = res.data;
+        return res.data; // Devolver los datos para que puedan ser usados directamente
+      } catch (error) {
+        hasError.value = true;
+        throw error;
       } finally {
         isLoadingMedicalRecords.value = false;
       }
