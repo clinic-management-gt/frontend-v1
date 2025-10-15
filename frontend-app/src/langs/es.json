@@ -66,7 +66,8 @@
     "filters": "Filtros",
     "clear-all": "Limpiar todo",
     "confirm-deletion": "Confirmar eliminación",
-    "delete-confirmation-message": "¿Estás seguro de que deseas eliminar este registro médico? Esta acción no se puede deshacer."
+    "delete-confirmation-message": "¿Estás seguro de que deseas eliminar este registro médico? Esta acción no se puede deshacer.",
+    "refresh": "Actualizar"
   },
   "login": {
     "login": "Iniciar sesión",
@@ -99,8 +100,9 @@
   },
   "patients": {
     "patients": "Pacientes",
+    "pending-patients": "Pacientes Pendientes",
     "status": "Estado",
-    "parents": "Padres",
+    "parents": "Padres/Tutores",
     "last-visit": "Ultima visita",
     "birth": "Nacimiento",
     "syndrome": "Sindromes",
@@ -113,33 +115,46 @@
     "fill-out-form": "Llene el formulario",
     "fill-out-patient-form": "Ingrese los datos del paciente",
     "names": "Nombres",
-    "names-placeholder": "Ingrese los nombres",
+    "names-placeholder": "Ingrese los nombres del paciente",
     "lastNames": "Apellidos",
-    "lastNames-placeholder": "Ingrese los apellidos",
+    "lastNames-placeholder": "Ingrese los apellidos del paciente",
     "birthdate": "Fecha de nacimiento",
     "gender": "Género",
     "male": "Masculino",
     "female": "Femenino",
-    "suffer-from-allergies": "Padece de alergias",
+    "suffer-from-allergies": "¿Padece de alergias?",
     "alergies": "Alergias",
     "alergies-placeholder": "Seleccione las alergias",
-    "suffer-from-syndromes": "Padece de sindromes",
+    "suffer-from-syndromes": "¿Padece de síndromes?",
     "syndrome-placeholder": "Seleccione el sindrome",
     "family-pediatrician": "Pediatra de cabecera",
-    "pediatrician-placeholder": "Nombre de la pediatra de cabecera",
+    "pediatrician-placeholder": "Nombre del pediatra de cabecera",
     "mother": "Madre",
     "father": "Padre",
     "mother-information": "Información de la madre",
     "father-information": "Información del padre",
     "parents-information-placeholder": "Ingrese los nombres y apellidos",
+    "add-contact-information": "Agregar información de contacto",
+    "contact": "Contacto",
+    "contact-name": "Nombre del contacto",
+    "contact-lastname": "Apellido del contacto",
+    "contact-lastname-placeholder": "Ingrese el apellido del contacto",
+    "contact-information-placeholder": "Ingrese el nombre del contacto",
+    "contact-type-placeholder": "Tipo de contacto",
+    "relation": "Tipo de relación",
+    "relation-placeholder": "Ej: Padre, Madre, Tutor, Abuelo, etc.",
+    "email-address-placeholder": "ejemplo{'@'}correo.com",
     "phone-contact": "Teléfono de contacto",
-    "phone-contact-placeholder": "Ingrese numero teléfonico",
-    "insurance": "Seguro",
-    "insurance-placeholder": "Seleccione el Seguro",
-    "residence-address": "Direccón de residencia",
-    "residence-address-placeholder": "Ingrese la dirección",
-    "email-address": "Correo de contacto",
-    "email-address-placeholder": "Ingrese el correo",
+    "phone-contact-placeholder": "Ingrese número telefónico",
+    "patient-phone-contact": "Teléfonos del paciente",
+    "email-address": "Correo electrónico",
+    "no-phones-added": "No se han agregado teléfonos",
+    "no-emails-added": "No se han agregado correos",
+    "no-contacts-added": "No se han agregado contactos. Haga clic en + para agregar uno.",
+    "insurance": "Seguro médico",
+    "insurance-placeholder": "Seleccione el seguro médico",
+    "residence-address": "Dirección de residencia",
+    "residence-address-placeholder": "Ingrese la dirección completa",
     "drag-or-click-here-to-load-the-PDF-of-the-data-sheet": "Arrastra o haz click aqui para cargar el PDF de la ficha de datos",
     "revise-patients-data": "Revise la información del paciente",
     "consult-detail": "Detalle de consulta",
@@ -184,6 +199,7 @@
     "family-background-label": "Antecedentes familiares",
     "evolution-notes-label": "Notas de evolución",
     "empty-data": "No hay pacientes disponibles",
+    "no-pending-patients": "No hay pacientes pendientes",
     "number-of-patients": "Número de pacientes {count}",
     "return-to-patient-table": "Regresar a pacientes",
     "vaccines": "Vacunas",
@@ -203,7 +219,8 @@
     "vaccination": "Vacunación",
     "neonatal": "Neonatal",
     "teenager": "Adolescente",
-    "specialty": "Especialidad"
+    "specialty": "Especialidad",
+    "created-at": "Fecha de registro"
   },
   "graph": {
     "graph": "Graficar"
@@ -252,7 +269,10 @@
     "error-deleting-appointment": "Error al eliminar la cita"
   },
   "vee-validate": {
-    "required-input": "Este campo es obligatorio"
+    "required-input": "Este campo es obligatorio",
+    "invalid-email": "El correo electrónico no es válido",
+    "invalid-phone": "El número de teléfono no es válido",
+    "phone-min-length": "El teléfono debe tener al menos 7 dígitos"
   },
   "http-errors": {
     "network-error": "Error de red",
@@ -336,6 +356,18 @@
     "family-history-placeholder": "Antecedentes familiares del paciente...",
     "evolution-notes": "Notas de evolución",
     "evolution-notes-placeholder": "Notas de evolución del paciente...",
-    "saving": "Guardando..."
+    "saving": "Guardando...",
+    "weight-must-be-positive": "El peso debe ser un número positivo",
+    "height-must-be-positive": "La altura debe ser un número positivo",
+    "notes-required": "Las notas de evolución son obligatorias",
+    "at-least-one-field": "Debe completar al menos un campo",
+    "record-created": "Registro médico creado exitosamente",
+    "record-updated": "Registro médico actualizado exitosamente",
+    "error-saving-record": "Error al guardar el registro médico",
+    "error-getting-record-id": "No se pudo obtener el ID del registro médico"
+  },
+  "files": {
+    "upload-laboratory": "Subir archivo de laboratorio",
+    "upload-exam": "Subir archivo de examen"
   }
 }

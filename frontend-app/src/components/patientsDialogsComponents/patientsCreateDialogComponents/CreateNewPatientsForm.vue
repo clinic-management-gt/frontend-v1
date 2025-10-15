@@ -89,60 +89,154 @@
       inputColor="patient-page-color"
     />
 
-    <!-- mother input -->
-    <text-input
-      inputClassError="ring-yellow-300 focus:ring-yellow-600"
-      name="mother"
-      type="text"
-      title="patients.mother-information"
-      inputPlaceholder="patients.parents-information-placeholder"
-      class="mt-2 sm:col-span-2"
-      inputColor="patient-page-color"
-    />
-
-    <!-- father input -->
-    <text-input
-      inputClassError="ring-yellow-300 focus:ring-yellow-600"
-      name="father"
-      type="text"
-      title="patients.father-information"
-      inputPlaceholder="patients.parents-information-placeholder"
-      class="mt-2 sm:col-span-2"
-      inputColor="patient-page-color"
-    />
-
-    <!-- phone input -->
-    <div class="sm:col-span-2 space-y-2">
-      <div class="flex items-center items-start">
+    <!-- contact inputs -->
+    <div class="sm:col-span-2 space-y-4">
+      <div class="flex items-center justify-between">
         <custom-label
-          title="patients.phone-contact"
+          title="patients.add-contact-information"
           :isRequired="true"
         />
         <action-button-outline-icon
           icon="PlusIcon"
           color="text-patient-page-color"
-          @click="addPhone()"
+          @click="addContact()"
         />
       </div>
+      
+      <!-- Lista de contactos -->
       <div
-        v-for="item in phoneList"
-        :key="item.id"
-        class="flex items-centers items-start gap-2 ml-6"
+        v-for="contact in contactInformationList"
+        :key="contact.id"
+        class="border border-gray-200 rounded-lg p-4 space-y-3 bg-gray-50"
       >
+        <!-- Header del contacto con botón eliminar -->
+        <div class="flex items-center justify-between border-b border-gray-300 pb-2">
+          <p class="text-sm font-semibold text-gray-700">
+            {{ $t('patients.contact') }} #{{ contactInformationList.indexOf(contact) + 1 }}
+          </p>
+          <action-button-outline-icon
+            icon="TrashIcon"
+            color="text-red-500"
+            @click="deleteContact(contact.id)"
+          />
+        </div>
+
+        <!-- Nombre y Apellido del contacto -->
+        <div class="grid grid-cols-2 gap-3">
+          <text-input
+            inputClassError="ring-yellow-300 focus:ring-yellow-600"
+            :name="`contact_name_${contact.id}`"
+            type="text"
+            title="patients.contact-name"
+            inputPlaceholder="patients.contact-information-placeholder"
+            inputColor="patient-page-color"
+          />
+          <text-input
+            inputClassError="ring-yellow-300 focus:ring-yellow-600"
+            :name="`contact_lastname_${contact.id}`"
+            type="text"
+            title="patients.contact-lastname"
+            inputPlaceholder="patients.contact-lastname-placeholder"
+            inputColor="patient-page-color"
+          />
+        </div>
+
+        <!-- Tipo de relación -->
         <text-input
           inputClassError="ring-yellow-300 focus:ring-yellow-600"
-          :name="`phone_${item.id}`"
-          type="number"
-          inputPlaceholder="patients.phone-contact-placeholder"
+          :name="`relation_${contact.id}`"
+          type="text"
+          title="patients.relation"
+          inputPlaceholder="patients.relation-placeholder"
           inputColor="patient-page-color"
-          class="w-full"
         />
-        <action-button-outline-icon
-          icon="TrashIcon"
-          color="text-red-500"
-          @click="deletePhone(item.id)"
-        />
+
+        <!-- Teléfonos del contacto -->
+        <div class="space-y-2 bg-white p-3 rounded border border-gray-200">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-medium text-gray-700">
+              {{ $t('patients.phone-contact') }}
+            </p>
+            <action-button-outline-icon
+              icon="PlusIcon"
+              color="text-patient-page-color"
+              @click="addPhoneToContact(contact.id)"
+            />
+          </div>
+          <div
+            v-for="phone in contact.phones"
+            :key="phone.id"
+            class="flex items-center gap-2"
+          >
+            <text-input
+              inputClassError="ring-yellow-300 focus:ring-yellow-600"
+              :name="`contact_${contact.id}_phone_${phone.id}`"
+              type="text"
+              inputPlaceholder="patients.phone-contact-placeholder"
+              inputColor="patient-page-color"
+              class="w-full"
+            />
+            <action-button-outline-icon
+              icon="TrashIcon"
+              color="text-red-500"
+              @click="deletePhoneFromContact(contact.id, phone.id)"
+            />
+          </div>
+          <p
+            v-if="contact.phones.length === 0"
+            class="text-xs text-gray-400 italic"
+          >
+            {{ $t('patients.no-phones-added') }}
+          </p>
+        </div>
+
+        <!-- Emails del contacto -->
+        <div class="space-y-2 bg-white p-3 rounded border border-gray-200">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-medium text-gray-700">
+              {{ $t('patients.email-address') }}
+            </p>
+            <action-button-outline-icon
+              icon="PlusIcon"
+              color="text-patient-page-color"
+              @click="addEmailToContact(contact.id)"
+            />
+          </div>
+          <div
+            v-for="email in contact.emails"
+            :key="email.id"
+            class="flex items-center gap-2"
+          >
+            <text-input
+              inputClassError="ring-yellow-300 focus:ring-yellow-600"
+              :name="`contact_${contact.id}_email_${email.id}`"
+              type="email"
+              inputPlaceholder="patients.email-address-placeholder"
+              inputColor="patient-page-color"
+              class="w-full"
+            />
+            <action-button-outline-icon
+              icon="TrashIcon"
+              color="text-red-500"
+              @click="deleteEmailFromContact(contact.id, email.id)"
+            />
+          </div>
+          <p
+            v-if="contact.emails.length === 0"
+            class="text-xs text-gray-400 italic"
+          >
+            {{ $t('patients.no-emails-added') }}
+          </p>
+        </div>
       </div>
+
+      <!-- Mensaje cuando no hay contactos -->
+      <p
+        v-if="contactInformationList.length === 0"
+        class="text-sm text-gray-400 italic text-center py-4"
+      >
+        {{ $t('patients.no-contacts-added') }}
+      </p>
     </div>
 
     <!-- insurance selector -->
@@ -169,7 +263,7 @@
     <text-input
       inputClassError="ring-yellow-300 focus:ring-yellow-600"
       name="gmail"
-      type="text"
+      type="email"
       title="patients.email-address"
       inputPlaceholder="patients.email-address-placeholder"
       class="mt-2 sm:col-span-2"
@@ -193,6 +287,7 @@
     />
   </div>
 </template>
+
 <script setup>
 import { useForm } from "vee-validate";
 import { ref, watchEffect, computed } from "vue";
@@ -265,72 +360,227 @@ const yesnoOptions = [
   { id: 1, name: "general.no" },
 ];
 
+// Inicializar listas
+const contactInformationList = ref(newPatientData.value.contactInformationList ?? []);
+const phoneList = ref(newPatientData.value.phoneList ?? []);
+
 const initialValues = computed(() => {
   const base = {
     names: newPatientData?.value.names || "",
     lastNames: newPatientData?.value.lastNames || "",
     birthdate: newPatientData?.value.birthdate || "",
     pediatrician: newPatientData?.value.pediatrician || "",
-    mother: newPatientData?.value.mother || "",
-    father: newPatientData?.value.father || "",
     residence: newPatientData?.value.residence || "",
     gmail: newPatientData?.value.gmail || "",
   };
 
-  if (newPatientData.value.phoneList?.length) {
-    newPatientData.value.phoneList.forEach((item) => {
-      base[`phone_${item.id}`] = item.phone || "";
+  // Agregar datos de contactos
+  if (newPatientData.value.contactInformationList?.length) {
+    newPatientData.value.contactInformationList.forEach((contact) => {
+      base[`contact_name_${contact.id}`] = contact.name || "";
+      base[`contact_lastname_${contact.id}`] = contact.lastName || "";
+      base[`relation_${contact.id}`] = contact.type || "";
+
+      // Agregar teléfonos del contacto
+      contact.phones?.forEach((phone) => {
+        base[`contact_${contact.id}_phone_${phone.id}`] = phone.value || "";
+      });
+
+      // Agregar emails del contacto
+      contact.emails?.forEach((email) => {
+        base[`contact_${contact.id}_email_${email.id}`] = email.value || "";
+      });
     });
   }
 
   return base;
 });
 
-const currentGender = ref(newPatientData.value.currentGender ?? null);
+const currentGender = ref(newPatientData.value.currentGender ?? 1);
+const hasAlergies = ref(newPatientData.value.hasAlergies ?? 1);
+const hasSyndromes = ref(newPatientData.value.hasSyndromes ?? 1);
 const currentAlergies = ref(newPatientData.value.currentAlergies ?? []);
 const currentSyndromes = ref(newPatientData.value.currentSyndromes ?? []);
 const currentInsurance = ref(newPatientData.value.currentInsurance ?? []);
 const currentBloodType = ref(newPatientData.value.currentBloodType ?? []);
-const phoneList = ref(newPatientData.value.phoneList ?? []);
-const hasAlergies = ref(newPatientData.value.hasAlergies ?? null);
-const hasSyndromes = ref(newPatientData.value.hasSyndromes ?? null);
+const currentPatientType = ref(newPatientData.value.currentPatientType ?? []);
 
-function addPhone() {
+function addContact() {
   const newId = Date.now();
-  phoneList.value.push({ id: newId, phone: "" });
-  setFieldValue(`phone_${newId}`, "");
+  contactInformationList.value.push({
+    id: newId,
+    name: "",
+    lastName: "",
+    type: "",
+    phones: [],
+    emails: [],
+  });
+  setFieldValue(`contact_name_${newId}`, "");
+  setFieldValue(`contact_lastname_${newId}`, "");
+  setFieldValue(`relation_${newId}`, "");
 }
-function deletePhone(id) {
-  phoneList.value = phoneList.value.filter((p) => Number(p.id) !== Number(id));
-  delete values[`phone_${id}`];
+
+function deleteContact(contactId) {
+  const contact = contactInformationList.value.find((c) => c.id === contactId);
+  
+  // Limpiar campos del formulario
+  if (contact) {
+    delete values[`contact_name_${contactId}`];
+    delete values[`contact_lastname_${contactId}`];
+    delete values[`relation_${contactId}`];
+    
+    contact.phones?.forEach((phone) => {
+      delete values[`contact_${contactId}_phone_${phone.id}`];
+    });
+    
+    contact.emails?.forEach((email) => {
+      delete values[`contact_${contactId}_email_${email.id}`];
+    });
+  }
+  
+  contactInformationList.value = contactInformationList.value.filter(
+    (c) => c.id !== contactId
+  );
 }
+
+function addPhoneToContact(contactId) {
+  const contact = contactInformationList.value.find((c) => c.id === contactId);
+  if (contact) {
+    const newPhoneId = Date.now();
+    if (!contact.phones) contact.phones = [];
+    contact.phones.push({ id: newPhoneId, value: "" });
+    setFieldValue(`contact_${contactId}_phone_${newPhoneId}`, "");
+  }
+}
+
+function deletePhoneFromContact(contactId, phoneId) {
+  const contact = contactInformationList.value.find((c) => c.id === contactId);
+  if (contact && contact.phones) {
+    contact.phones = contact.phones.filter((p) => p.id !== phoneId);
+    delete values[`contact_${contactId}_phone_${phoneId}`];
+  }
+}
+
+function addEmailToContact(contactId) {
+  const contact = contactInformationList.value.find((c) => c.id === contactId);
+  if (contact) {
+    const newEmailId = Date.now();
+    if (!contact.emails) contact.emails = [];
+    contact.emails.push({ id: newEmailId, value: "" });
+    setFieldValue(`contact_${contactId}_email_${newEmailId}`, "");
+  }
+}
+
+function deleteEmailFromContact(contactId, emailId) {
+  const contact = contactInformationList.value.find((c) => c.id === contactId);
+  if (contact && contact.emails) {
+    contact.emails = contact.emails.filter((e) => e.id !== emailId);
+    delete values[`contact_${contactId}_email_${emailId}`];
+  }
+}
+
+// Validation Schema Dinámico
+const validationSchema = computed(() => {
+  const schema = {
+    // Validaciones base del paciente
+    names: yup.string().required(t("vee-validate.required-input")),
+    lastNames: yup.string().required(t("vee-validate.required-input")),
+    birthdate: yup.date().required(t("vee-validate.required-input")),
+    pediatrician: yup.string().required(t("vee-validate.required-input")),
+    residence: yup.string().required(t("vee-validate.required-input")),
+    gmail: yup
+      .string()
+      .email(t("vee-validate.invalid-email"))
+      .required(t("vee-validate.required-input")),
+  };
+
+  // Validaciones para contactos
+  contactInformationList.value.forEach((contact) => {
+    // Nombre del contacto (requerido)
+    schema[`contact_name_${contact.id}`] = yup
+      .string()
+      .required(t("vee-validate.required-input"));
+
+    // Apellido del contacto (requerido)
+    schema[`contact_lastname_${contact.id}`] = yup
+      .string()
+      .required(t("vee-validate.required-input"));
+
+    // Tipo de relación (requerido)
+    schema[`relation_${contact.id}`] = yup
+      .string()
+      .required(t("vee-validate.required-input"));
+
+    // Validaciones para teléfonos del contacto
+    contact.phones?.forEach((phone) => {
+      schema[`contact_${contact.id}_phone_${phone.id}`] = yup
+        .string()
+        .matches(/^[0-9+\-() ]+$/, t("vee-validate.invalid-phone"))
+        .min(7, t("vee-validate.phone-min-length"))
+        .required(t("vee-validate.required-input"));
+    });
+
+    // Validaciones para emails del contacto
+    contact.emails?.forEach((email) => {
+      schema[`contact_${contact.id}_email_${email.id}`] = yup
+        .string()
+        .email(t("vee-validate.invalid-email"))
+        .required(t("vee-validate.required-input"));
+    });
+  });
+
+  return yup.object(schema);
+});
 
 const { values, errors, setFieldValue } = useForm({
   initialValues,
-  validationSchema: yup.object({
-    names: yup.string().required(),
-    lastNames: yup.string().required(),
-    birthdate: yup.date().required(),
-    pediatrician: yup.string().required(),
-    mother: yup.string().required(),
-    father: yup.string().required(),
-    residence: yup.string().required(),
-    gmail: yup.string().required(),
-  }),
+  validationSchema,
 });
+
 const isFormValid = computed(() => {
-  return (
-    Object.keys(errors.value).length === 0 &&
+  const hasNoErrors = Object.keys(errors.value).length === 0;
+  const hasRequiredFields = 
     values.names &&
     values.lastNames &&
-    values.date &&
     values.birthdate &&
     values.pediatrician &&
-    values.mother &&
-    values.father &&
     values.residence &&
-    values.gmail
-  );
+    values.gmail;
+  
+  // Validar que al menos haya un teléfono del paciente
+  const hasPatientPhone = phoneList.value.length > 0 && 
+    phoneList.value.some(p => values[`phone_${p.id}`]);
+  
+  return hasNoErrors && hasRequiredFields && hasPatientPhone;
+});
+
+// Computed para generar el array de contactos en el formato requerido
+const formattedContacts = computed(() => {
+  return contactInformationList.value.map((contact) => {
+    // Recopilar teléfonos del contacto
+    const phones = contact.phones
+      ?.map((phone) => {
+        const fieldKey = `contact_${contact.id}_phone_${phone.id}`;
+        return values[fieldKey] || "";
+      })
+      .filter((phone) => phone !== "");
+
+    // Recopilar emails del contacto
+    const emails = contact.emails
+      ?.map((email) => {
+        const fieldKey = `contact_${contact.id}_email_${email.id}`;
+        return values[fieldKey] || "";
+      })
+      .filter((email) => email !== "");
+
+    return {
+      type: values[`relation_${contact.id}`] || "",
+      name: values[`contact_name_${contact.id}`] || "",
+      lastName: values[`contact_lastname_${contact.id}`] || "",
+      phones: phones || [],
+      emails: emails || [],
+    };
+  });
 });
 
 watchEffect(() => {
@@ -339,28 +589,43 @@ watchEffect(() => {
     LastName: values.lastNames,
     Birthdate: values.birthdate,
     Gender: currentGender.value,
-    HasAlergies: hasAlergies.value,
-    HasSyndromes: hasSyndromes.value,
+    Address: values.residence, 
+    Alergies: hasAlergies.value == 1 ? currentAlergies.value : [],
+    Syndromes: hasSyndromes.value == 1 ? currentSyndromes.value : [],
     Pediatrician: values.pediatrician,
-    MotherInfo: values.mother,
-    FatherInfo: values.father,
-    ContactPhones: phoneList.value,
-    Insurance: currentInsurance.value,
-    ResidenceAddress: values.residence,
-    ContactEmail: values.gmail,
-    BloodTypeId: values.gmail,
-    PatientTypeId: values.gmail,
+    Contacts: formattedContacts.value,
+    InsuranceId: currentInsurance.value,
+    BloodTypeId: currentBloodType.value,
+    PatientTypeId: currentPatientType.value,
     isFormValid: isFormValid.value,
+    // Guardar también las listas para persistencia
+    contactInformationList: contactInformationList.value,
   };
 });
-watchEffect(() => {
-  phoneList.value.forEach((item) => {
-    const fieldKey = `phone_${item.id}`;
-    const fieldValue = values[fieldKey];
 
-    if (fieldValue !== undefined && fieldValue !== item.phone) {
-      item.phone = fieldValue;
-    }
+// Actualizar valores de contactos
+watchEffect(() => {
+  contactInformationList.value.forEach((contact) => {
+    // Actualizar nombre, apellido y tipo
+    const nameKey = `contact_name_${contact.id}`;
+    const lastNameKey = `contact_lastname_${contact.id}`;
+    const relationKey = `relation_${contact.id}`;
+    
+    if (values[nameKey] !== undefined) contact.name = values[nameKey];
+    if (values[lastNameKey] !== undefined) contact.lastName = values[lastNameKey];
+    if (values[relationKey] !== undefined) contact.type = values[relationKey];
+
+    // Actualizar teléfonos del contacto
+    contact.phones?.forEach((phone) => {
+      const phoneKey = `contact_${contact.id}_phone_${phone.id}`;
+      if (values[phoneKey] !== undefined) phone.value = values[phoneKey];
+    });
+
+    // Actualizar emails del contacto
+    contact.emails?.forEach((email) => {
+      const emailKey = `contact_${contact.id}_email_${email.id}`;
+      if (values[emailKey] !== undefined) email.value = values[emailKey];
+    });
   });
 });
 </script>
