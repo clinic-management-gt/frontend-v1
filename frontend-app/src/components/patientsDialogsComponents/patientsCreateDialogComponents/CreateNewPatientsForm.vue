@@ -1,5 +1,5 @@
 <template>
-  <div class="ml-2 grid grid-cols-2 gap-2">
+  <form @submit.prevent class="ml-2 grid grid-cols-2 gap-2">
     <!-- name input -->
     <text-input
       inputClassError="ring-yellow-300 focus:ring-yellow-600"
@@ -9,6 +9,7 @@
       inputPlaceholder="patients.names-placeholder"
       class="mt-2 sm:col-span-2"
       inputColor="patient-page-color"
+      :required="true"
     />
     <!-- last name input -->
     <text-input
@@ -19,6 +20,7 @@
       inputPlaceholder="patients.lastNames-placeholder"
       class="mt-2 sm:col-span-2"
       inputColor="patient-page-color"
+      :required="true"
     />
     <!-- birthdate input -->
     <text-input
@@ -29,6 +31,7 @@
       inputPlaceholder="patients.birthdate"
       class="mt-2 sm:col-span-1"
       inputColor="patient-page-color"
+      :required="true"
     />
     <!-- gender input -->
     <radio-group
@@ -36,8 +39,36 @@
       title="patients.gender"
       :data="genders"
       class="mt-2 col-span-2 sm:col-span-1"
+      :required="true"
+    />
+        <!-- pediatrician input -->
+    <text-input
+      inputClassError="ring-yellow-300 focus:ring-yellow-600"
+      name="pediatrician"
+      type="text"
+      title="patients.family-pediatrician"
+      inputPlaceholder="patients.pediatrician-placeholder"
+      class="mt-2 sm:col-span-2"
+      inputColor="patient-page-color"
+      :required="true"
     />
 
+    <!-- bloodtype selector -->
+    <comboboxes-input
+      v-model:currentSelected="currentBloodType"
+      :data="bloodType"
+      title="patients.blood-type"
+      placeholder="patients.blood-type-placeholder"
+      class="mt-2 sm:col-span-2"
+    />
+    <comboboxes-input
+      v-model:currentSelected="currentPatientType"
+      :data="patientType"
+      title="patients.patient-type"
+      placeholder="patients.patient-type-placeholder"
+      class="mt-2 sm:col-span-2"
+      :required="true"
+    />
     <!-- alergies selector -->
     <radio-group
       v-model:currentSelected="hasAlergies"
@@ -55,6 +86,7 @@
         title="patients.alergies"
         placeholder="patients.alergies-placeholder"
         class="mt-2 sm:col-span-2"
+        :required="true"
       />
     </div>
 
@@ -75,19 +107,9 @@
         title="patients.syndrome"
         placeholder="patients.syndrome-placeholder"
         class="mt-2 sm:col-span-2"
+        :required="true"
       />
     </div>
-
-    <!-- pediatrician input -->
-    <text-input
-      inputClassError="ring-yellow-300 focus:ring-yellow-600"
-      name="pediatrician"
-      type="text"
-      title="patients.family-pediatrician"
-      inputPlaceholder="patients.pediatrician-placeholder"
-      class="mt-2 sm:col-span-2"
-      inputColor="patient-page-color"
-    />
 
     <!-- contact inputs -->
     <div class="sm:col-span-2 space-y-4">
@@ -99,17 +121,15 @@
         <action-button-outline-icon
           icon="PlusIcon"
           color="text-patient-page-color"
-          @click="addContact()"
+          @click.prevent.stop="addContact()"
         />
       </div>
       
-      <!-- Lista de contactos -->
       <div
         v-for="contact in contactInformationList"
         :key="contact.id"
-        class="border border-gray-200 rounded-lg p-4 space-y-3 bg-gray-50"
+        class="rounded-lg p-4 space-y-3 bg-gray-50"
       >
-        <!-- Header del contacto con botón eliminar -->
         <div class="flex items-center justify-between border-b border-gray-300 pb-2">
           <p class="text-sm font-semibold text-gray-700">
             {{ $t('patients.contact') }} #{{ contactInformationList.indexOf(contact) + 1 }}
@@ -117,7 +137,7 @@
           <action-button-outline-icon
             icon="TrashIcon"
             color="text-red-500"
-            @click="deleteContact(contact.id)"
+            @click.prevent.stop="deleteContact(contact.id)"
           />
         </div>
 
@@ -160,7 +180,7 @@
             <action-button-outline-icon
               icon="PlusIcon"
               color="text-patient-page-color"
-              @click="addPhoneToContact(contact.id)"
+              @click.prevent.stop="addPhoneToContact(contact.id)"
             />
           </div>
           <div
@@ -179,15 +199,9 @@
             <action-button-outline-icon
               icon="TrashIcon"
               color="text-red-500"
-              @click="deletePhoneFromContact(contact.id, phone.id)"
+              @click.prevent.stop="deletePhoneFromContact(contact.id, phone.id)"
             />
           </div>
-          <p
-            v-if="contact.phones.length === 0"
-            class="text-xs text-gray-400 italic"
-          >
-            {{ $t('patients.no-phones-added') }}
-          </p>
         </div>
 
         <!-- Emails del contacto -->
@@ -199,7 +213,7 @@
             <action-button-outline-icon
               icon="PlusIcon"
               color="text-patient-page-color"
-              @click="addEmailToContact(contact.id)"
+              @click.prevent.stop="addEmailToContact(contact.id)"
             />
           </div>
           <div
@@ -218,25 +232,18 @@
             <action-button-outline-icon
               icon="TrashIcon"
               color="text-red-500"
-              @click="deleteEmailFromContact(contact.id, email.id)"
+              @click.prevent.stop="deleteEmailFromContact(contact.id, email.id)"
             />
           </div>
-          <p
-            v-if="contact.emails.length === 0"
-            class="text-xs text-gray-400 italic"
-          >
-            {{ $t('patients.no-emails-added') }}
-          </p>
         </div>
       </div>
 
-      <!-- Mensaje cuando no hay contactos -->
-      <p
+      <span
         v-if="contactInformationList.length === 0"
-        class="text-sm text-gray-400 italic text-center py-4"
+        class="text-sm text-gray-400 italic text-center"
       >
         {{ $t('patients.no-contacts-added') }}
-      </p>
+      </span>
     </div>
 
     <!-- insurance selector -->
@@ -258,43 +265,17 @@
       class="mt-2 sm:col-span-2"
       inputColor="patient-page-color"
     />
-
-    <!-- email input -->
-    <text-input
-      inputClassError="ring-yellow-300 focus:ring-yellow-600"
-      name="gmail"
-      type="email"
-      title="patients.email-address"
-      inputPlaceholder="patients.email-address-placeholder"
-      class="mt-2 sm:col-span-2"
-      inputColor="patient-page-color"
-    />
-
-    <!-- bloodtype selector -->
-    <comboboxes-input
-      v-model:currentSelected="currentBloodType"
-      :data="bloodType"
-      title="patients.blood-type"
-      placeholder="patients.blood-type-placeholder"
-      class="mt-2 sm:col-span-2"
-    />
-    <comboboxes-input
-      v-model:currentSelected="currentPatientType"
-      :data="patientType"
-      title="patients.patient-type"
-      placeholder="patients.patient-type-placeholder"
-      class="mt-2 sm:col-span-2"
-    />
-  </div>
+  </form>
 </template>
 
 <script setup>
 import { useForm } from "vee-validate";
-import { ref, watchEffect, computed } from "vue";
+import { ref, watch, computed, nextTick } from "vue";
 import { usePatientsStore } from "@stores/patientsStore.js";
 import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
 import * as yup from "yup";
+import { useDebounceFn } from "@vueuse/core";
 
 import ActionButtonOutlineIcon from "@components/forms/ActionButtonOutlinedIcon.vue";
 import CustomLabel from "@/components/forms/CustomLabel.vue";
@@ -360,9 +341,7 @@ const yesnoOptions = [
   { id: 1, name: "general.no" },
 ];
 
-// Inicializar listas
 const contactInformationList = ref(newPatientData.value.contactInformationList ?? []);
-const phoneList = ref(newPatientData.value.phoneList ?? []);
 
 const initialValues = computed(() => {
   const base = {
@@ -374,19 +353,16 @@ const initialValues = computed(() => {
     gmail: newPatientData?.value.gmail || "",
   };
 
-  // Agregar datos de contactos
   if (newPatientData.value.contactInformationList?.length) {
     newPatientData.value.contactInformationList.forEach((contact) => {
       base[`contact_name_${contact.id}`] = contact.name || "";
       base[`contact_lastname_${contact.id}`] = contact.lastName || "";
       base[`relation_${contact.id}`] = contact.type || "";
 
-      // Agregar teléfonos del contacto
       contact.phones?.forEach((phone) => {
         base[`contact_${contact.id}_phone_${phone.id}`] = phone.value || "";
       });
 
-      // Agregar emails del contacto
       contact.emails?.forEach((email) => {
         base[`contact_${contact.id}_email_${email.id}`] = email.value || "";
       });
@@ -405,7 +381,7 @@ const currentInsurance = ref(newPatientData.value.currentInsurance ?? []);
 const currentBloodType = ref(newPatientData.value.currentBloodType ?? []);
 const currentPatientType = ref(newPatientData.value.currentPatientType ?? []);
 
-function addContact() {
+async function addContact() {
   const newId = Date.now();
   contactInformationList.value.push({
     id: newId,
@@ -415,74 +391,82 @@ function addContact() {
     phones: [],
     emails: [],
   });
+  
+  await nextTick();
+  
   setFieldValue(`contact_name_${newId}`, "");
   setFieldValue(`contact_lastname_${newId}`, "");
   setFieldValue(`relation_${newId}`, "");
 }
 
-function deleteContact(contactId) {
+async function deleteContact(contactId) {
   const contact = contactInformationList.value.find((c) => c.id === contactId);
   
-  // Limpiar campos del formulario
   if (contact) {
-    delete values[`contact_name_${contactId}`];
-    delete values[`contact_lastname_${contactId}`];
-    delete values[`relation_${contactId}`];
+    setFieldValue(`contact_name_${contactId}`, undefined);
+    setFieldValue(`contact_lastname_${contactId}`, undefined);
+    setFieldValue(`relation_${contactId}`, undefined);
     
     contact.phones?.forEach((phone) => {
-      delete values[`contact_${contactId}_phone_${phone.id}`];
+      setFieldValue(`contact_${contactId}_phone_${phone.id}`, undefined);
     });
     
     contact.emails?.forEach((email) => {
-      delete values[`contact_${contactId}_email_${email.id}`];
+      setFieldValue(`contact_${contactId}_email_${email.id}`, undefined);
     });
   }
   
   contactInformationList.value = contactInformationList.value.filter(
     (c) => c.id !== contactId
   );
+  
+  await nextTick();
 }
 
-function addPhoneToContact(contactId) {
+async function addPhoneToContact(contactId) {
   const contact = contactInformationList.value.find((c) => c.id === contactId);
   if (contact) {
     const newPhoneId = Date.now();
     if (!contact.phones) contact.phones = [];
     contact.phones.push({ id: newPhoneId, value: "" });
+    
+    await nextTick();
     setFieldValue(`contact_${contactId}_phone_${newPhoneId}`, "");
   }
 }
 
-function deletePhoneFromContact(contactId, phoneId) {
+async function deletePhoneFromContact(contactId, phoneId) {
   const contact = contactInformationList.value.find((c) => c.id === contactId);
   if (contact && contact.phones) {
+    setFieldValue(`contact_${contactId}_phone_${phoneId}`, undefined);
     contact.phones = contact.phones.filter((p) => p.id !== phoneId);
-    delete values[`contact_${contactId}_phone_${phoneId}`];
+    await nextTick();
   }
 }
 
-function addEmailToContact(contactId) {
+async function addEmailToContact(contactId) {
   const contact = contactInformationList.value.find((c) => c.id === contactId);
   if (contact) {
     const newEmailId = Date.now();
     if (!contact.emails) contact.emails = [];
     contact.emails.push({ id: newEmailId, value: "" });
+    
+    await nextTick();
     setFieldValue(`contact_${contactId}_email_${newEmailId}`, "");
   }
 }
 
-function deleteEmailFromContact(contactId, emailId) {
+async function deleteEmailFromContact(contactId, emailId) {
   const contact = contactInformationList.value.find((c) => c.id === contactId);
   if (contact && contact.emails) {
+    setFieldValue(`contact_${contactId}_email_${emailId}`, undefined);
     contact.emails = contact.emails.filter((e) => e.id !== emailId);
-    delete values[`contact_${contactId}_email_${emailId}`];
+    await nextTick();
   }
 }
 
-// Validation Schema Dinámico
 const validationSchema = computed(() => {
   const schema = {
-    // Validaciones base del paciente
     names: yup.string().required(t("vee-validate.required-input")),
     lastNames: yup.string().required(t("vee-validate.required-input")),
     birthdate: yup.date().required(t("vee-validate.required-input")),
@@ -494,24 +478,19 @@ const validationSchema = computed(() => {
       .required(t("vee-validate.required-input")),
   };
 
-  // Validaciones para contactos
   contactInformationList.value.forEach((contact) => {
-    // Nombre del contacto (requerido)
     schema[`contact_name_${contact.id}`] = yup
       .string()
       .required(t("vee-validate.required-input"));
 
-    // Apellido del contacto (requerido)
     schema[`contact_lastname_${contact.id}`] = yup
       .string()
       .required(t("vee-validate.required-input"));
 
-    // Tipo de relación (requerido)
     schema[`relation_${contact.id}`] = yup
       .string()
       .required(t("vee-validate.required-input"));
 
-    // Validaciones para teléfonos del contacto
     contact.phones?.forEach((phone) => {
       schema[`contact_${contact.id}_phone_${phone.id}`] = yup
         .string()
@@ -520,7 +499,6 @@ const validationSchema = computed(() => {
         .required(t("vee-validate.required-input"));
     });
 
-    // Validaciones para emails del contacto
     contact.emails?.forEach((email) => {
       schema[`contact_${contact.id}_email_${email.id}`] = yup
         .string()
@@ -547,17 +525,11 @@ const isFormValid = computed(() => {
     values.residence &&
     values.gmail;
   
-  // Validar que al menos haya un teléfono del paciente
-  const hasPatientPhone = phoneList.value.length > 0 && 
-    phoneList.value.some(p => values[`phone_${p.id}`]);
-  
-  return hasNoErrors && hasRequiredFields && hasPatientPhone;
+  return hasNoErrors && hasRequiredFields;
 });
 
-// Computed para generar el array de contactos en el formato requerido
 const formattedContacts = computed(() => {
   return contactInformationList.value.map((contact) => {
-    // Recopilar teléfonos del contacto
     const phones = contact.phones
       ?.map((phone) => {
         const fieldKey = `contact_${contact.id}_phone_${phone.id}`;
@@ -565,7 +537,6 @@ const formattedContacts = computed(() => {
       })
       .filter((phone) => phone !== "");
 
-    // Recopilar emails del contacto
     const emails = contact.emails
       ?.map((email) => {
         const fieldKey = `contact_${contact.id}_email_${email.id}`;
@@ -583,49 +554,78 @@ const formattedContacts = computed(() => {
   });
 });
 
-watchEffect(() => {
+const updateStoreData = () => {
   newPatientData.value = {
     Name: values.names,
     LastName: values.lastNames,
     Birthdate: values.birthdate,
     Gender: currentGender.value,
     Address: values.residence, 
-    Alergies: hasAlergies.value == 1 ? currentAlergies.value : [],
-    Syndromes: hasSyndromes.value == 1 ? currentSyndromes.value : [],
+    Alergies: hasAlergies.value === 0 ? currentAlergies.value : [],
+    Syndromes: hasSyndromes.value === 0 ? currentSyndromes.value : [],
     Pediatrician: values.pediatrician,
     Contacts: formattedContacts.value,
     InsuranceId: currentInsurance.value,
     BloodTypeId: currentBloodType.value,
     PatientTypeId: currentPatientType.value,
     isFormValid: isFormValid.value,
-    // Guardar también las listas para persistencia
     contactInformationList: contactInformationList.value,
   };
-});
+};
 
-// Actualizar valores de contactos
-watchEffect(() => {
-  contactInformationList.value.forEach((contact) => {
-    // Actualizar nombre, apellido y tipo
-    const nameKey = `contact_name_${contact.id}`;
-    const lastNameKey = `contact_lastname_${contact.id}`;
-    const relationKey = `relation_${contact.id}`;
-    
-    if (values[nameKey] !== undefined) contact.name = values[nameKey];
-    if (values[lastNameKey] !== undefined) contact.lastName = values[lastNameKey];
-    if (values[relationKey] !== undefined) contact.type = values[relationKey];
+const debouncedUpdate = useDebounceFn(updateStoreData, 300);
 
-    // Actualizar teléfonos del contacto
-    contact.phones?.forEach((phone) => {
-      const phoneKey = `contact_${contact.id}_phone_${phone.id}`;
-      if (values[phoneKey] !== undefined) phone.value = values[phoneKey];
+watch(
+  [
+    () => values.names,
+    () => values.lastNames,
+    () => values.birthdate,
+    () => values.pediatrician,
+    () => values.residence,
+    () => values.gmail,
+    currentGender,
+    hasAlergies,
+    hasSyndromes,
+    currentAlergies,
+    currentSyndromes,
+    currentInsurance,
+    currentBloodType,
+    currentPatientType,
+  ],
+  () => {
+    debouncedUpdate();
+  }
+);
+
+watch(
+  [contactInformationList, formattedContacts],
+  () => {
+    // Actualizar datos locales de contactos
+    contactInformationList.value.forEach((contact) => {
+      const nameKey = `contact_name_${contact.id}`;
+      const lastNameKey = `contact_lastname_${contact.id}`;
+      const relationKey = `relation_${contact.id}`;
+      
+      if (values[nameKey] !== undefined) contact.name = values[nameKey];
+      if (values[lastNameKey] !== undefined) contact.lastName = values[lastNameKey];
+      if (values[relationKey] !== undefined) contact.type = values[relationKey];
+
+      contact.phones?.forEach((phone) => {
+        const phoneKey = `contact_${contact.id}_phone_${phone.id}`;
+        if (values[phoneKey] !== undefined) phone.value = values[phoneKey];
+      });
+
+      contact.emails?.forEach((email) => {
+        const emailKey = `contact_${contact.id}_email_${email.id}`;
+        if (values[emailKey] !== undefined) email.value = values[emailKey];
+      });
     });
 
-    // Actualizar emails del contacto
-    contact.emails?.forEach((email) => {
-      const emailKey = `contact_${contact.id}_email_${email.id}`;
-      if (values[emailKey] !== undefined) email.value = values[emailKey];
-    });
-  });
+    debouncedUpdate();
+  }
+);
+
+watch(isFormValid, (newValue) => {
+  newPatientData.value.isFormValid = newValue;
 });
 </script>

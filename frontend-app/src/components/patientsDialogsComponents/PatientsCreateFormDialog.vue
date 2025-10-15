@@ -75,13 +75,14 @@ const patientsLogicStore = usePatientsLogicStore();
 const { showCreateFormDialog } = storeToRefs(patientsLogicStore);
 
 const currentPage = ref(1);
-const rawFile = ref(newPatientData.value.file ?? null);
+const rawFile = ref(newPatientData.value.InfoSheetFile ?? null);
 
 defineProps({
   isOpen: { type: Boolean, default: false },
 });
 
 const handleClose = (closeModal) => {
+  newPatientData.value = null;
   showCreateFormDialog.value = closeModal;
   currentPage.value = 1;
 };
@@ -94,15 +95,12 @@ async function handleSendFiles(fileReceived) {
     const reader = new FileReader();
     
     reader.onload = () => {
-      const base64String = reader.result; // Obtienes el base64 del archivo
-      console.log(base64String); // Base64 del archivo
-
-      // Asigna el base64 al objeto `newPatientData.value`
+      const base64String = reader.result;
+      console.log(base64String); 
       Object.assign(newPatientData.value, { InfoSheetFile: base64String });
     };
     
-    // Lee el archivo como una URL base64
-    reader.readAsDataURL(fileReceived);  // Usa readAsDataURL para obtener base64
+    reader.readAsDataURL(fileReceived);
   } else {
     newPatientData.value.InfoSheetFile = null;
   }
@@ -112,6 +110,7 @@ function nextPage() { currentPage.value += 1; }
 function backPage() { currentPage.value -= 1; }
 
 async function createPatient() {
+  currentPage.value = 3;
   await createNewPatient(newPatientData.value);
   handleClose(false);
 }

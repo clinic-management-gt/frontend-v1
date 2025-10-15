@@ -103,6 +103,10 @@ const handleFilters = (filteredData) => {
      updatedFilteredPatients.value = filteredData;
 };
 
+onMounted(async () => {
+  await patientsStore.fetchAllPatients();
+});
+
 watch(currentPatientSelectedId, async (newId) => {
   if (newId) {
     await patientsStore.fetchPatientData(newId);
@@ -112,7 +116,7 @@ watch(currentPatientSelectedId, async (newId) => {
 
 onMounted(async () => {
   if (currentPatientSelectedId.value) {
-    await patientsStore.fetchPatientData(currentPatientSelectedId.value);
+    await patientsStore.fetchPatieantData(currentPatientSelectedId.value);
     await patientsStore.fetchPatientMedicalRecords( currentPatientSelectedId.value);
   }
 });

@@ -6,6 +6,7 @@
       :title="title"
       :name="name"
       :textClass="labelCss"
+      :isRequired="required"
     />
     <div :class="{ 'mt-2': title && title !== 'general.empty' }"></div>
     <!-- Input -->
