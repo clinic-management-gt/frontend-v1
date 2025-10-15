@@ -53,18 +53,20 @@ export const usePatientsStore = defineStore(
 
     // patientsStore.js
     async function updateAppointmentStatus(id, newStatus) {
-      isLoadingAppointmentsToday.value = true;
       try {
+        // No activamos el loading global para evitar recargar todo el componente
         await instance.patch(`/appointments/${id}`, {
           status: newStatus,
         });
         const idx = appointmentsToday.value.findIndex((a) => a.id === id);
         if (idx !== -1) {
+          // Actualizamos solo el estado sin modificar la referencia completa
           appointmentsToday.value[idx].status = newStatus;
         }
         return true;
-      } finally {
-        isLoadingAppointmentsToday.value = false;
+      } catch (error) {
+        console.error("Error al actualizar estado de cita:", error);
+        return false;
       }
     }
 
