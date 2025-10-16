@@ -310,7 +310,6 @@ import { useForm } from "vee-validate";
 import * as yup from "yup";
 import { useI18n } from "vue-i18n";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
-import { useMedicalRecordStore } from "@stores/medicalRecordStore.js";
 import { useFileStore } from "@stores/FileStore.js";
 import { useNotificationStore } from "@stores/notificationStore.js";
 import { storeToRefs } from "pinia";
@@ -348,7 +347,6 @@ const emit = defineEmits(["close", "save"]);
 
 const { t } = useI18n();
 const patientsLogicStore = usePatientsLogicStore();
-const medicalRecordStore = useMedicalRecordStore();
 const fileStore = useFileStore();
 const notificationStore = useNotificationStore();
 
@@ -364,12 +362,6 @@ const examInput = ref(null);
 
 // Valores originales para referencia
 const includeRecipe = ref(false);
-const formData = ref({
-  weight: "",
-  height: "",
-  familyHistory: "",
-  notes: "",
-});
 
 // Estado para la receta médica
 const recipeData = ref({
