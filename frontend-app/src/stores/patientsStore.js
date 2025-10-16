@@ -54,18 +54,20 @@ export const usePatientsStore = defineStore(
     }
 
     async function updateAppointmentStatus(id, newStatus) {
-      isLoadingAppointmentsToday.value = true;
       try {
+        // No activamos el loading global para evitar recargar todo el componente
         await instance.patch(`/appointments/${id}`, {
           status: newStatus,
         });
         const idx = appointmentsToday.value.findIndex((a) => a.id === id);
         if (idx !== -1) {
+          // Actualizamos solo el estado sin modificar la referencia completa
           appointmentsToday.value[idx].status = newStatus;
         }
         return true;
-      } finally {
-        isLoadingAppointmentsToday.value = false;
+      } catch (error) {
+        console.error("Error al actualizar estado de cita:", error);
+        return false;
       }
     }
 
@@ -95,14 +97,18 @@ export const usePatientsStore = defineStore(
 
     async function fetchPatientData() {
       isLoadingPatientData.value = true;
-      if (!currentPatientSelectedId.value) {
-        return;
+      // Usar el ID proporcionado o el guardado en el store
+      const id = patientId || currentPatientSelectedId.value;
+      if (!id) {
+        return null;
       }
       try {
-        const res = await instance.get(
-          `/patients/${currentPatientSelectedId.value}`,
-        );
-        currentPatientSelectedData.value = res.data;
+        const res = await instance.get(`/patients/${id}`);
+        // Si estamos obteniendo datos para el paciente seleccionado, actualizar el store
+        if (id === currentPatientSelectedId.value) {
+          currentPatientSelectedData.value = res.data;
+        }
+        return res.data;
       } finally {
         isLoadingPatientData.value = false;
       }
@@ -174,6 +180,10 @@ export const usePatientsStore = defineStore(
       try {
         const res = await instance.get(`/medicalrecords/${recordId}/details`);
         fullRecord.value = res.data;
+        return res.data; // Devolver los datos para que puedan ser usados directamente
+      } catch (error) {
+        hasError.value = true;
+        throw error;
       } finally {
         isLoadingMedicalRecords.value = false;
       }

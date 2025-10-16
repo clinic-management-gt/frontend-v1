@@ -82,6 +82,134 @@ export const usePatientsLogicStore = defineStore(
       isEditingRecipe.value = false;
     }
 
+    async function handleMedicalRecordSave(formData, patientId) {
+      try {
+        const patientsStore = usePatientsStore();
+        const notificationStore = useNotificationStore();
+        
+        // Verificar si viene en el nuevo formato (con medicalRecord y recipe separados)
+        const isNewFormat = formData.medicalRecord || formData.recipe;
+        let medicalRecordId = null;
+
+        if (isNewFormat) {
+          // NUEVO FORMATO: Manejar medical record y recipe por separado
+
+          // 1. Manejar Medical Record
+          if (formData.medicalRecord) {
+            if (isEditing.value && selectedRecordForEdit.value) {
+              // Obtener el ID correcto del medical record
+              const recordId =
+                selectedRecordForEdit.value.medicalRecord?.id ||
+                selectedRecordForEdit.value.id;
+              await patientsStore.updateMedicalRecord(
+                recordId,
+                formData.medicalRecord,
+              );
+              medicalRecordId = recordId;
+            } else {
+              // Crear nuevo registro médico y guardar su ID para asociar con la receta
+              const response = await patientsStore.createMedicalRecord(
+                patientId,
+                formData.medicalRecord,
+              );
+              medicalRecordId = response.id; // Asumiendo que la API devuelve el ID del registro creado
+            }
+          }
+
+          // 2. Manejar Recipe si existe
+          if (formData.recipe) {
+            try {
+              // Verificamos primero si tenemos tratamientos disponibles para este paciente
+              let treatmentId = null;
+              
+              try {
+                // Intentamos obtener los detalles del paciente para ver sus tratamientos
+                await patientsStore.fetchPatientData(patientId);
+                
+                // Obtenemos detalles del registro médico si está disponible
+                if (medicalRecordId) {
+                  const details = await patientsStore.fetchMedicalRecordDetails(medicalRecordId);
+                  
+                  // Si hay tratamientos disponibles en los detalles del registro médico
+                  if (details && details.treatments && details.treatments.length > 0) {
+                    treatmentId = details.treatments[0].id;
+                  }
+                }
+              } catch {
+                // Error silencioso - ya manejamos el caso de fallo con notificación
+              }
+              
+              // Si no se encontró un tratamiento, mostramos una notificación
+              if (!treatmentId) {
+                notificationStore.addNotification(
+                  "warning",
+                  "recipes.warning",
+                  "recipes.warning-no-treatment"
+                );
+                return; // No continuamos con la creación de la receta
+              }
+              
+              // Preparar datos para la receta con el tratamiento encontrado
+              const recipeData = {
+                prescription: formData.recipe.prescription,
+                treatmentId: treatmentId
+              };
+              
+              // Crear la receta
+              await patientsStore.createRecipe(recipeData);
+            } catch {
+              notificationStore.addNotification(
+                "error",
+                "general.error",
+                "recipes.error-saving"
+              );
+              // Seguimos adelante, al menos el registro médico se creó correctamente
+            }
+          }
+        } else {
+          // FORMATO ACTUAL: Mantener compatibilidad
+
+          if (isEditing.value && selectedRecordForEdit.value) {
+            // Obtener el ID correcto del medical record
+            const recordId =
+              selectedRecordForEdit.value.medicalRecord?.id ||
+              selectedRecordForEdit.value.id;
+            await patientsStore.updateMedicalRecord(recordId, formData);
+          } else {
+            await patientsStore.createMedicalRecord(patientId, formData);
+          }
+        }
+
+        // Cerrar modal y recargar datos
+        closeHistoryLogModals();
+        await patientsStore.fetchPatientMedicalRecords(patientId);
+
+        // Mensaje de éxito según si se guardó solo registro médico o también receta
+        let successMessage = isEditing.value
+          ? "general.record-updated-successfully"
+          : "general.record-created-successfully";
+          
+        if (formData.recipe) {
+          successMessage = "notifications.medical-record-and-recipe-created-successfully";
+        }
+
+        notificationStore.addNotification(
+          "success",
+          "general.success",
+          successMessage
+        );
+      } catch (error) {
+        // Usar notification store en lugar de alert
+        const notificationStore = useNotificationStore();
+        notificationStore.addNotification(
+          "error",
+          "general.error",
+          "Error al guardar el registro: " +
+            (error.message || "Error desconocido"),
+        );
+      }
+    }
+
     async function handleRecipeSave(recipeData, patientId) {
       try {
         const patientsStore = usePatientsStore();
