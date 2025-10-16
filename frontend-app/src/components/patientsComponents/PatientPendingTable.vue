@@ -58,11 +58,10 @@ const pendingPatientsHeader = computed(() => ({
       label: 'patients.contacts', 
       current: false, 
       visible: true, 
-      sortable: false,
+      sortable: false, 
       sortType: 'string', 
       hasAction: false, 
-      valueKey: 'contacts',
-      isHtml: true
+      valueKey: 'contacts'
     },
     { 
       key: 'createdAt', 
@@ -79,14 +78,24 @@ const pendingPatientsHeader = computed(() => ({
   iconType: 'solidIcon',
 }));
 
-const formatContactsHTML = (contact) => {
-  if (!contact) return '-';
+const formatContactsArray = (contact) => {
+  if (!contact) return ['-'];
+  
+  // Si es un array de contactos
   if (Array.isArray(contact)) {
-    return contact
-      .map(c => `<div class="text-gray-700">${c.name} - ${c.relationship}</div>`)
-      .join('');
+    return contact.map(c => {
+      const name = c.name || '';
+      const lastName = c.lastName || '';
+      const relationship = c.relationship || '';
+      return `${name} ${lastName} - ${relationship}`.trim();
+    });
   }
-  return `<div class="text-gray-700">${contact.name} - ${contact.relationship}</div>`;
+  
+  // Si es un objeto único
+  const name = contact.name || '';
+  const lastName = contact.lastName || '';
+  const relationship = contact.relationship || '';
+  return [`${name} ${lastName} - ${relationship}`.trim()];
 };
 
 const tableData = computed(() => ({
@@ -104,8 +113,8 @@ const tableData = computed(() => ({
       style: 'px-3 py-4 text-sm text-center text-gray-700' 
     }],
     contacts: [{ 
-      contacts: formatContactsHTML(patient.contact),
-      isHtml: true
+      contacts: formatContactsArray(patient.contact).join('\n'), 
+      isMultiLine: true 
     }],
     createdAt: [{ 
       date: patient.createdAt, 

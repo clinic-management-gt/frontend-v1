@@ -63,14 +63,19 @@
                   class="cursor-pointer"
                 >
                   <div @click="item.action">
-                    <!-- ✅ NUEVO: Renderizar HTML si tiene flag isHtml -->
                     <div
-                      v-if="item[header.key]?.[0]?.isHtml"
-                      v-html="item[header.key][0][header.valueKey]"
+                      v-if="item[header.key]?.[0]?.isMultiLine"
                       :class="item[header.key][0].style"
-                    />
+                    >
+                      <div
+                        v-for="(line, lineIndex) in parseMultilineText(item[header.key][0][header.valueKey])"
+                        :key="lineIndex"
+                        class="text-gray-700"
+                      >
+                        {{ line }}
+                      </div>
+                    </div>
                     
-                    <!-- ✅ Renderizado normal para el resto -->
                     <span v-else-if="Array.isArray(item[header.key])">
                       <span
                         v-if="getArrayValue(item[header.key], 'hasLabel') === 'true'"
@@ -157,6 +162,12 @@ const props = defineProps({
     default: () => ({ key: '', direction: 'asc' }), 
   }
 });
+
+const parseMultilineText = (text) => {
+  if (!text) return [];
+  if (Array.isArray(text)) return text;
+  return text.split('\n').filter(line => line.trim() !== '');
+};
 
 const getArrayValue = (arr, key) => {
   if (!arr) return '';

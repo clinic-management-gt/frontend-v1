@@ -54,15 +54,14 @@ const patientsHeader = computed(() => ({
       valueKey: 'age' 
     },
     { 
-      key: 'contacts', // ✅ Cambié "parents" a "contacts"
-      label: 'patients.contacts', // ✅ Cambié label
+      key: 'contacts',
+      label: 'patients.contacts',
       current: false, 
       visible: true, 
-      sortable: false, // ✅ Desactivar sort cuando hay múltiples líneas
+      sortable: false,
       sortType: 'string', 
       hasAction: false, 
-      valueKey: 'contacts', // ✅ Cambié valueKey
-      isHtml: true // ✅ Agregar flag para HTML
+      valueKey: 'contacts'
     },
     { 
       key: 'lastVisit', 
@@ -79,17 +78,22 @@ const patientsHeader = computed(() => ({
   iconType: 'solidIcon',
 }));
 
-const formatContactsHTML = (contact) => {
-     console.log(contact);
-  if (!contact || contact.length === 0) return '-';
+const formatContactsArray = (contact) => {
+  if (!contact || (Array.isArray(contact) && contact.length === 0)) return ['-'];
   
   if (Array.isArray(contact)) {
-    return contact
-      .map(c => `<div class="text-gray-700">${c.name || ''} ${c.lastName || ''} - ${c.relationship || ''}</div>`)
-      .join('');
+    return contact.map(c => {
+      const name = c.name || '';
+      const lastName = c.lastName || '';
+      const relationship = c.relationship || '';
+      return `${name} ${lastName} - ${relationship}`.trim();
+    });
   }
   
-  return `<div class="text-gray-700">${contact.name || ''} ${contact.lastName || ''} - ${contact.relationship || ''}</div>`;
+  const name = contact.name || '';
+  const lastName = contact.lastName || '';
+  const relationship = contact.relationship || '';
+  return [`${name} ${lastName} - ${relationship}`.trim()];
 };
 
 const tableData = computed(() => ({
@@ -107,8 +111,8 @@ const tableData = computed(() => ({
       style: 'px-3 py-4 text-sm text-center text-gray-700' 
     }],
     contacts: [{ 
-      contacts: formatContactsHTML(patient.contact || patient.contacts || patient.parents),
-      isHtml: true
+      contacts: formatContactsArray(patient.contact || patient.contacts || patient.parents).join('\n'),
+      isMultiLine: true 
     }],
     lastVisit: [{ 
       lastVisit: patient.lastVisit, 

@@ -306,6 +306,7 @@ export const usePatientsLogicStore = defineStore(
       handleRecipeSave,
       selectPatientById,
       returnToPatientsTable,
+      handleMedicalRecordSave
     };
   },
   {

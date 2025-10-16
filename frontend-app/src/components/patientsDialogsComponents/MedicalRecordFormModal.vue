@@ -245,37 +245,37 @@
               </div>
             </div>
             
-                          <div v-if="includeRecipe" class="mb-4">
-                <label for="prescription" class="block mb-2 text-sm font-medium text-gray-700">
-                  {{ $t("recipes.prescription") }}
-                </label>
-                <div class="mb-2 p-2 bg-yellow-50 border border-yellow-200 text-yellow-700 text-sm rounded-md">
-                  <p class="flex items-center">
-                    <svg 
-                      class="w-4 h-4 mr-2" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24" 
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path 
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
-                      />
-                    </svg>
-                    {{ $t("recipes.warning-recipe-note") }}
-                  </p>
-                </div>
-                <textarea
-                  id="prescription"
-                  v-model="recipeData.prescription"
-                  rows="4"
-                  class="w-full p-2 border rounded-md"
-                  :placeholder="$t('recipes.prescription-placeholder')"
-                ></textarea>
+            <div v-if="includeRecipe" class="mb-4">
+              <label for="prescription" class="block mb-2 text-sm font-medium text-gray-700">
+                {{ $t("recipes.prescription") }}
+              </label>
+              <div class="mb-2 p-2 bg-yellow-50 border border-yellow-200 text-yellow-700 text-sm rounded-md">
+                <p class="flex items-center">
+                  <svg 
+                    class="w-4 h-4 mr-2" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24" 
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path 
+                      stroke-linecap="round" 
+                      stroke-linejoin="round" 
+                      stroke-width="2" 
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
+                    />
+                  </svg>
+                  {{ $t("recipes.warning-recipe-note") }}
+                </p>
               </div>
+              <textarea
+                id="prescription"
+                v-model="recipeData.prescription"
+                rows="4"
+                class="w-full p-2 border rounded-md"
+                :placeholder="$t('recipes.prescription-placeholder')"
+              ></textarea>
+            </div>
           </div>
         </form>
       </div>
@@ -352,10 +352,8 @@ const medicalRecordStore = useMedicalRecordStore();
 const fileStore = useFileStore();
 const notificationStore = useNotificationStore();
 
-const { isEditing, currentMedicalRecordId } = storeToRefs(patientsLogicStore);
+const { isEditing } = storeToRefs(patientsLogicStore);
 const { closeHistoryLogModals } = patientsLogicStore;
-const { handleMedicalRecordSave } = medicalRecordStore;
-const { uploadFile } = fileStore;
 
 // Estados
 const isLoading = ref(false);

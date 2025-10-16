@@ -29,7 +29,7 @@ export const usePatientsStore = defineStore(
 
     function setPatientsData(id) {
       currentPatientSelectedId.value = id;
-      fetchPatientData();
+      fetchPatientData(id);
       fetchPatientMedicalRecords();
     }
 
@@ -95,10 +95,10 @@ export const usePatientsStore = defineStore(
       }
     }
 
-    async function fetchPatientData() {
+    async function fetchPatientData(patientId) {
       isLoadingPatientData.value = true;
       // Usar el ID proporcionado o el guardado en el store
-      const id = patientId || currentPatientSelectedId.value;
+      const id = patientId.value || currentPatientSelectedId.value;
       if (!id) {
         return null;
       }
