@@ -164,8 +164,9 @@ watch(currentPatientSelectedId, async (newId) => {
 });
 
 onMounted(async () => {
-  // Cargar pacientes pendientes al montar
+  await patientsStore.fetchAllPatients();
   await fetchPendingPatients();
+
   
   if (currentPatientSelectedId.value) {
     await patientsStore.fetchPatientData(currentPatientSelectedId.value);

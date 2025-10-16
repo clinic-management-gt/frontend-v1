@@ -82,8 +82,8 @@ export const usePatientsStore = defineStore(
     async function fetchPendingPatients() {
       isLoadingPendingPatients.value = true;
       try {
-        const res = await instance.get("/patients/basic");
-        pendingPatients.value = res.data;
+        const res = await instance.get("/patients/pending");
+        pendingPatients.value = res.data.patients;
         return res.data;
       } catch (error) {
         console.error("Error fetching pending patients:", error);

@@ -10,7 +10,7 @@
                   v-for="(header, index) in props.data.headers.filter(h => h.visible)"
                   :key="index"
                   scope="col"
-                  :class="[header.sortable ? 'px-2 py-4 text-left text-sm font-semibold text-gray-400 hover:text-gray-700 truncate' : 'flex text-sm text-gray-400 justify-between py-2 px-2']"
+                  :class="[header.sortable ? 'px-2 py-4 text-left text-sm font-semibold text-gray-400 hover:text-gray-700 truncate' : 'flex text-sm text-gray-400 justify-between py-4 px-2']"
                 >
                   <button
                     v-if="header.sortable"
@@ -46,7 +46,7 @@
             <tbody class="divide-y divide-gray-200 bg-white">
               <tr v-if="props.data.displayData.length === 0 || props.isLoadingContent">
                 <td
-                  class="  justify-center text-gray-500  text-center text-sm py-4"
+                  class="justify-center text-gray-500 text-center text-sm py-4"
                   :colspan="props.data.headers.filter(h => h.visible).length"
                 >
                   <spinner-loading v-if="props.isLoadingContent" class="mx-auto" />
@@ -63,7 +63,15 @@
                   class="cursor-pointer"
                 >
                   <div @click="item.action">
-                    <span v-if="Array.isArray(item[header.key])">
+                    <!-- ✅ NUEVO: Renderizar HTML si tiene flag isHtml -->
+                    <div
+                      v-if="item[header.key]?.[0]?.isHtml"
+                      v-html="item[header.key][0][header.valueKey]"
+                      :class="item[header.key][0].style"
+                    />
+                    
+                    <!-- ✅ Renderizado normal para el resto -->
+                    <span v-else-if="Array.isArray(item[header.key])">
                       <span
                         v-if="getArrayValue(item[header.key], 'hasLabel') === 'true'"
                       >
@@ -91,7 +99,7 @@
               <div class="w-full border-t border-gray-300"></div>
             </div>
           </div>
-          <div class="mt-6 flex justify-between ">
+          <div class="mt-6 flex justify-between">
             <div class="flex items-center">
               <label for="itemsPerPage">{{ $t('general.results-per-page') }}</label>
               <select id="itemsPerPage" v-model="itemsPerPage" class="ml-2 border:bg-emerald-500">
@@ -123,6 +131,7 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { ArrowLongUpIcon } from '@heroicons/vue/24/outline';
 import { computed, ref, defineAsyncComponent } from 'vue';
@@ -135,94 +144,99 @@ import ActionButtonSolidIcon from '@components/forms/ActionButtonSolidIcon.vue';
 
 const emit = defineEmits(['update:sort']);
 const props = defineProps({
-     data: {
-          type: Object,
-          required: true
-     },
-     isLoadingContent: {
-          type: Boolean,
-          default: false,
-     },
-     defaultSort: {
-          type: Object,
-          default: () => ({ key: '', direction: 'asc' }), 
-     }
+  data: {
+    type: Object,
+    required: true
+  },
+  isLoadingContent: {
+    type: Boolean,
+    default: false,
+  },
+  defaultSort: {
+    type: Object,
+    default: () => ({ key: '', direction: 'asc' }), 
+  }
 });
 
 const getArrayValue = (arr, key) => {
-     if (!arr) return '';
-     return arr.map(item => typeof item === 'object' ? item[key] : item).join(', ');
+  if (!arr) return '';
+  return arr.map(item => typeof item === 'object' ? item[key] : item).join(', ');
 };
 
 const sortConfig = ref(props.defaultSort);
 const toggleSort = (key) => {
-     if (sortConfig.value.key === key) {
-          props.data.headers.forEach(element => {
-               if (element.key === sortConfig.value.key) {
-                    element.current = true;
-               } else {
-                    element.current = false;
-               }
-          });
-          sortConfig.value.direction = sortConfig.value.direction === 'asc' ? 'desc' : 'asc';
-     } else {
-          sortConfig.value = { key, direction: 'asc' };
-     }
-     emit('update:sort', sortConfig.value);
+  if (sortConfig.value.key === key) {
+    props.data.headers.forEach(element => {
+      if (element.key === sortConfig.value.key) {
+        element.current = true;
+      } else {
+        element.current = false;
+      }
+    });
+    sortConfig.value.direction = sortConfig.value.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortConfig.value = { key, direction: 'asc' };
+  }
+  emit('update:sort', sortConfig.value);
 };
+
 const compareValues = (a, b, type = 'string') => {
-     if (a == null) a = '';
-     if (b == null) b = '';
-     switch (type) {
-          case 'number':
-               return parseFloat(a) - parseFloat(b);
-          case 'date':
-               return DateTime.fromISO(a) - DateTime.fromISO(b);
-          case 'boolean':
-               return (a === b) ? 0 : a ? -1 : 1;
-          default:
-               return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
-     }
+  if (a == null) a = '';
+  if (b == null) b = '';
+  switch (type) {
+    case 'number':
+      return parseFloat(a) - parseFloat(b);
+    case 'date':
+      return DateTime.fromISO(a) - DateTime.fromISO(b);
+    case 'boolean':
+      return (a === b) ? 0 : a ? -1 : 1;
+    default:
+      return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
+  }
 };
+
 const tableData = computed(() => {
-     let sortedData = [...props.data.displayData];
-     if (sortConfig.value.key) {
-          const header = props.data.headers.find(h => h.key === sortConfig.value.key);
-          if (header) {
-               sortedData.sort((a, b) => {
-                    let aValue = a[sortConfig.value.key];
-                    let bValue = b[sortConfig.value.key];
-                    if (Array.isArray(aValue)) {
-                         aValue = aValue.map(item =>
-                              header.valueKey && typeof item === 'object' ? item[header.valueKey] : item
-                         ).join(', ');
-                         bValue = bValue.map(item =>
-                              header.valueKey && typeof item === 'object' ? item[header.valueKey] : item
-                         ).join(', ');
-                    }
-                    const compareResult = compareValues(aValue, bValue, header.sortType);
-                    return sortConfig.value.direction === 'asc' ? compareResult : -compareResult;
-               });
-          }
-     }
-     return sortedData;
+  let sortedData = [...props.data.displayData];
+  if (sortConfig.value.key) {
+    const header = props.data.headers.find(h => h.key === sortConfig.value.key);
+    if (header) {
+      sortedData.sort((a, b) => {
+        let aValue = a[sortConfig.value.key];
+        let bValue = b[sortConfig.value.key];
+        if (Array.isArray(aValue)) {
+          aValue = aValue.map(item =>
+            header.valueKey && typeof item === 'object' ? item[header.valueKey] : item
+          ).join(', ');
+          bValue = bValue.map(item =>
+            header.valueKey && typeof item === 'object' ? item[header.valueKey] : item
+          ).join(', ');
+        }
+        const compareResult = compareValues(aValue, bValue, header.sortType);
+        return sortConfig.value.direction === 'asc' ? compareResult : -compareResult;
+      });
+    }
+  }
+  return sortedData;
 });
 
 const itemsPerPage = ref(10);
 const currentPage = ref(1);
 const displayedItems = computed(() => {
-     const perPage = parseInt(itemsPerPage.value, 10);
-     const startIndex = (currentPage.value - 1) * perPage;
-     const endIndex = startIndex + perPage;
-     return tableData.value.slice(startIndex, endIndex);
+  const perPage = parseInt(itemsPerPage.value, 10);
+  const startIndex = (currentPage.value - 1) * perPage;
+  const endIndex = startIndex + perPage;
+  return tableData.value.slice(startIndex, endIndex);
 });
+
 const pageCount = computed(() => {
-     return Math.ceil(props.data.displayData.length / itemsPerPage.value);
+  return Math.ceil(props.data.displayData.length / itemsPerPage.value);
 });
+
 const previousPage = () => {
-     if (currentPage.value > 1) currentPage.value--;
+  if (currentPage.value > 1) currentPage.value--;
 };
+
 const nextPage = () => {
-     if (currentPage.value < pageCount.value) currentPage.value++;
+  if (currentPage.value < pageCount.value) currentPage.value++;
 };
 </script>

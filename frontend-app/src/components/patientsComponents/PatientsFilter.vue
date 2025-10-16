@@ -42,14 +42,14 @@
             />
           </div>
 
-          <!-- Padres -->
+          <!-- Contactos -->
           <div class="flex flex-col">
-            <p class="mb-2 text-gray-600 block text-sm font-medium leading-6 truncate">{{ $t('patients.parents') }}</p>
+            <p class="mb-2 text-gray-600 block text-sm font-medium leading-6 truncate">{{ $t('patients.contacts') }}</p>
             <SearchOption
-              v-model="searchCriteria.parents"
+              v-model="searchCriteria.contacts"
               :cleanText="clearText"
               icon="MagnifyingGlassIcon"
-              textPlaceholder="patients.parents"
+              textPlaceholder="patients.contacts"
             />
           </div>
 
@@ -87,7 +87,7 @@ const props = defineProps({
 const searchCriteria = reactive({
   fullName: '',
   age: '',
-  parents: '',
+  contacts: '',
   lastVisit: ''
 });
 
@@ -108,19 +108,53 @@ const filterCount = computed(() => {
   return Object.values(searchCriteria).filter(value => value !== '' && value !== null).length;
 });
 
+const normalizeText = (text) => {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+};
+
+const getContactNames = (contact) => {
+  if (!contact) return '';
+
+  if (Array.isArray(contact)) {
+    return contact
+      .map(c => `${c.name || ''} ${c.lastName || ''} ${c.relationship || ''}`)
+      .join(' ')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
+
+  return `${contact.name || ''} ${contact.lastName || ''} ${contact.relationship || ''}`
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+};
+
 watchEffect(() => {
   filteredItems.value = props.data.filter(item => {
-    const fullName = `${item.name ?? ''} ${item.lastName ?? ''}`.toLowerCase().trim();
-    const inputName = searchCriteria.fullName.toLowerCase().trim();
+    const fullName = normalizeText(`${item.name ?? ''} ${item.lastName ?? ''}`);
+    const inputName = normalizeText(searchCriteria.fullName);
     const nameMatch = !inputName || fullName.includes(inputName);
 
     const ageMatch = !searchCriteria.age || Number(searchCriteria.age) === formatAgeFromDate(item.birthdate, 'number');
 
-    const parentsMatch = !searchCriteria.parents || item.parents.toLowerCase().includes(searchCriteria.parents.toLowerCase());
+    const contactData = item.contact || item.contacts || item.parents;
+    const contactNames = getContactNames(contactData);
+    const inputContact = normalizeText(searchCriteria.contacts);
+    const contactsMatch = !inputContact || contactNames.includes(inputContact);
 
-    const lastVisitMatch = !searchCriteria.lastVisit || item.lastVisit.includes(searchCriteria.lastVisit);
+    const lastVisitNormalized = normalizeText(item.lastVisit || '');
+    const inputLastVisit = normalizeText(searchCriteria.lastVisit);
+    const lastVisitMatch = !inputLastVisit || lastVisitNormalized.includes(inputLastVisit);
 
-    return nameMatch && ageMatch && parentsMatch && lastVisitMatch;
+    return nameMatch && ageMatch && contactsMatch && lastVisitMatch;
   });
 
   emit('FilteredData', filteredItems.value);

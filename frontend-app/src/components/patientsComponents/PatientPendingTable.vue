@@ -12,7 +12,7 @@ import { usePatientsStore } from "@stores/patientsStore";
 import { usePatientsLogicStore } from '@stores/patientsLogicStore';
 import { computed, ref } from 'vue';
 import { formatAgeFromDate } from '@utils/formatAge.js';
-import { formatDateShort } from '@utils/isoFormatDate.js';
+import { formatDateLong } from '@utils/isoFormatDate.js';
 import { storeToRefs } from "pinia";
 
 import GeneralTable from '@components/forms/GeneralTable.vue';
@@ -54,14 +54,15 @@ const pendingPatientsHeader = computed(() => ({
       valueKey: 'age' 
     },
     { 
-      key: 'parents', 
-      label: 'patients.parents', 
+      key: 'contacts', 
+      label: 'patients.contacts', 
       current: false, 
       visible: true, 
-      sortable: true, 
+      sortable: false,
       sortType: 'string', 
       hasAction: false, 
-      valueKey: 'parents' 
+      valueKey: 'contacts',
+      isHtml: true
     },
     { 
       key: 'createdAt', 
@@ -78,6 +79,16 @@ const pendingPatientsHeader = computed(() => ({
   iconType: 'solidIcon',
 }));
 
+const formatContactsHTML = (contact) => {
+  if (!contact) return '-';
+  if (Array.isArray(contact)) {
+    return contact
+      .map(c => `<div class="text-gray-700">${c.name} - ${c.relationship}</div>`)
+      .join('');
+  }
+  return `<div class="text-gray-700">${contact.name} - ${contact.relationship}</div>`;
+};
+
 const tableData = computed(() => ({
   ...pendingPatientsHeader.value,
   displayData: props.data.map(patient => ({
@@ -92,14 +103,14 @@ const tableData = computed(() => ({
       label: formatAgeFromDate(patient.birthdate, 'number'), 
       style: 'px-3 py-4 text-sm text-center text-gray-700' 
     }],
-    parents: [{ 
-      parents: patient.parents || '-', 
-      style: 'px-3 py-4 text-sm text-start text-gray-700' 
+    contacts: [{ 
+      contacts: formatContactsHTML(patient.contact),
+      isHtml: true
     }],
     createdAt: [{ 
       date: patient.createdAt, 
       hasLabel: true, 
-      label: formatDateShort(patient.createdAt), 
+      label: formatDateLong(patient.createdAt), 
       style: 'px-3 py-4 text-sm text-start text-gray-700' 
     }],
     action: () => selectPatientById(patient.id),

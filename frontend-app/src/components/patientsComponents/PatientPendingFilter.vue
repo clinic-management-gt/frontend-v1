@@ -42,14 +42,14 @@
             />
           </div>
 
-          <!-- Padres -->
+          <!-- Contactos -->
           <div class="flex flex-col">
-            <p class="mb-2 text-gray-600 block text-sm font-medium leading-6 truncate">{{ $t('patients.parents') }}</p>
+            <p class="mb-2 text-gray-600 block text-sm font-medium leading-6 truncate">{{ $t('patients.contacts') }}</p>
             <SearchOption
-              v-model="searchCriteria.parents"
+              v-model="searchCriteria.contacts"
               :cleanText="clearText"
               icon="MagnifyingGlassIcon"
-              textPlaceholder="patients.parents"
+              textPlaceholder="patients.contacts"
             />
           </div>
 
@@ -87,7 +87,7 @@ const props = defineProps({
 const searchCriteria = reactive({
   fullName: '',
   age: '',
-  parents: '',
+  contacts: '',
   createdAt: ''
 });
 
@@ -108,25 +108,52 @@ const filterCount = computed(() => {
   return Object.values(searchCriteria).filter(value => value !== '' && value !== null).length;
 });
 
+const normalizeText = (text) => {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .normalize('NFD') 
+    .replace(/[\u0300-\u036f]/g, '') 
+    .trim();
+};
+
+const getContactNames = (contact) => {
+  if (!contact) return '';
+  
+  if (Array.isArray(contact)) {
+    return contact
+      .map(c => `${c.name || ''} ${c.lastName || ''} ${c.relationship || ''}`)
+      .join(' ')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
+
+  return `${contact.name || ''} ${contact.lastName || ''} ${contact.relationship || ''}`
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+};
+
 watchEffect(() => {
   filteredItems.value = props.data.filter(item => {
-    // Filtro por nombre completo
-    const fullName = `${item.name ?? ''} ${item.lastName ?? ''}`.toLowerCase().trim();
-    const inputName = searchCriteria.fullName.toLowerCase().trim();
+    const fullName = normalizeText(`${item.name ?? ''} ${item.lastName ?? ''}`);
+    const inputName = normalizeText(searchCriteria.fullName);
     const nameMatch = !inputName || fullName.includes(inputName);
 
-    // Filtro por edad
     const ageMatch = !searchCriteria.age || Number(searchCriteria.age) === formatAgeFromDate(item.birthdate, 'number');
 
-    // Filtro por padres
-    const parentsMatch = !searchCriteria.parents || 
-      (item.parents && item.parents.toLowerCase().includes(searchCriteria.parents.toLowerCase()));
+    const contactNames = getContactNames(item.contact);
+    const inputContact = normalizeText(searchCriteria.contacts);
+    const contactsMatch = !inputContact || contactNames.includes(inputContact);
 
-    // Filtro por fecha de registro (createdAt)
-    const createdAtMatch = !searchCriteria.createdAt || 
-      (item.createdAt && item.createdAt.includes(searchCriteria.createdAt));
+    const createdAtNormalized = normalizeText(item.createdAt || '');
+    const inputCreatedAt = normalizeText(searchCriteria.createdAt);
+    const createdAtMatch = !inputCreatedAt || createdAtNormalized.includes(inputCreatedAt);
 
-    return nameMatch && ageMatch && parentsMatch && createdAtMatch;
+    return nameMatch && ageMatch && contactsMatch && createdAtMatch;
   });
 
   emit('FilteredData', filteredItems.value);
