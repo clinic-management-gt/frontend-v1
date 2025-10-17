@@ -49,7 +49,6 @@ export const usePatientsStore = defineStore(
         formData.append("InfoSheetFile", data.File)
         formData.append("BloodTypeId", data.BloodTypeId)
         formData.append("PatientTypeId", data.PatientTypeId)
-        console.log("formData", formData)
         const res = await instance.post("/patients", data, {
           headers: {
             "Content-Type": "multipart/form-data",

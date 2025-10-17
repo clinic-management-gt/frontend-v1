@@ -553,15 +553,6 @@ const isFormValid = computed(() => {
 
     return hasName && hasLastName && hasRelation && hasValidPhone && hasValidEmail;
   });
-
-  console.log("Form Validity:", {
-    hasNoErrors,
-    hasRequiredFields,
-    contactsValid,
-    totalContacts: contactInformationList.value.length,
-    errors: errors.value
-  });
-
   return hasNoErrors && hasRequiredFields && contactsValid;
 });
 
