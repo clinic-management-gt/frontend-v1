@@ -5,13 +5,13 @@
     @dragleave.prevent="onDragLeave"
     @drop.prevent="onDrop"
   >
-    <div :disabled="isDragging">
+    <div :class="{ 'opacity-60 pointer-events-none': isDragging }">
       <input
         id="filePdf_input"
         ref="filePdf"
         class="hidden"
         type="file"
-        :accept="aceptAll ? true : 'application/pdf'"
+        :accept="aceptAll ? '*/*' : 'application/pdf'"
         @change="handleFilePdf"
       />
       <div class="flex items-center m-4">
@@ -22,13 +22,9 @@
           color="text-patient-page-color"
           @click="triggerFilePdf"
         />
-        <a
-          class="ml-2"
-          role="button"
-          @click="triggerFilePdf"
-        >{{
-          $t(title)
-        }}</a>
+        <a class="ml-2" role="button" @click="triggerFilePdf">
+          {{ $t(title) }}
+        </a>
         <action-button-outlined-icon
           v-if="filePdfUploaded"
           icon="CheckCircleIcon"
@@ -45,64 +41,51 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import ActionButtonOutlinedIcon from "@components/forms/ActionButtonOutlinedIcon.vue";
 import { ref } from "vue";
 
 const emit = defineEmits(["sendFiles"]);
 const props = defineProps({
-  data: {
-    type: [String, File, Object],
-    required: false,
-    default: null,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  aceptAll: {
-    type: Boolean,
-    default: false,
-  },
-  currentSelected: {
-    type: [String, Object, File],
-    default: null,
-  },
+  data: { type: [String, File, Object], default: null },
+  title: { type: String, required: true },
+  aceptAll: { type: Boolean, default: false },
+  currentSelected: { type: [String, Object, File], default: null },
 });
 
 const filePdf = ref(null);
 const filePdfUploaded = ref(!!props.data);
 const uploadedFile = ref(props.data || null);
-const triggerFilePdf = () => {
-  filePdf.value.click();
-};
+
+const triggerFilePdf = () => filePdf.value?.click();
+
 const handleFilePdf = (event) => {
-  const files = event.target.files;
-  if (files.length > 0) {
-    filePdfUploaded.value = true;
-    emit("sendFiles", files[0]);
-  } else {
-    filePdfUploaded.value = false;
-  }
-};
-
-const isDragging = ref(false);
-const onDragOver = () => {
-  isDragging.value = true;
-};
-
-const onDragLeave = () => {
-  isDragging.value = false;
-};
-const onDrop = (event) => {
-  event.preventDefault();
-  const files = event.dataTransfer.files;
-  if (files.length > 0) {
+  const files = event.target.files || [];
+  if (files.length) {
     filePdfUploaded.value = true;
     uploadedFile.value = files[0];
     emit("sendFiles", uploadedFile.value);
   } else {
     filePdfUploaded.value = false;
+    uploadedFile.value = null;
+    emit("sendFiles", null);
+  }
+};
+
+const isDragging = ref(false);
+const onDragOver = () => (isDragging.value = true);
+const onDragLeave = () => (isDragging.value = false);
+const onDrop = (event) => {
+  const files = event.dataTransfer?.files || [];
+  if (files.length) {
+    filePdfUploaded.value = true;
+    uploadedFile.value = files[0];
+    emit("sendFiles", uploadedFile.value);
+  } else {
+    filePdfUploaded.value = false;
+    uploadedFile.value = null;
+    emit("sendFiles", null);
   }
   isDragging.value = false;
 };

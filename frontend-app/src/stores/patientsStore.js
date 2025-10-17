@@ -22,6 +22,7 @@ export const usePatientsStore = defineStore(
     const isLoadingAllPatients = ref(false);
     const isLoadingPendingPatients = ref(false);
     const isLoadingPatientData = ref(false);
+    const isLoadingCreateNewPatient = ref(false);
 
     const currentPatientMedicalRecords = ref(undefined);
     const isLoadingMedicalRecords = ref(false);
@@ -31,6 +32,35 @@ export const usePatientsStore = defineStore(
       currentPatientSelectedId.value = id;
       fetchPatientData(id);
       fetchPatientMedicalRecords();
+    }
+
+    async function createNewPatient(data){
+      isLoadingCreateNewPatient.value = true;
+      try {
+        const formData = new FormData();
+        formData.append("Name", data.Name)
+        formData.append("LastName", data.LastName)
+        formData.append("Birthdate", data.Birthdate)
+        formData.append("Gender", data.Gender)
+        formData.append("Address", data.Address)
+        formData.append("Alergies", data.Alergies)
+        formData.append("Syndromes", data.Syndromes)
+        formData.append("Pediatrician", data.Pediatrician)
+        formData.append("Contacts", data.Contacts)
+        formData.append("InsuranceId", data.Insurance)
+        formData.append("InfoSheetFile", data.File)
+        formData.append("BloodTypeId", data.BloodTypeId)
+        formData.append("PatientTypeId", data.PatientTypeId)
+        const res = await instance.post("/patients", data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          }
+        });
+        fetchAllPatients();
+        return res.data;
+      } finally {
+        isLoadingCreateNewPatient.value = false;
+      }
     }
 
     async function fetchAppointments() {
@@ -272,10 +302,12 @@ export const usePatientsStore = defineStore(
       isLoadingAllPatients,
       isLoadingPendingPatients,
       isLoadingPatientData,
+      isLoadingCreateNewPatient,
       currentPatientMedicalRecords,
       isLoadingMedicalRecords,
       hasError,
       // actions
+      createNewPatient,
       fetchPatientMedicalRecords,
       setPatientsData,
       fetchAppointments,

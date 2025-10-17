@@ -12,7 +12,7 @@ const props = defineProps({
   title: { type: String, default: "general.empty" },
   placeholder: { type: String, default: "general.empty" },
   labelCss: { type: String, default: "font-bold" },
-  isRequired: { type: Boolean, default: false },
+  required: { type: Boolean, default: false },
 });
 
 // ❌ const emit = defineEmits(["close"]); // no lo usas → elimínalo
@@ -61,7 +61,7 @@ watch(
       v-if="title"
       :title="title"
       :textClass="labelCss"
-      :isRequired="isRequired"
+      :isRequired="required"
     />
     <Combobox
       v-model="selectedItems"

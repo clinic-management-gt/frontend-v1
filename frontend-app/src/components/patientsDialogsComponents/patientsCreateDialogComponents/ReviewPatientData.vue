@@ -64,7 +64,7 @@ const patientSummary = computed(() => {
     },
     {
       name: "patients.birthdate",
-      value: isoFormatDate(newPatientData.value.birthdate).longSpanishDate,
+      value: isoFormatDate(newPatientData.value.birthdate)
     },
     {
       name: "patients.gender",
@@ -90,6 +90,8 @@ const patientSummary = computed(() => {
 });
 
 const patientPhoneList = computed(() => {
+  if(!newPatientData.value.phoneList) return [];
+  if(newPatientData.value.phoneList.length === 0) return [];
   return newPatientData.value.phoneList.map((item) => Number(item.phone));
 });
 </script>

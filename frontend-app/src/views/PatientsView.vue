@@ -151,10 +151,9 @@ const handlePendingFilters = (filteredData) => {
   updatedFilteredPendingPatients.value = filteredData;
 };
 
-// Función para refrescar pacientes pendientes
-async function refreshPendingPatients() {
-  await fetchPendingPatients();
-}
+onMounted(async () => {
+  await patientsStore.fetchAllPatients();
+});
 
 watch(currentPatientSelectedId, async (newId) => {
   if (newId) {

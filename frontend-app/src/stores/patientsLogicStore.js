@@ -18,6 +18,24 @@ export const usePatientsLogicStore = defineStore(
     const isEditing = ref(false);
     const isEditingRecipe = ref(false);
 
+    // ✅ Función auxiliar para inicializar paciente vacío
+    const initializeEmptyPatient = () => ({
+      Name: "",
+      LastName: "",
+      Birthdate: "",
+      Gender: 1,
+      Address: "",
+      Alergies: [],
+      Syndromes: [],
+      Pediatrician: "",
+      Contacts: [],
+      InsuranceId: null,
+      BloodTypeId: [],
+      PatientTypeId: [],
+      isFormValid: false,
+      InfoSheetFile: null,
+    });
+
     const selectedRecord = ref(null);
     const selectedRecordForEdit = ref(null);
     const selectedRecipeForEdit = ref(null);
@@ -43,6 +61,12 @@ export const usePatientsLogicStore = defineStore(
       showDownloadPatientRecordDialog.value = true;
     }
     function openCreateFormDialog() {
+      const patientsStore = usePatientsStore();
+
+      if (!patientsStore.newPatientData) {
+        patientsStore.newPatientData = initializeEmptyPatient();
+      }
+      
       showCreateFormDialog.value = true;
     }
     function openRecordDetailsDialog(record) {
@@ -281,8 +305,8 @@ export const usePatientsLogicStore = defineStore(
       showEditPatientRecordDialog,
       showDownloadPatientRecordDialog,
       showCreateFormDialog,
-      showFormModal,
       showDetailsModal,
+      showFormModal,
       showRecipeFormModal,
       selectedRecord,
       selectedRecordForEdit,
