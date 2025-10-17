@@ -5,7 +5,7 @@
       :title="title"
       :name="name"
       :textClass="labelCss"
-      :isRequired="isRequired"
+      :isRequired="required"
     />
     <fieldset>
       <div
@@ -61,7 +61,7 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  isRequired: {
+  required: {
     type: Boolean,
     default: false,
   },

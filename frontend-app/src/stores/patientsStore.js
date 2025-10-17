@@ -20,6 +20,7 @@ export const usePatientsStore = defineStore(
     const isLoadingAppointmentsToday = ref(false);
     const isLoadingAllPatients = ref(false);
     const isLoadingPatientData = ref(false);
+    const isLoadingCreateNewPatient = ref(false);
 
     const currentPatientMedicalRecords = ref(undefined);
     const isLoadingMedicalRecords = ref(false);
@@ -29,6 +30,35 @@ export const usePatientsStore = defineStore(
       currentPatientSelectedId.value = id;
       fetchPatientData();
       fetchPatientMedicalRecords();
+    }
+
+    async function createNewPatient(data){
+      isLoadingCreateNewPatient.value = true;
+      try {
+        const formData = new FormData();
+        formData.append("Name", data.Name)
+        formData.append("LastName", data.LastName)
+        formData.append("Birthdate", data.Birthdate)
+        formData.append("Gender", data.Gender)
+        formData.append("Address", data.Address)
+        formData.append("Alergies", data.Alergies)
+        formData.append("Syndromes", data.Syndromes)
+        formData.append("Pediatrician", data.Pediatrician)
+        formData.append("Contacts", data.Contacts)
+        formData.append("InsuranceId", data.Insurance)
+        formData.append("InfoSheetFile", data.File)
+        formData.append("BloodTypeId", data.BloodTypeId)
+        formData.append("PatientTypeId", data.PatientTypeId)
+        const res = await instance.post("/patients", data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          }
+        });
+        fetchAllPatients();
+        return res.data;
+      } finally {
+        isLoadingCreateNewPatient.value = false;
+      }
     }
 
     async function fetchAppointments() {
@@ -178,45 +208,6 @@ export const usePatientsStore = defineStore(
       }
     }
 
-    async function uploadFile(
-      file,
-      type,
-      patientId,
-      description,
-      medicalRecordID,
-    ) {
-      isLoadingMedicalRecords.value = true;
-      try {
-        const formData = new FormData();
-        formData.append("patientId", patientId);
-        formData.append("type", type);
-        formData.append("descripcion", description);
-        formData.append("file", file);
-        formData.append("medicalRecordID", medicalRecordID);
-
-        const res = await instance.post(`/files/upload`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        return res.data;
-      } finally {
-        isLoadingMedicalRecords.value = false;
-      }
-    }
-
-    async function downloadFile(PatientId, type, MedicalRecordId) {
-      const res = await instance.get("/files/download", {
-        params: {
-          PatientId,
-          type,
-          MedicalRecordId,
-        },
-        responseType: "blob",
-      });
-      return res.data;
-    }
-
     async function fetchRecipe(recipeId) {
       isLoadingMedicalRecords.value = true;
       try {
@@ -290,10 +281,12 @@ export const usePatientsStore = defineStore(
       isLoadingAppointmentsToday,
       isLoadingAllPatients,
       isLoadingPatientData,
+      isLoadingCreateNewPatient,
       currentPatientMedicalRecords,
       isLoadingMedicalRecords,
       hasError,
       // actions
+      createNewPatient,
       fetchPatientMedicalRecords,
       setPatientsData,
       fetchAppointments,
@@ -305,8 +298,6 @@ export const usePatientsStore = defineStore(
       updateMedicalRecord,
       deleteMedicalRecord,
       fetchMedicalRecordDetails,
-      uploadFile,
-      downloadFile,
       fetchRecipe,
       updateRecipe,
       createRecipe,
