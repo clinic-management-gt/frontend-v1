@@ -225,6 +225,58 @@
               </div>
             </div>
           </div>
+
+          <!-- Receta médica (Nuevo apartado para CLINIC-134) -->
+          <div class="bg-green-50 p-4 rounded-lg mt-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-semibold text-green-800">
+                {{ $t("patients.medical-recipe") }}
+              </h3>
+              <div class="flex items-center">
+                <input
+                  id="includeRecipe"
+                  v-model="includeRecipe"
+                  type="checkbox"
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="includeRecipe" class="ml-2 text-sm text-gray-700">
+                  {{ $t("recipes.include-recipe") }}
+                </label>
+              </div>
+            </div>
+            
+                          <div v-if="includeRecipe" class="mb-4">
+                <label for="prescription" class="block mb-2 text-sm font-medium text-gray-700">
+                  {{ $t("recipes.prescription") }}
+                </label>
+                <div class="mb-2 p-2 bg-yellow-50 border border-yellow-200 text-yellow-700 text-sm rounded-md">
+                  <p class="flex items-center">
+                    <svg 
+                      class="w-4 h-4 mr-2" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24" 
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path 
+                        stroke-linecap="round" 
+                        stroke-linejoin="round" 
+                        stroke-width="2" 
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
+                      />
+                    </svg>
+                    {{ $t("recipes.warning-recipe-note") }}
+                  </p>
+                </div>
+                <textarea
+                  id="prescription"
+                  v-model="recipeData.prescription"
+                  rows="4"
+                  class="w-full p-2 border rounded-md"
+                  :placeholder="$t('recipes.prescription-placeholder')"
+                ></textarea>
+              </div>
+          </div>
         </form>
       </div>
     </template>
@@ -313,6 +365,20 @@ const laboratoryInput = ref(null);
 const examInput = ref(null);
 
 // Valores originales para referencia
+const includeRecipe = ref(false);
+const formData = ref({
+  weight: "",
+  height: "",
+  familyHistory: "",
+  notes: "",
+});
+
+// Estado para la receta médica
+const recipeData = ref({
+  prescription: "",
+});
+
+// Valores originales para mostrar como referencia
 const originalValues = ref({
   weight: "",
   height: "",
@@ -452,7 +518,8 @@ async function handleSubmit() {
       heightToSend = parseFloat(originalValues.value.height);
     }
 
-    const dataToSend = {
+    // Preparar datos del registro médico
+    const medicalRecordData = {
       Weight: weightToSend,
       Height: heightToSend,
       FamilyHistory: values.familyHistory || null,
@@ -512,6 +579,45 @@ async function handleSubmit() {
         await Promise.all(uploadPromises);
         console.log("Archivos subidos exitosamente");
       }
+    // Validar que tenemos los datos mínimos necesarios
+    if (
+      !medicalRecordData.Weight &&
+      !medicalRecordData.Height &&
+      !medicalRecordData.FamilyHistory &&
+      !medicalRecordData.Notes
+    ) {
+      notificationStore.addNotification(
+        "warning",
+        "general.warning",
+        "Por favor completa al menos un campo",
+      );
+      return;
+    }
+
+    // Preparar estructura de datos que incluye medical record y opcionalmente receta
+    const dataToSend = {
+      medicalRecord: medicalRecordData
+    };
+
+    // Si se seleccionó incluir receta y hay texto en la receta, agregarla
+    if (includeRecipe.value && recipeData.value.prescription.trim()) {
+      dataToSend.recipe = {
+        prescription: recipeData.value.prescription.trim()
+      };
+    }
+
+    if (isEditing.value && props.record) {
+      // Actualizar registro existente - usar el store de lógica
+      await patientsLogicStore.handleMedicalRecordSave(
+        dataToSend,
+        props.patientId,
+      );
+    } else if (!isEditing.value && props.patientId) {
+      // Crear nuevo registro usando el store de lógica
+      await patientsLogicStore.handleMedicalRecordSave(
+        dataToSend,
+        props.patientId,
+      );
     } else {
       console.error("No se pudo obtener el ID del registro médico");
       notificationStore.addNotification(
@@ -532,6 +638,10 @@ async function handleSubmit() {
       "notifications.error",
       error.message || t("general.error")
     );
+    // El store de lógica ya maneja el cierre del modal y recarga de datos
+    emit("save", dataToSend);
+  } catch {
+    // El manejo de errores lo hace el store de lógica
   } finally {
     isLoading.value = false;
   }

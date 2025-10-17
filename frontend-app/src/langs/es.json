@@ -64,6 +64,10 @@
     "number-of-pages": "Número de páginas",
     "filters": "Filtros",
     "clear-all": "Limpiar todo",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "page": "Página",
+    "of": "de",
     "confirm-deletion": "Confirmar eliminación",
     "delete-confirmation-message": "¿Estás seguro de que deseas eliminar este registro médico? Esta acción no se puede deshacer."
   },
@@ -290,12 +294,14 @@
     "success": "Éxito",
     "medical-record-updated-successfully": "Registro médico actualizado exitosamente",
     "medical-record-created-successfully": "Registro médico creado exitosamente",
+    "medical-record-and-recipe-created-successfully": "Registro médico y receta creados correctamente",
     "medical-record-deleted-successfully": "El registro médico ha sido eliminado correctamente",
     "error-deleting-record": "Error al eliminar el registro médico. Inténtalo nuevamente."
   },
   "recipes": {
     "edit-recipe": "Editar receta médica",
     "create-recipe": "Crear receta médica",
+    "include-recipe": "Incluir receta médica",
     "prescription": "Prescripción médica",
     "prescription-placeholder": "Escriba aquí la prescripción médica completa...",
     "creation-date": "Fecha de creación",
@@ -303,6 +309,7 @@
     "treatment-id": "ID de tratamiento",
     "warning": "Advertencia",
     "warning-no-treatment": "No se encontró un tratamiento asociado. Para crear una receta, primero debe haber un tratamiento registrado en esta consulta.",
+    "warning-recipe-note": "Nota: Para crear una receta es necesario tener un tratamiento registrado previamente.",
     "saving": "Guardando...",
     "recipe-updated": "Receta actualizada exitosamente",
     "recipe-created": "Receta creada exitosamente",

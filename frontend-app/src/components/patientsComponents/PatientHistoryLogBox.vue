@@ -111,12 +111,12 @@
           class="px-3 py-1 border rounded disabled:opacity-50"
           @click="goToPreviousPage"
         >
-          {{ $t("general.previous") || "Anterior" }}
+          {{ $t("general.previous") }}
         </button>
 
         <span>
-          {{ $t("general.page") || "Página" }} {{ currentPage }}
-          {{ $t("general.of") || "de" }} {{ totalPages }}
+          {{ $t("general.page") }} {{ currentPage }}
+          {{ $t("general.of") }} {{ totalPages }}
         </span>
 
         <button
@@ -124,7 +124,7 @@
           class="px-3 py-1 border rounded disabled:opacity-50"
           @click="goToNextPage"
         >
-          {{ $t("general.next") || "Siguiente" }}
+          {{ $t("general.next") }}
         </button>
       </div>
     </div>
