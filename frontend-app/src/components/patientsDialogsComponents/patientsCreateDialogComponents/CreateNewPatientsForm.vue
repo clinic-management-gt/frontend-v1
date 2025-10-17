@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent class="ml-2 grid grid-cols-2 gap-2">
+  <form class="ml-2 grid grid-cols-2 gap-2" @submit.prevent>
     <!-- name input -->
     <text-input
       inputClassError="ring-yellow-300 focus:ring-yellow-600"
@@ -41,7 +41,7 @@
       class="mt-2 col-span-2 sm:col-span-1"
       :required="true"
     />
-        <!-- pediatrician input -->
+    <!-- pediatrician input -->
     <text-input
       inputClassError="ring-yellow-300 focus:ring-yellow-600"
       name="pediatrician"

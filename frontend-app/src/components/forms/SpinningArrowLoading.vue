@@ -1,19 +1,19 @@
 <template>
-    <div class="flex justify-center items-center">
-        <ArrowPathIcon
-            :class="['w-12 h-12 animate-spin-smooth', color]"
-        />
-    </div>
+  <div class="flex justify-center items-center">
+    <ArrowPathIcon
+      :class="['w-12 h-12 animate-spin-smooth', color]"
+    />
+  </div>
 </template>
 
 <script setup>
-import { ArrowPathIcon } from '@heroicons/vue/24/solid'
+import { ArrowPathIcon } from '@heroicons/vue/24/solid';
 defineProps({
     color: {
         type: String,
         default: 'text-patient-page-color'
     }
-})
+});
 </script>
 
 <style scoped>

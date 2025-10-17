@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import instance from "@stores/axios.js";
 import { ref } from "vue";
 
 export const useFileStore = defineStore(

@@ -29,7 +29,7 @@
         <div class="ml-2 sm:border-l">
           <create-new-patients-form v-if="currentPage === 1" />
           <review-patient-data v-if="currentPage === 2" />
-          <spinning-arrow-loading v-if="currentPage === 3"/>
+          <spinning-arrow-loading v-if="currentPage === 3" />
         </div>
       </div>
     </template>
@@ -44,10 +44,9 @@
       >
         <div class="uppercase">{{ $t("general.back") }}</div>
       </primary-button>
-      {{ newPatientData.isFormValid }}
-      <primary-button type="button" class="mr-2" v-if="newPatientData.isFormValid">
-        <div v-if="currentPage === 1" @click="nextPage()" class="uppercase">{{ $t('general.next') }}</div>
-        <div v-if="currentPage === 2" @click="createPatient()" class="uppercase">{{ $t("general.accept") }}</div>
+      <primary-button v-if="newPatientData.isFormValid" type="button" class="mr-2">
+        <div v-if="currentPage === 1" class="uppercase" @click="nextPage()">{{ $t('general.next') }}</div>
+        <div v-if="currentPage === 2" class="uppercase" @click="createPatient()">{{ $t("general.accept") }}</div>
       </primary-button>
     </template>
   </general-dialog-modal>
@@ -81,7 +80,6 @@ defineProps({
 });
 
 const handleClose = (closeModal) => {
-  // ✅ Reset simple - solo null
   newPatientData.value = null;
   showCreateFormDialog.value = closeModal;
   currentPage.value = 1;
@@ -97,10 +95,8 @@ async function handleSendFiles(fileReceived) {
     return;
   }
 
-  // Asignar directamente el File/Blob para el iframe
   rawFile.value = fileReceived;
 
-  // Convertir a base64 para el store (sin afectar rawFile)
   const reader = new FileReader();
   reader.onload = () => {
     if (newPatientData.value) {

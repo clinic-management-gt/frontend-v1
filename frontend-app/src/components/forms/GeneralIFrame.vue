@@ -25,7 +25,7 @@ import { useBlobAdapter } from "@/composables/useBlobAdapter";
 import PrimaryButton from "@components/forms/PrimaryButton.vue";
 
 const props = defineProps({
-  source: { type: [String, Blob, File, ArrayBuffer, Uint8Array], required: true, default: '' },
+  source: { type: [String, Blob, File, ArrayBuffer, Uint8Array], required: true },
   width: { type: String, default: "100%" },
   height: { type: String, default: "900px" },
 });
