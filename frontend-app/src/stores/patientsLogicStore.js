@@ -104,9 +104,11 @@ export const usePatientsLogicStore = defineStore(
     async function handleMedicalRecordSave(formData, patientId) {
       try {
         const patientsStore = usePatientsStore();
-
+        const notificationStore = useNotificationStore();
+        
         // Verificar si viene en el nuevo formato (con medicalRecord y recipe separados)
         const isNewFormat = formData.medicalRecord || formData.recipe;
+        let medicalRecordId = null;
 
         if (isNewFormat) {
           // NUEVO FORMATO: Manejar medical record y recipe por separado
@@ -122,17 +124,66 @@ export const usePatientsLogicStore = defineStore(
                 recordId,
                 formData.medicalRecord,
               );
+              medicalRecordId = recordId;
             } else {
-              await patientsStore.createMedicalRecord(
+              // Crear nuevo registro médico y guardar su ID para asociar con la receta
+              const response = await patientsStore.createMedicalRecord(
                 patientId,
                 formData.medicalRecord,
               );
+              medicalRecordId = response.id; // Asumiendo que la API devuelve el ID del registro creado
             }
           }
 
           // 2. Manejar Recipe si existe
           if (formData.recipe) {
-            // Aquí agregamos lógica para recipes cuando esté lista
+            try {
+              // Verificamos primero si tenemos tratamientos disponibles para este paciente
+              let treatmentId = null;
+              
+              try {
+                // Intentamos obtener los detalles del paciente para ver sus tratamientos
+                await patientsStore.fetchPatientData(patientId);
+                
+                // Obtenemos detalles del registro médico si está disponible
+                if (medicalRecordId) {
+                  const details = await patientsStore.fetchMedicalRecordDetails(medicalRecordId);
+                  
+                  // Si hay tratamientos disponibles en los detalles del registro médico
+                  if (details && details.treatments && details.treatments.length > 0) {
+                    treatmentId = details.treatments[0].id;
+                  }
+                }
+              } catch {
+                // Error silencioso - ya manejamos el caso de fallo con notificación
+              }
+              
+              // Si no se encontró un tratamiento, mostramos una notificación
+              if (!treatmentId) {
+                notificationStore.addNotification(
+                  "warning",
+                  "recipes.warning",
+                  "recipes.warning-no-treatment"
+                );
+                return; // No continuamos con la creación de la receta
+              }
+              
+              // Preparar datos para la receta con el tratamiento encontrado
+              const recipeData = {
+                prescription: formData.recipe.prescription,
+                treatmentId: treatmentId
+              };
+              
+              // Crear la receta
+              await patientsStore.createRecipe(recipeData);
+            } catch {
+              notificationStore.addNotification(
+                "error",
+                "general.error",
+                "recipes.error-saving"
+              );
+              // Seguimos adelante, al menos el registro médico se creó correctamente
+            }
           }
         } else {
           // FORMATO ACTUAL: Mantener compatibilidad
@@ -152,14 +203,19 @@ export const usePatientsLogicStore = defineStore(
         closeHistoryLogModals();
         await patientsStore.fetchPatientMedicalRecords(patientId);
 
-        // Usar notification store en lugar de alert
-        const notificationStore = useNotificationStore();
+        // Mensaje de éxito según si se guardó solo registro médico o también receta
+        let successMessage = isEditing.value
+          ? "general.record-updated-successfully"
+          : "general.record-created-successfully";
+          
+        if (formData.recipe) {
+          successMessage = "notifications.medical-record-and-recipe-created-successfully";
+        }
+
         notificationStore.addNotification(
           "success",
           "general.success",
-          isEditing.value
-            ? "general.record-updated-successfully"
-            : "general.record-created-successfully",
+          successMessage
         );
       } catch (error) {
         // Usar notification store en lugar de alert

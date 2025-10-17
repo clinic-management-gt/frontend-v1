@@ -2,7 +2,7 @@
   <general-dialog-modal
     ref="createDialog"
     :isOpen="isOpen"
-    dialogSize="max-w-6xl"
+    dialogSize="max-w-7xl"
     @close-modal="handleClose"
   >
     <!-- Header -->
@@ -27,7 +27,7 @@
 
     <!-- Body -->
     <template #body>
-      <div class="overflow-y-auto max-h-[calc(90vh-160px)]">
+      <div class="overflow-y-auto max-h-[calc(95vh-160px)]">
         <!-- Loading -->
         <div
           v-if="isLoadingMedicalRecords"
@@ -119,8 +119,8 @@
             </div>
           </div>
 
-          <!-- Nota de evolución -->
-          <div class="bg-gray-100 rounded-lg p-4">
+          <!-- Nota de evolución - Modificada para ocupar todo el ancho de la pantalla -->
+          <div class="bg-gray-100 rounded-lg p-4 w-full">
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center">
                 <div
@@ -130,6 +130,9 @@
                 <h3 class="text-lg font-bold text-gray-800">
                   {{ $t("patients.evolution-note") }}
                 </h3>
+                <span class="ml-2 text-sm text-gray-500">
+                  {{ displayRecord?.updatedAt ? formatDate(displayRecord.updatedAt) : (displayRecord?.createdAt ? formatDate(displayRecord.createdAt) : '') }}
+                </span>
               </div>
               <button
                 class="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm font-medium rounded flex items-center gap-1"
@@ -140,7 +143,7 @@
             </div>
             <div
               v-if="displayRecord.notes && displayRecord.notes.trim()"
-              class="bg-white rounded p-3 border-l-4"
+              class="bg-white rounded p-5 border-l-4 min-h-[300px]"
               style="border-color: #489fb5"
             >
               <p class="text-gray-800 whitespace-pre-line">
@@ -152,7 +155,7 @@
                 displayRecord.medicalRecord?.notes &&
                   displayRecord.medicalRecord.notes.trim()
               "
-              class="bg-white rounded p-3 border-l-4"
+              class="bg-white rounded p-5 border-l-4 min-h-[300px]"
               style="border-color: #489fb5"
             >
               <p class="text-gray-800 whitespace-pre-line">
@@ -161,7 +164,7 @@
             </div>
             <div
               v-else
-              class="text-center py-6"
+              class="text-center py-6 min-h-[300px] flex flex-col items-center justify-center"
             >
               <div class="text-gray-400 text-4xl mb-2">
                 📝

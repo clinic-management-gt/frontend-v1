@@ -89,11 +89,19 @@ async function changueStatus(appointment) {
   const currKey = appointment.status.toLowerCase();
   const idx = statuses.findIndex((s) => s.key === currKey);
   const next = statuses[(idx + 1) % statuses.length];
-
+  
+  // Guardamos el estado anterior para restaurarlo si falla
+  const prevStatus = appointment.status;
+  
+  // Actualizamos localmente primero para dar feedback instantáneo
   appointment.status = next.key;
-
+  
+  // Actualizamos en el servidor sin bloquear la UI
   const ok = await patientsStore.updateAppointmentStatus(appointment.id, next.label);
-  if (!ok) appointment.status = currKey;
+  if (!ok) {
+    // Restauramos el estado anterior si falla
+    appointment.status = prevStatus;
+  }
 }
 
 function statusClass(status) {
