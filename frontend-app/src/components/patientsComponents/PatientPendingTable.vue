@@ -1,7 +1,7 @@
 <template>
   <general-table
     :data="tableData"
-    :isLoadingContent="isLoadingPatientData"
+    :isLoadingContent="isLoadingPendingPatients"
     :defaultSort="currentSort"
     @update:sort="(newSort) => currentSort = newSort"
   />
@@ -27,11 +27,11 @@ const props = defineProps({
 const patientsLogicStore = usePatientsLogicStore();
 const { selectPatientById } = patientsLogicStore;
 const patientsStore = usePatientsStore();
-const { isLoadingPatientData } = storeToRefs(patientsStore);
+const { isLoadingPendingPatients } = storeToRefs(patientsStore);
 
 const currentSort = ref({ key: 'name', direction: 'asc' });
 
-const patientsHeader = computed(() => ({
+const pendingPatientsHeader = computed(() => ({
   headers: [
     { 
       key: 'name', 
@@ -54,33 +54,34 @@ const patientsHeader = computed(() => ({
       valueKey: 'age' 
     },
     { 
-      key: 'contacts',
-      label: 'patients.contacts',
+      key: 'contacts', 
+      label: 'patients.contacts', 
       current: false, 
       visible: true, 
-      sortable: false,
+      sortable: false, 
       sortType: 'string', 
       hasAction: false, 
       valueKey: 'contacts'
     },
     { 
-      key: 'lastVisit', 
-      label: 'patients.last-visit', 
+      key: 'createdAt', 
+      label: 'patients.created-at', 
       current: false, 
       visible: true, 
       sortable: true, 
       sortType: 'date', 
       hasAction: false, 
-      valueKey: 'lastVisit' 
+      valueKey: 'createdAt' 
     }
   ],
-  noDataMessage: 'patients.empty-data',
+  noDataMessage: 'patients.no-pending-patients',
   iconType: 'solidIcon',
 }));
 
 const formatContactsArray = (contact) => {
-  if (!contact || (Array.isArray(contact) && contact.length === 0)) return ['-'];
+  if (!contact) return ['-'];
   
+  // Si es un array de contactos
   if (Array.isArray(contact)) {
     return contact.map(c => {
       const name = c.name || '';
@@ -90,6 +91,7 @@ const formatContactsArray = (contact) => {
     });
   }
   
+  // Si es un objeto único
   const name = contact.name || '';
   const lastName = contact.lastName || '';
   const relationship = contact.relationship || '';
@@ -97,7 +99,7 @@ const formatContactsArray = (contact) => {
 };
 
 const tableData = computed(() => ({
-  ...patientsHeader.value,
+  ...pendingPatientsHeader.value,
   displayData: props.data.map(patient => ({
     id: patient.id,
     name: [{ 
@@ -111,13 +113,13 @@ const tableData = computed(() => ({
       style: 'px-3 py-4 text-sm text-center text-gray-700' 
     }],
     contacts: [{ 
-      contacts: formatContactsArray(patient.contact || patient.contacts || patient.parents).join('\n'),
+      contacts: formatContactsArray(patient.contact).join('\n'), 
       isMultiLine: true 
     }],
-    lastVisit: [{ 
-      lastVisit: patient.lastVisit, 
+    createdAt: [{ 
+      date: patient.createdAt, 
       hasLabel: true, 
-      label: formatDateLong(patient.lastVisit), 
+      label: formatDateLong(patient.createdAt), 
       style: 'px-3 py-4 text-sm text-start text-gray-700' 
     }],
     action: () => selectPatientById(patient.id),

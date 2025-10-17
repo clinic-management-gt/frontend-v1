@@ -106,6 +106,11 @@ export function formatDateTime(dateString) {
   });
 }
 
+/**
+ * Formatea una fecha en formato corto (dd/mm/yyyy)
+ * @param {*} dateString 
+ * @returns 
+ */
 export function formatDateShortest(dateString) {
   if (!dateString) return "Fecha no disponible";
   const defaultOptions = {
@@ -116,3 +121,18 @@ export function formatDateShortest(dateString) {
   return new Date(dateString).toLocaleDateString("es-ES", defaultOptions);
 }
 
+/**
+  * Formatea una fecha devolviendo solamente DD de MMMM de YYYY
+  * Sin devolver la hora
+  * @param {string} dateString - Fecha en formato ISO string
+  * @returns {string} Fecha formateada (ejemplo: "15 de octubre de 2025")
+  */
+export function formatDateLong(dateString) {
+  if (!dateString) return "Fecha no disponible";
+  
+  return new Date(dateString).toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}

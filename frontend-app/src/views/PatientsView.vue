@@ -8,19 +8,53 @@
     </div>
     <div
       v-else-if="currentPatientSelectedData == null"
-      class="px-6 py-6 mx-auto"
+      class="px-6 py-6 mx-auto space-y-6"
     >
+      <!-- Tabla de Pacientes Activos -->
       <app-panel>
-        <div class="flex items-center">
-          <p class="text-2xl mr-2">
-            {{ $t('patients.patients') }}
-          </p>
-          <p class="text-md text-gray-500">
-            ({{ Object.keys(allPatients).length }})
-          </p>
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <p class="text-2xl mr-2">
+              {{ $t('patients.patients') }}
+            </p>
+            <p class="text-md text-gray-500">
+              ({{ Object.keys(allPatients).length }})
+            </p>
+          </div>
         </div>
         <patients-filter :data="allPatients" @filtered-data="handleFilters" />
         <patient-table :data="updatedFilteredPatients" />
+      </app-panel>
+
+      <!-- Tabla de Pacientes Pendientes -->
+      <app-panel>
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <p class="text-2xl mr-2">
+              {{ $t('patients.pending-patients') }}
+            </p>
+            <p class="text-md text-gray-500">
+              ({{ pendingPatients.length }})
+            </p>
+          </div>
+          <primary-button
+            :disabled="isLoadingPendingPatients"
+            @click="refreshPendingPatients"
+          >
+            <span class="flex items-center">
+              <ArrowPathIcon 
+                class="w-4 h-4 mr-2" 
+                :class="{ 'animate-spin': isLoadingPendingPatients }"
+              />
+              {{ $t('general.refresh') }}
+            </span>
+          </primary-button>
+        </div>
+        <patient-pending-filter 
+          :data="pendingPatients" 
+          @filtered-data="handlePendingFilters" 
+        />
+        <patient-pending-table :data="updatedFilteredPendingPatients" />
       </app-panel>
     </div>
     <div
@@ -64,9 +98,9 @@
 import { usePatientsStore } from "@stores/patientsStore";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { ArrowUturnLeftIcon } from "@heroicons/vue/20/solid";
+import { ArrowPathIcon } from "@heroicons/vue/24/outline";
 import { ref, watch, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-
 
 import PatientContactDataBox from "@components/patientsComponents/PatientContactDataBox.vue";
 import PatientDataSheetBox from "@components/patientsComponents/PatientDataSheetBox.vue";
@@ -75,7 +109,10 @@ import PatientImportantInformationBox from "@components/patientsComponents/Patie
 import PatientMainDataBox from "@components/patientsComponents/PatientMainDataBox.vue";
 import PatientsDataSheetDialog from "@components/patientsDialogsComponents/patientsDataSheetDialog.vue";
 import PatientTable from "@components/patientsComponents/PatientTable.vue";
-import PatientsFilter from "../components/patientsComponents/PatientsFilter.vue";
+import PatientPendingTable from "@components/patientsComponents/PatientPendingTable.vue";
+import PatientsFilter from "@components/patientsComponents/PatientsFilter.vue";
+import PatientPendingFilter from "@components/patientsComponents/PatientPendingFilter.vue";
+import PrimaryButton from "@components/forms/PrimaryButton.vue";
 import AppPanel from "@components/forms/AppPanel.vue";
 
 const showRecipeModal = ref(false);
@@ -92,15 +129,26 @@ const {
   currentPatientSelectedData,
   isLoadingPatientData,
   allPatients,
+  pendingPatients,
+  isLoadingPendingPatients,
 } = storeToRefs(patientsStore);
+
+const { fetchPendingPatients } = patientsStore;
 
 const patientsLogicStore = usePatientsLogicStore();
 const { showDataSheetPatientDialog } = storeToRefs(patientsLogicStore);
 const { openDataSheetPatientDialog, closeAllPatientDialog, returnToPatientsTable } = patientsLogicStore;
 
+// Filtros para pacientes activos
 const updatedFilteredPatients = ref([]);
 const handleFilters = (filteredData) => {
-     updatedFilteredPatients.value = filteredData;
+  updatedFilteredPatients.value = filteredData;
+};
+
+// Filtros para pacientes pendientes
+const updatedFilteredPendingPatients = ref([]);
+const handlePendingFilters = (filteredData) => {
+  updatedFilteredPendingPatients.value = filteredData;
 };
 
 onMounted(async () => {
@@ -115,9 +163,13 @@ watch(currentPatientSelectedId, async (newId) => {
 });
 
 onMounted(async () => {
+  await patientsStore.fetchAllPatients();
+  await fetchPendingPatients();
+
+  
   if (currentPatientSelectedId.value) {
-    await patientsStore.fetchPatieantData(currentPatientSelectedId.value);
-    await patientsStore.fetchPatientMedicalRecords( currentPatientSelectedId.value);
+    await patientsStore.fetchPatientData(currentPatientSelectedId.value);
+    await patientsStore.fetchPatientMedicalRecords(currentPatientSelectedId.value);
   }
 });
 </script>
