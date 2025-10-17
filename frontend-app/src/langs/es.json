@@ -67,7 +67,8 @@
     "clear-all": "Limpiar todo",
     "confirm-deletion": "Confirmar eliminación",
     "delete-confirmation-message": "¿Estás seguro de que deseas eliminar este registro médico? Esta acción no se puede deshacer.",
-    "refresh": "Actualizar"
+    "refresh": "Actualizar",
+    "download-pdf": "Descargar PDF"
   },
   "login": {
     "login": "Iniciar sesión",

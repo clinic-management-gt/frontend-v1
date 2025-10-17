@@ -144,12 +144,13 @@
         <!-- Nombre y Apellido del contacto -->
         <div class="grid grid-cols-2 gap-3">
           <text-input
-            inputClassError="ring-yellow-300 focus:ring-yellow-600"
+            inputClassError="ring-yellow-30 0 focus:ring-yellow-600"
             :name="`contact_name_${contact.id}`"
             type="text"
             title="patients.contact-name"
             inputPlaceholder="patients.contact-information-placeholder"
             inputColor="patient-page-color"
+            :required="true"
           />
           <text-input
             inputClassError="ring-yellow-300 focus:ring-yellow-600"
@@ -158,6 +159,7 @@
             title="patients.contact-lastname"
             inputPlaceholder="patients.contact-lastname-placeholder"
             inputColor="patient-page-color"
+            :required="true"
           />
         </div>
 
@@ -169,14 +171,18 @@
           title="patients.relation"
           inputPlaceholder="patients.relation-placeholder"
           inputColor="patient-page-color"
+          :required="true"
         />
 
         <!-- Teléfonos del contacto -->
         <div class="space-y-2 bg-white p-3 rounded border border-gray-200">
           <div class="flex items-center justify-between">
-            <p class="text-sm font-medium text-gray-700">
-              {{ $t('patients.phone-contact') }}
-            </p>
+            <span class="flex">
+              <span class="text-red-500">*</span>
+              <p class="text-sm font-medium text-gray-700">
+                {{ $t('patients.phone-contact') }}
+              </p>
+            </span>
             <action-button-outline-icon
               icon="PlusIcon"
               color="text-patient-page-color"
@@ -207,9 +213,12 @@
         <!-- Emails del contacto -->
         <div class="space-y-2 bg-white p-3 rounded border border-gray-200">
           <div class="flex items-center justify-between">
-            <p class="text-sm font-medium text-gray-700">
-              {{ $t('patients.email-address') }}
-            </p>
+            <span class="flex">
+              <span class="text-red-500">*</span>
+              <p class="text-sm font-medium text-gray-700">
+                {{ $t('patients.email-address') }}
+              </p>
+            </span>
             <action-button-outline-icon
               icon="PlusIcon"
               color="text-patient-page-color"
@@ -264,6 +273,7 @@
       inputPlaceholder="patients.residence-address-placeholder"
       class="mt-2 sm:col-span-2"
       inputColor="patient-page-color"
+      :required="true"
     />
   </form>
 </template>
@@ -350,7 +360,6 @@ const initialValues = computed(() => {
     birthdate: newPatientData?.value.birthdate || "",
     pediatrician: newPatientData?.value.pediatrician || "",
     residence: newPatientData?.value.residence || "",
-    gmail: newPatientData?.value.gmail || "",
   };
 
   if (newPatientData.value.contactInformationList?.length) {
@@ -472,10 +481,6 @@ const validationSchema = computed(() => {
     birthdate: yup.date().required(t("vee-validate.required-input")),
     pediatrician: yup.string().required(t("vee-validate.required-input")),
     residence: yup.string().required(t("vee-validate.required-input")),
-    gmail: yup
-      .string()
-      .email(t("vee-validate.invalid-email"))
-      .required(t("vee-validate.required-input")),
   };
 
   contactInformationList.value.forEach((contact) => {
@@ -517,15 +522,47 @@ const { values, errors, setFieldValue } = useForm({
 
 const isFormValid = computed(() => {
   const hasNoErrors = Object.keys(errors.value).length === 0;
+  
   const hasRequiredFields = 
     values.names &&
     values.lastNames &&
     values.birthdate &&
     values.pediatrician &&
-    values.residence &&
-    values.gmail;
-  
-  return hasNoErrors && hasRequiredFields;
+    values.residence;
+
+  if (contactInformationList.value.length === 0) {
+    return hasNoErrors && hasRequiredFields;
+  }
+
+  const contactsValid = contactInformationList.value.every((contact) => {
+    const hasName = values[`contact_name_${contact.id}`]?.trim();
+    const hasLastName = values[`contact_lastname_${contact.id}`]?.trim();
+    const hasRelation = values[`relation_${contact.id}`]?.trim();
+    
+    // Al menos un teléfono válido
+    const hasValidPhone = contact.phones?.some((phone) => {
+      const phoneValue = values[`contact_${contact.id}_phone_${phone.id}`]?.trim();
+      return phoneValue && phoneValue.length >= 7;
+    });
+    
+    // Al menos un email válido
+    const hasValidEmail = contact.emails?.some((email) => {
+      const emailValue = values[`contact_${contact.id}_email_${email.id}`]?.trim();
+      return emailValue && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+    });
+
+    return hasName && hasLastName && hasRelation && hasValidPhone && hasValidEmail;
+  });
+
+  console.log("Form Validity:", {
+    hasNoErrors,
+    hasRequiredFields,
+    contactsValid,
+    totalContacts: contactInformationList.value.length,
+    errors: errors.value
+  });
+
+  return hasNoErrors && hasRequiredFields && contactsValid;
 });
 
 const formattedContacts = computed(() => {
@@ -555,12 +592,12 @@ const formattedContacts = computed(() => {
 });
 
 const updateStoreData = () => {
-  newPatientData.value = {
+  Object.assign(newPatientData.value, {
     Name: values.names,
     LastName: values.lastNames,
     Birthdate: values.birthdate,
     Gender: currentGender.value,
-    Address: values.residence, 
+    Address: values.residence,
     Alergies: hasAlergies.value === 0 ? currentAlergies.value : [],
     Syndromes: hasSyndromes.value === 0 ? currentSyndromes.value : [],
     Pediatrician: values.pediatrician,
@@ -570,7 +607,7 @@ const updateStoreData = () => {
     PatientTypeId: currentPatientType.value,
     isFormValid: isFormValid.value,
     contactInformationList: contactInformationList.value,
-  };
+  });
 };
 
 const debouncedUpdate = useDebounceFn(updateStoreData, 300);
@@ -582,7 +619,6 @@ watch(
     () => values.birthdate,
     () => values.pediatrician,
     () => values.residence,
-    () => values.gmail,
     currentGender,
     hasAlergies,
     hasSyndromes,
@@ -626,6 +662,8 @@ watch(
 );
 
 watch(isFormValid, (newValue) => {
-  newPatientData.value.isFormValid = newValue;
+  if (newPatientData.value) {
+    newPatientData.value.isFormValid = newValue;
+  }
 });
 </script>

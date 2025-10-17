@@ -14,14 +14,13 @@
     <template #body>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <!-- Input para subir PDF -->
           <drag-drop-file-input
             title="patients.drag-or-click-here-to-load-the-PDF-of-the-data-sheet"
             @send-files="handleSendFiles"
           />
-          <!-- Vista previa -->
           <general-i-frame
             v-if="rawFile"
+            :key="rawFile"
             :source="rawFile"
             height="700px"
           />
@@ -45,8 +44,8 @@
       >
         <div class="uppercase">{{ $t("general.back") }}</div>
       </primary-button>
-
-      <primary-button type="button" class="mr-2" >
+      {{ newPatientData.isFormValid }}
+      <primary-button type="button" class="mr-2" v-if="newPatientData.isFormValid">
         <div v-if="currentPage === 1" @click="nextPage()" class="uppercase">{{ $t('general.next') }}</div>
         <div v-if="currentPage === 2" @click="createPatient()" class="uppercase">{{ $t("general.accept") }}</div>
       </primary-button>
@@ -75,42 +74,46 @@ const patientsLogicStore = usePatientsLogicStore();
 const { showCreateFormDialog } = storeToRefs(patientsLogicStore);
 
 const currentPage = ref(1);
-const rawFile = ref(newPatientData.value.InfoSheetFile ?? null);
+const rawFile = ref(null);
 
 defineProps({
   isOpen: { type: Boolean, default: false },
 });
 
 const handleClose = (closeModal) => {
+  // ✅ Reset simple - solo null
   newPatientData.value = null;
   showCreateFormDialog.value = closeModal;
   currentPage.value = 1;
+  rawFile.value = null;
 };
 
 async function handleSendFiles(fileReceived) {
-  rawFile.value = fileReceived;
-  console.log(fileReceived);
-
-  if (fileReceived) {
-    const reader = new FileReader();
-    
-    reader.onload = () => {
-      const base64String = reader.result;
-      console.log(base64String); 
-      Object.assign(newPatientData.value, { InfoSheetFile: base64String });
-    };
-    
-    reader.readAsDataURL(fileReceived);
-  } else {
-    newPatientData.value.InfoSheetFile = null;
+  if (!fileReceived) {
+    rawFile.value = null;
+    if (newPatientData.value) {
+      newPatientData.value.InfoSheetFile = null;
+    }
+    return;
   }
+
+  // Asignar directamente el File/Blob para el iframe
+  rawFile.value = fileReceived;
+
+  // Convertir a base64 para el store (sin afectar rawFile)
+  const reader = new FileReader();
+  reader.onload = () => {
+    if (newPatientData.value) {
+      newPatientData.value.InfoSheetFile = reader.result;
+    }
+  };
+  reader.readAsDataURL(fileReceived);
 }
 
 function nextPage() { currentPage.value += 1; }
 function backPage() { currentPage.value -= 1; }
 
 async function createPatient() {
-  currentPage.value = 3;
   await createNewPatient(newPatientData.value);
   handleClose(false);
 }

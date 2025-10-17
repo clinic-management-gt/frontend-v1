@@ -35,7 +35,6 @@ export const usePatientsStore = defineStore(
     async function createNewPatient(data){
       isLoadingCreateNewPatient.value = true;
       try {
-        console.log("data to send", data)
         const formData = new FormData();
         formData.append("Name", data.Name)
         formData.append("LastName", data.LastName)
@@ -56,6 +55,7 @@ export const usePatientsStore = defineStore(
             "Content-Type": "multipart/form-data",
           }
         });
+        fetchAllPatients();
         return res.data;
       } finally {
         isLoadingCreateNewPatient.value = false;
