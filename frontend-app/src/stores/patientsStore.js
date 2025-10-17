@@ -216,37 +216,7 @@ export const usePatientsStore = defineStore(
       });
       return res.data;
     }
-
-    async function fetchRecipe(recipeId) {
-      isLoadingMedicalRecords.value = true;
-      try {
-        const res = await instance.get(`/recipes/${recipeId}`);
-        return res.data;
-      } finally {
-        isLoadingMedicalRecords.value = false;
-      }
-    }
-
-    async function updateRecipe(recipeId, recipeData) {
-      isLoadingMedicalRecords.value = true;
-      try {
-        const res = await instance.patch(`/recipes/${recipeId}`, recipeData);
-        return res.data;
-      } finally {
-        isLoadingMedicalRecords.value = false;
-      }
-    }
-
-    async function createRecipe(recipeData) {
-      isLoadingMedicalRecords.value = true;
-      try {
-        const res = await instance.post(`/recipes`, recipeData);
-        return res.data;
-      } finally {
-        isLoadingMedicalRecords.value = false;
-      }
-    }
-
+    
     async function createBasicPatient(patientData) {
       isLoadingAllPatients.value = true;
       try {
@@ -307,9 +277,10 @@ export const usePatientsStore = defineStore(
       fetchMedicalRecordDetails,
       uploadFile,
       downloadFile,
-      fetchRecipe,
-      updateRecipe,
-      createRecipe,
+      // ❌ Eliminar estas exports
+      // fetchRecipe,
+      // updateRecipe,
+      // createRecipe,
       createBasicPatient,
       createAppointment,
       clearFullRecord

@@ -22,6 +22,7 @@ export const usePatientsLogicStore = defineStore(
     const selectedRecordForEdit = ref(null);
     const selectedRecipeForEdit = ref(null);
     const fullRecord = ref(null);
+    const currentMedicalRecordId = ref(null);
 
     const patientStore = usePatientsStore();
     const { currentPatientSelectedId, currentPatientSelectedData } = storeToRefs(patientStore)
@@ -50,12 +51,15 @@ export const usePatientsLogicStore = defineStore(
     }
     function openCreateModal() {
       selectedRecordForEdit.value = null;
+      currentMedicalRecordId.value = null;
       isEditing.value = false;
       showFormModal.value = true;
     }
 
     function openMedicalRecordEditModal(record) {
       selectedRecordForEdit.value = record;
+      // Extraer el ID correcto del medical record
+      currentMedicalRecordId.value = record.medicalRecord?.id || record.id;
       isEditing.value = true;
       showFormModal.value = true;
     }
@@ -71,6 +75,7 @@ export const usePatientsLogicStore = defineStore(
       selectedRecord.value = null;
       showFormModal.value = false;
       selectedRecordForEdit.value = null;
+      currentMedicalRecordId.value = null;
       isEditing.value = false;
       showRecipeFormModal.value = false;
       selectedRecipeForEdit.value = null;
@@ -229,17 +234,14 @@ export const usePatientsLogicStore = defineStore(
           );
         }
 
-        // Cerrar modal y recargar datos
         closeHistoryLogModals();
 
-        // Recargar los detalles del medical record si hay uno seleccionado
         if (selectedRecord.value?.id) {
           await patientsStore.fetchMedicalRecordDetails(
             selectedRecord.value.id,
           );
         }
 
-        // También recargar la lista de medical records del paciente
         if (patientId) {
           await patientsStore.fetchPatientMedicalRecords(patientId);
         }
@@ -253,6 +255,7 @@ export const usePatientsLogicStore = defineStore(
         );
       }
     }
+
     function closeAllPatientDialog() {
       showCreateFormDialog.value = false;
       showDataSheetPatientDialog.value = false;
@@ -284,6 +287,7 @@ export const usePatientsLogicStore = defineStore(
       selectedRecord,
       selectedRecordForEdit,
       selectedRecipeForEdit,
+      currentMedicalRecordId,
       isEditing,
       isEditingRecipe,
       fullRecord,
@@ -299,7 +303,6 @@ export const usePatientsLogicStore = defineStore(
       openRecipeFormModal,
       closeAllPatientDialog,
       closeHistoryLogModals,
-      handleMedicalRecordSave,
       handleRecipeSave,
       selectPatientById,
       returnToPatientsTable,

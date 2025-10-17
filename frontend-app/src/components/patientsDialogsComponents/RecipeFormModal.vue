@@ -88,8 +88,8 @@
     <!-- Botones de acción -->
     <template #buttons>
       <primary-button
-        v-if="isLoading"
-        :disabled="isLoading"
+        v-if="medicalRecordStore.loading"
+        :disabled="medicalRecordStore.loading"
       >
         <span class="flex items-center">
           <svg
@@ -117,7 +117,7 @@
       </primary-button>
       <primary-button
         v-else
-        :disabled="isLoading || !formData.prescription.trim()"
+        :disabled="medicalRecordStore.loading || !formData.prescription.trim()"
         @click="handleSubmit"
       >
         <p class="uppercase">
@@ -131,7 +131,7 @@
 <script setup>
 import { ref, watch, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
-import { usePatientsStore } from "@stores/patientsStore.js";
+import { useMedicalRecordStore } from "@stores/medicalRecordStore.js";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { useNotificationStore } from "@stores/notificationStore.js";
 import { formatDate } from "@utils/isoFormatDate.js";
@@ -161,15 +161,14 @@ const props = defineProps({
 const emit = defineEmits(["close", "save"]);
 
 const { t } = useI18n();
-const patientsStore = usePatientsStore();
+const medicalRecordStore = useMedicalRecordStore();
 const patientsLogicStore = usePatientsLogicStore();
 const notificationStore = useNotificationStore();
 
-const { updateRecipe, createRecipe } = patientsStore;
+const { updateRecipe, createRecipe } = medicalRecordStore;
 const { closeHistoryLogModals } = patientsLogicStore;
 
 // Estados
-const isLoading = ref(false);
 const formData = ref({
   prescription: "",
 });
@@ -219,8 +218,6 @@ async function handleSubmit() {
   if (!formData.value.prescription.trim()) {
     return;
   }
-
-  isLoading.value = true;
 
   try {
     const dataToSend = {
@@ -279,8 +276,6 @@ async function handleSubmit() {
         ": " +
         (error.message || t("recipes.unknown-error")),
     );
-  } finally {
-    isLoading.value = false;
   }
 }
 
@@ -307,7 +302,7 @@ watch(
             textarea.click();
             textarea.focus();
           }
-        }, 500); // Aumenté el delay a 500ms
+        }, 500);
       });
     }
   },

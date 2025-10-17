@@ -161,17 +161,6 @@
       @save="(formData) => handleMedicalRecordSave(formData, props.patientId)"
     />
 
-    <!-- Modal de formulario de recetas -->
-    <recipe-form-modal
-      v-if="showRecipeFormModal"
-      :isOpen="showRecipeFormModal"
-      :recipe="selectedRecipeForEdit"
-      :isEditing="isEditingRecipe"
-      :treatmentId="getFirstTreatmentId()"
-      @close="closeHistoryLogModals"
-      @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)"
-    />
-
     <!-- Modal de confirmación de eliminación -->
     <div
       v-if="showDeleteConfirmation"
@@ -213,7 +202,6 @@ import { DocumentIcon } from "@heroicons/vue/24/outline";
 import ActionButtonSolidIcon from "@components/forms/ActionButtonSolidIcon.vue";
 import ConsultationDetailsModal from "../patientsDialogsComponents/ConsultationDetailsModal.vue";
 import MedicalRecordFormModal from "../patientsDialogsComponents/MedicalRecordFormModal.vue";
-import RecipeFormModal from "../patientsDialogsComponents/RecipeFormModal.vue";
 import { formatDateShort } from "@/utils/isoFormatDate.js";
 
 const props = defineProps({
@@ -239,12 +227,9 @@ const showDeleteConfirmation = ref(false);
 const {
   showFormModal,
   showDetailsModal,
-  showRecipeFormModal,
   selectedRecord,
   selectedRecordForEdit,
-  selectedRecipeForEdit,
   isEditing,
-  isEditingRecipe,
 } = storeToRefs(patientsLogicStore);
 const {
   openRecordDetailsDialog,
@@ -252,7 +237,6 @@ const {
   closeHistoryLogModals,
   openMedicalRecordEditModal,
   handleMedicalRecordSave,
-  handleRecipeSave,
 } = patientsLogicStore;
 // Estados locales
 const itemsPerPage = ref(5);
@@ -310,26 +294,6 @@ function downloadRecord() {
 
 function handleViewRecipe(recipe) {
   emit("view-recipe", recipe);
-}
-
-function getFirstTreatmentId() {
-  // Si estamos editando una receta existente, usar su treatmentId
-  if (selectedRecipeForEdit.value?.treatmentId) {
-    return selectedRecipeForEdit.value.treatmentId;
-  }
-
-  // Si hay registros médicos con tratamientos, buscar el primer tratamiento disponible
-  if (currentPatientMedicalRecords.value) {
-    const records = Object.values(currentPatientMedicalRecords.value);
-    for (const record of records) {
-      if (record.treatments && record.treatments.length > 0) {
-        return record.treatments[0].id;
-      }
-    }
-  }
-
-  // Si no hay tratamientos, retornar null para indicar que no se puede crear receta
-  return null;
 }
 
 function resetPagination() {
