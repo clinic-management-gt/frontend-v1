@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import instance from "@stores/axios.js";
 import { ref } from "vue";
-import instance from "@stores/axios.js";
 import { useNotificationStore } from "@stores/notificationStore.js";
 import { globalI18n } from "@/langs/index.js";
 
