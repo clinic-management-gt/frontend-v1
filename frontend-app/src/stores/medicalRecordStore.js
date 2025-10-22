@@ -7,8 +7,12 @@ import { globalI18n } from "@/langs/index.js";
 export const useMedicalRecordStore = defineStore("medicalRecord", () => {
     const medicalRecords = ref([]);
     const selectedRecord = ref(null);
-    const loading = ref(false);
     const error = ref(null);
+    
+    const loading = ref(false);
+    const isLoadingMedicalRecordSave = ref(false);
+
+    const notificationStore = useNotificationStore();
 
     // Recipe related functions
     async function fetchRecipe(recipeId) {
@@ -54,7 +58,6 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
     }
 
     async function deleteRecipe(recipeId) {
-        const notificationStore = useNotificationStore();
         loading.value = true;
         error.value = null;
         
@@ -155,7 +158,6 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
     }
 
     async function deleteMedicalRecordById(recordId) {
-        const notificationStore = useNotificationStore();
         loading.value = true;
         error.value = null;
         
@@ -185,11 +187,9 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
         }
     }
 
-    // Handle Medical Record Save (Create or Update)
     async function handleMedicalRecordSave(recordData, patientId, isEditing = false, recordId = null) {
-        const notificationStore = useNotificationStore();
-        
         try {
+            isLoadingMedicalRecordSave.value = true;
             let result;
 
             if (isEditing && recordId) {
@@ -211,19 +211,10 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
                     globalI18n.t("medical-records.record-created")
                 );
             }
-
-            // Recargar los registros médicos del paciente
             await fetchMedicalRecords(patientId);
-
             return result;
-        } catch (err) {
-            error.value = err.message;
-            notificationStore.addNotification(
-                "error",
-                "notifications.error",
-                err.message || globalI18n.t("medical-records.error-saving-record")
-            );
-            throw err;
+        } finally {
+            isLoadingMedicalRecordSave.value = false;
         }
     }
 
@@ -275,6 +266,7 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
         medicalRecords,
         selectedRecord,
         loading,
+        isLoadingMedicalRecordSave,
         error,
         
         // recipe actions
