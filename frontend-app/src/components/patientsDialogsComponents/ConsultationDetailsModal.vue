@@ -408,13 +408,13 @@
 </template>
 
 <script setup>
-import { onMounted, watch, computed, nextTick } from "vue";
+import { watch, computed } from "vue";
 import { usePatientsStore } from "@stores/patientsStore";
 import { usePatientsLogicStore } from "../../stores/patientsLogicStore";
 import { storeToRefs } from "pinia";
-import { formatDateShortest } from "@/utils/isoFormatDate.js";
-
-import { formatDate } from "@/utils/isoFormatDate.js";
+import { formatDateShortest, formatDate } from "@/utils/isoFormatDate.js";
+import { useMedicalRecordStore } from "@stores/medicalRecordStore";
+import { nextTick } from "vue";
 
 import PrimaryButton from "@components/forms/PrimaryButton.vue";
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
@@ -434,12 +434,11 @@ const props = defineProps({
 const emit = defineEmits(["close", "view-recipe", "edit", "download"]);
 
 const patientsStore = usePatientsStore();
-const { fullRecord, isLoadingMedicalRecords, hasError } =
-  storeToRefs(patientsStore);
-
+const { fullRecord, isLoadingMedicalRecords, hasError } = storeToRefs(patientsStore);
 
 const patientsLogicStore = usePatientsLogicStore();
-const { selectedRecord } = storeToRefs(patientsLogicStore);
+const medicalRecordStore = useMedicalRecordStore();
+const { selectedRecord } = storeToRefs(medicalRecordStore);
 const {
   closeHistoryLogModals,
   openMedicalRecordEditModal,
@@ -457,9 +456,20 @@ const handleClose = () => {
 };
 
 const displayRecord = computed(() => fullRecord.value);
-// 🎯 Solo llama a la store (sin try/catch)
+
+// ✅ Guard: evitar llamadas duplicadas
+const isLoadingDetails = ref(false);
+
 async function loadFullRecord() {
-  await patientsStore.fetchMedicalRecordDetails(selectedRecord.value.id);
+  if (isLoadingDetails.value || !selectedRecord.value?.id) return;
+  
+  isLoadingDetails.value = true;
+  try {
+    console.log("Cargando detalles de la consulta para ID:", selectedRecord.value.id);
+    await medicalRecordStore.fetchMedicalRecordDetails(selectedRecord.value.id);
+  } finally {
+    isLoadingDetails.value = false;
+  }
 }
 
 function editRecord() {
@@ -467,9 +477,7 @@ function editRecord() {
 }
 
 function editEvolutionNote() {
-  // Cerrar el modal actual primero
   handleClose();
-  // Luego abrir modal de edición de medical record
   nextTick(() => {
     openMedicalRecordEditModal(displayRecord.value);
   });
@@ -483,20 +491,18 @@ function downloadRecord() {
   emit("download", displayRecord.value);
 }
 
+const lastLoadedRecordId = ref(null);
+
 watch(
   () => props.isOpen,
   async (newVal) => {
-    if (newVal) {
+    if (newVal && selectedRecord.value?.id !== lastLoadedRecordId.value) {
+      lastLoadedRecordId.value = selectedRecord.value?.id;
       await loadFullRecord();
-    } else {
+    } else if (!newVal) {
       patientsStore.clearFullRecord();
+      lastLoadedRecordId.value = null;
     }
   },
 );
-
-onMounted(() => {
-  if (props.isOpen) {
-    loadFullRecord();
-  }
-});
 </script>

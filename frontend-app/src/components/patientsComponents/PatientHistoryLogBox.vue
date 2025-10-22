@@ -196,6 +196,7 @@
 import { computed, ref, watch, onMounted } from "vue";
 import { usePatientsStore } from "@stores/patientsStore";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
+import { useMedicalRecordStore } from "@stores/medicalRecordStore";
 import { storeToRefs } from "pinia";
 import { DocumentIcon } from "@heroicons/vue/24/outline";
 
@@ -214,11 +215,11 @@ const props = defineProps({
 const emit = defineEmits(["view-recipe"]);
 
 // Store
-const patientsStore = usePatientsStore();
+const medicalRecordStore = useMedicalRecordStore();
 const {
   currentPatientMedicalRecords,
   currentPatientSelectedId,
-} = storeToRefs(patientsStore);
+} = storeToRefs(medicalRecordStore);
 const patientsLogicStore = usePatientsLogicStore();
 
 // Estado para confirmación de eliminación
@@ -281,8 +282,8 @@ function cancelDelete() {
 async function confirmDelete() {
   if (!recordToDelete.value) return;
 
-  await patientsStore.deleteMedicalRecord(recordToDelete.value.id);
-  await patientsStore.fetchPatientMedicalRecords(props.patientId);
+  await medicalRecordStore.deleteMedicalRecordById(recordToDelete.value.id);
+  await medicalRecordStore.fetchPatientMedicalRecords(props.patientId);
   
   // Cerrar modal
   cancelDelete();
@@ -309,7 +310,7 @@ function goToNextPage() {
 // Cargar datos al montar el componente
 onMounted(async () => {
   if (props.patientId) {
-    await patientsStore.fetchPatientMedicalRecords(props.patientId);
+    await medicalRecordStore.fetchPatientMedicalRecords(props.patientId);
   }
 });
 
@@ -319,7 +320,7 @@ watch(
   async (newId) => {
     if (newId) {
       currentPage.value = 1;
-      await patientsStore.fetchPatientMedicalRecords(newId);
+      await medicalRecordStore.fetchPatientMedicalRecords(newId);
     }
   },
 );

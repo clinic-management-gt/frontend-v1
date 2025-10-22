@@ -1,6 +1,7 @@
 import { defineStore, storeToRefs } from "pinia";
 import { ref } from "vue";
 import { usePatientsStore } from "./patientsStore.js";
+import { useMedicalRecordStore } from "./medicalRecordStore.js";
 import { useNotificationStore } from "./notificationStore.js";
 
 export const usePatientsLogicStore = defineStore(
@@ -18,7 +19,6 @@ export const usePatientsLogicStore = defineStore(
     const isEditing = ref(false);
     const isEditingRecipe = ref(false);
 
-    // ✅ Función auxiliar para inicializar paciente vacío
     const initializeEmptyPatient = () => ({
       Name: "",
       LastName: "",
@@ -39,11 +39,11 @@ export const usePatientsLogicStore = defineStore(
     const selectedRecord = ref(null);
     const selectedRecordForEdit = ref(null);
     const selectedRecipeForEdit = ref(null);
-    const fullRecord = ref(null);
     const currentMedicalRecordId = ref(null);
 
     const patientStore = usePatientsStore();
-    const { currentPatientSelectedId, currentPatientSelectedData } = storeToRefs(patientStore)
+    const medicalRecordStore = useMedicalRecordStore();
+    const { currentPatientSelectedId, currentPatientSelectedData } = storeToRefs(patientStore);
 
     function openDataSheetPatientDialog() {
       showDataSheetPatientDialog.value = true;
@@ -61,15 +61,14 @@ export const usePatientsLogicStore = defineStore(
       showDownloadPatientRecordDialog.value = true;
     }
     function openCreateFormDialog() {
-      const patientsStore = usePatientsStore();
-
-      if (!patientsStore.newPatientData) {
-        patientsStore.newPatientData = initializeEmptyPatient();
+      if (!patientStore.newPatientData) {
+        patientStore.newPatientData = initializeEmptyPatient();
       }
       
       showCreateFormDialog.value = true;
     }
     function openRecordDetailsDialog(record) {
+      console.log("Abriendo detalles para el registro:", record);
       selectedRecord.value = record;
       showDetailsModal.value = true;
     }
@@ -82,7 +81,6 @@ export const usePatientsLogicStore = defineStore(
 
     function openMedicalRecordEditModal(record) {
       selectedRecordForEdit.value = record;
-      // Extraer el ID correcto del medical record
       currentMedicalRecordId.value = record.medicalRecord?.id || record.id;
       isEditing.value = true;
       showFormModal.value = true;
@@ -108,107 +106,89 @@ export const usePatientsLogicStore = defineStore(
 
     async function handleMedicalRecordSave(formData, patientId) {
       try {
-        const patientsStore = usePatientsStore();
         const notificationStore = useNotificationStore();
         
-        // Verificar si viene en el nuevo formato (con medicalRecord y recipe separados)
         const isNewFormat = formData.medicalRecord || formData.recipe;
         let medicalRecordId = null;
 
         if (isNewFormat) {
-          // NUEVO FORMATO: Manejar medical record y recipe por separado
-
-          // 1. Manejar Medical Record
+          // Manejar Medical Record
           if (formData.medicalRecord) {
             if (isEditing.value && selectedRecordForEdit.value) {
-              // Obtener el ID correcto del medical record
               const recordId =
                 selectedRecordForEdit.value.medicalRecord?.id ||
                 selectedRecordForEdit.value.id;
-              await patientsStore.updateMedicalRecord(
+              await medicalRecordStore.updateMedicalRecordById(
                 recordId,
                 formData.medicalRecord,
               );
               medicalRecordId = recordId;
             } else {
-              // Crear nuevo registro médico y guardar su ID para asociar con la receta
-              const response = await patientsStore.createMedicalRecord(
+              const response = await medicalRecordStore.createMedicalRecord(
                 patientId,
                 formData.medicalRecord,
               );
-              medicalRecordId = response.id; // Asumiendo que la API devuelve el ID del registro creado
+              medicalRecordId = response.id;
             }
           }
 
-          // 2. Manejar Recipe si existe
+          // Manejar Recipe si existe
           if (formData.recipe) {
             try {
-              // Verificamos primero si tenemos tratamientos disponibles para este paciente
               let treatmentId = null;
               
               try {
-                // Intentamos obtener los detalles del paciente para ver sus tratamientos
-                await patientsStore.fetchPatientData(patientId);
+                await patientStore.fetchPatientData(patientId);
                 
-                // Obtenemos detalles del registro médico si está disponible
                 if (medicalRecordId) {
-                  const details = await patientsStore.fetchMedicalRecordDetails(medicalRecordId);
+                  const details = await medicalRecordStore.fetchMedicalRecordDetails(medicalRecordId);
                   
-                  // Si hay tratamientos disponibles en los detalles del registro médico
                   if (details && details.treatments && details.treatments.length > 0) {
                     treatmentId = details.treatments[0].id;
                   }
                 }
               } catch {
-                // Error silencioso - ya manejamos el caso de fallo con notificación
+                // Error silencioso
               }
               
-              // Si no se encontró un tratamiento, mostramos una notificación
               if (!treatmentId) {
                 notificationStore.addNotification(
                   "warning",
                   "recipes.warning",
                   "recipes.warning-no-treatment"
                 );
-                return; // No continuamos con la creación de la receta
+                return;
               }
               
-              // Preparar datos para la receta con el tratamiento encontrado
               const recipeData = {
                 prescription: formData.recipe.prescription,
                 treatmentId: treatmentId
               };
               
-              // Crear la receta
-              await patientsStore.createRecipe(recipeData);
+              await medicalRecordStore.createRecipe(recipeData);
             } catch {
               notificationStore.addNotification(
                 "error",
                 "general.error",
                 "recipes.error-saving"
               );
-              // Seguimos adelante, al menos el registro médico se creó correctamente
             }
           }
         } else {
-          // FORMATO ACTUAL: Mantener compatibilidad
-
+          // Formato actual
           if (isEditing.value && selectedRecordForEdit.value) {
-            // Obtener el ID correcto del medical record
             const recordId =
               selectedRecordForEdit.value.medicalRecord?.id ||
               selectedRecordForEdit.value.id;
-            await patientsStore.updateMedicalRecord(recordId, formData);
+            await medicalRecordStore.updateMedicalRecordById(recordId, formData);
           } else {
-            await patientsStore.createMedicalRecord(patientId, formData);
+            await medicalRecordStore.createMedicalRecord(patientId, formData);
           }
         }
 
-        // Cerrar modal y recargar datos
         closeHistoryLogModals();
-        await patientsStore.fetchPatientMedicalRecords(patientId);
+        await medicalRecordStore.fetchPatientMedicalRecords(patientId);
 
-        // Mensaje de éxito según si se guardó solo registro médico o también receta
         let successMessage = isEditing.value
           ? "general.record-updated-successfully"
           : "general.record-created-successfully";
@@ -223,7 +203,6 @@ export const usePatientsLogicStore = defineStore(
           successMessage
         );
       } catch (error) {
-        // Usar notification store en lugar de alert
         const notificationStore = useNotificationStore();
         notificationStore.addNotification(
           "error",
@@ -236,11 +215,10 @@ export const usePatientsLogicStore = defineStore(
 
     async function handleRecipeSave(recipeData, patientId) {
       try {
-        const patientsStore = usePatientsStore();
         const notificationStore = useNotificationStore();
 
         if (isEditingRecipe.value && selectedRecipeForEdit.value) {
-          await patientsStore.updateRecipe(
+          await medicalRecordStore.updateRecipe(
             selectedRecipeForEdit.value.id,
             recipeData,
           );
@@ -250,7 +228,7 @@ export const usePatientsLogicStore = defineStore(
             "Receta actualizada correctamente",
           );
         } else {
-          await patientsStore.createRecipe(recipeData);
+          await medicalRecordStore.createRecipe(recipeData);
           notificationStore.addNotification(
             "success",
             "general.success",
@@ -261,13 +239,13 @@ export const usePatientsLogicStore = defineStore(
         closeHistoryLogModals();
 
         if (selectedRecord.value?.id) {
-          await patientsStore.fetchMedicalRecordDetails(
+          await medicalRecordStore.fetchMedicalRecordDetails(
             selectedRecord.value.id,
           );
         }
 
         if (patientId) {
-          await patientsStore.fetchPatientMedicalRecords(patientId);
+          await medicalRecordStore.fetchPatientMedicalRecords(patientId);
         }
       } catch (error) {
         const notificationStore = useNotificationStore();
@@ -290,7 +268,7 @@ export const usePatientsLogicStore = defineStore(
     }
 
     function selectPatientById(id){
-      currentPatientSelectedId.value = id
+      currentPatientSelectedId.value = id;
     }
 
     function returnToPatientsTable() {
@@ -314,7 +292,6 @@ export const usePatientsLogicStore = defineStore(
       currentMedicalRecordId,
       isEditing,
       isEditingRecipe,
-      fullRecord,
       openDataSheetPatientDialog,
       openCreateNewPatientRecordDialog,
       openViewPatientRecordDialog,
