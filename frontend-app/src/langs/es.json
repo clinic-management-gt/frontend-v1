@@ -46,7 +46,6 @@
     "no-medical-records": "No hay registros médicos disponibles",
     "delete": "Eliminar",
     "update": "Actualizar",
-    "next": "Siguiente",
     "save": "Guardar",
     "confirmed": "Confirmado",
     "completed": "Completado",
@@ -72,7 +71,6 @@
     "of": "de",
     "confirm-deletion": "Confirmar eliminación",
     "delete-confirmation-message": "¿Estás seguro de que deseas eliminar este registro médico? Esta acción no se puede deshacer.",
-    "refresh": "Actualizar",
     "refresh": "Actualizar",
     "download-pdf": "Descargar PDF"
   },
@@ -107,12 +105,9 @@
   },
   "patients": {
     "patients": "Pacientes",
-    "pending-patients": "Pacientes Pendientes",
     "status": "Estado",
     "parents": "Padres",
-    "contact": "Contacto",
     "contacts": "Contactos",
-    "parents": "Padres/Tutores",
     "last-visit": "Ultima visita",
     "birth": "Nacimiento",
     "syndrome": "Sindromes",
@@ -209,7 +204,6 @@
     "family-background-label": "Antecedentes familiares",
     "evolution-notes-label": "Notas de evolución",
     "empty-data": "No hay pacientes disponibles",
-    "no-pending-patients": "No hay pacientes pendientes",
     "number-of-patients": "Número de pacientes {count}",
     "return-to-patient-table": "Regresar a pacientes",
     "vaccines": "Vacunas",
@@ -220,7 +214,6 @@
     "disease": "Enfermedades",
     "blood-type": "Tipo de sangre",
     "pending-patients": "Pacientes pendientes",
-    "created-at": "Fecha de registro",
     "no-pending-patients": "No hay pacientes pendientes",
     "blood-type-placeholder": "Seleccione el tipo de sangre",
     "patient-type": "Tipo de paciente",
@@ -398,15 +391,10 @@
     "file-too-large": "El archivo es demasiado grande. El tamaño máximo permitido es {maxSize} MB.",
     "no-file-selected": "No se seleccionó ningún archivo.",
     "uploading": "Subiendo...",
-    "uploading": "Subiendo...",
     "at-least-one-field": "Debe completar al menos un campo",
     "record-created": "Registro médico creado exitosamente",
     "record-updated": "Registro médico actualizado exitosamente",
     "error-saving-record": "Error al guardar el registro médico",
     "error-getting-record-id": "No se pudo obtener el ID del registro médico"
-  },
-  "files": {
-    "upload-laboratory": "Subir archivo de laboratorio",
-    "upload-exam": "Subir archivo de examen"
   }
 }

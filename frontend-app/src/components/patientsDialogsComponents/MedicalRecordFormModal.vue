@@ -46,6 +46,7 @@
                   inputPlaceholder="medical-records.weight-placeholder"
                   inputColor="patient-page-color"
                   labelCss="text-sm font-medium text-gray-700"
+                  :required="true"
                 />
               </div>
 
