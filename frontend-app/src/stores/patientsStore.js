@@ -10,6 +10,7 @@ export const usePatientsStore = defineStore(
     const appointments = ref([]);
     const appointmentsToday = ref([]);
     const allPatients = ref([]);
+    const pendingPatients = ref([]);
     const newPatientData = ref([]);
     const fullRecord = ref([]);
     const currentPatientSelectedId = ref(null);
@@ -19,7 +20,9 @@ export const usePatientsStore = defineStore(
     const isLoadingAppointments = ref(false);
     const isLoadingAppointmentsToday = ref(false);
     const isLoadingAllPatients = ref(false);
+    const isLoadingPendingPatients = ref(false);
     const isLoadingPatientData = ref(false);
+    const isLoadingCreateNewPatient = ref(false);
 
     const currentPatientMedicalRecords = ref(undefined);
     const isLoadingMedicalRecords = ref(false);
@@ -27,8 +30,37 @@ export const usePatientsStore = defineStore(
 
     function setPatientsData(id) {
       currentPatientSelectedId.value = id;
-      fetchPatientData();
+      fetchPatientData(id);
       fetchPatientMedicalRecords();
+    }
+
+    async function createNewPatient(data){
+      isLoadingCreateNewPatient.value = true;
+      try {
+        const formData = new FormData();
+        formData.append("Name", data.Name)
+        formData.append("LastName", data.LastName)
+        formData.append("Birthdate", data.Birthdate)
+        formData.append("Gender", data.Gender)
+        formData.append("Address", data.Address)
+        formData.append("Alergies", data.Alergies)
+        formData.append("Syndromes", data.Syndromes)
+        formData.append("Pediatrician", data.Pediatrician)
+        formData.append("Contacts", data.Contacts)
+        formData.append("InsuranceId", data.Insurance)
+        formData.append("InfoSheetFile", data.File)
+        formData.append("BloodTypeId", data.BloodTypeId)
+        formData.append("PatientTypeId", data.PatientTypeId)
+        const res = await instance.post("/patients", data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          }
+        });
+        fetchAllPatients();
+        return res.data;
+      } finally {
+        isLoadingCreateNewPatient.value = false;
+      }
     }
 
     async function fetchAppointments() {
@@ -51,7 +83,6 @@ export const usePatientsStore = defineStore(
       }
     }
 
-    // patientsStore.js
     async function updateAppointmentStatus(id, newStatus) {
       try {
         // No activamos el loading global para evitar recargar todo el componente
@@ -80,10 +111,24 @@ export const usePatientsStore = defineStore(
       }
     }
 
+    async function fetchPendingPatients() {
+      isLoadingPendingPatients.value = true;
+      try {
+        const res = await instance.get("/patients/pending");
+        pendingPatients.value = res.data.patients;
+        return res.data;
+      } catch (error) {
+        console.error("Error fetching pending patients:", error);
+        throw error;
+      } finally {
+        isLoadingPendingPatients.value = false;
+      }
+    }
+
     async function fetchPatientData(patientId) {
       isLoadingPatientData.value = true;
       // Usar el ID proporcionado o el guardado en el store
-      const id = patientId || currentPatientSelectedId.value;
+      const id = patientId.value || currentPatientSelectedId.value;
       if (!id) {
         return null;
       }
@@ -99,7 +144,6 @@ export const usePatientsStore = defineStore(
       }
     }
 
-    // Busca la función fetchPatientMedicalRecords y modifícala para manejar mejor el error 404
     async function fetchPatientMedicalRecords(patientId) {
       isLoadingMedicalRecords.value = true;
       patientId = patientId || currentPatientSelectedId.value;
@@ -118,7 +162,6 @@ export const usePatientsStore = defineStore(
     async function createMedicalRecord(patientId, recordData) {
       isLoadingMedicalRecords.value = true;
       try {
-        // Asegurar que el PatientId esté en los datos (backend espera PascalCase)
         const dataToSend = { ...recordData, PatientId: patientId };
         const res = await instance.post(`/medicalrecords`, dataToSend);
         return res.data;
@@ -147,7 +190,6 @@ export const usePatientsStore = defineStore(
       try {
         await instance.delete(`/medicalrecords/${recordId}`);
         
-        // Mostrar notificación de éxito usando i18n
         notificationStore.addNotification(
           "success",
           "notifications.success",
@@ -156,7 +198,6 @@ export const usePatientsStore = defineStore(
         
         return true;
       } catch {
-        // El manejo de errores se hace en el backend
         throw new Error(globalI18n.t("notifications.error-deleting-record"));
       } finally {
         isLoadingMedicalRecords.value = false;
@@ -218,14 +259,14 @@ export const usePatientsStore = defineStore(
     }
     
     async function createBasicPatient(patientData) {
-      isLoadingAllPatients.value = true;
+      isLoadingPendingPatients.value = true;
       try {
         const res = await instance.post(`/patients/basic`, patientData);
-        // Actualizar la lista de pacientes para incluir el nuevo
-        await fetchAllPatients();
+        // Actualizar la lista de pacientes pendientes
+        await fetchPendingPatients();
         return res.data;
       } finally {
-        isLoadingAllPatients.value = false;
+        isLoadingPendingPatients.value = false;
       }
     }
 
@@ -233,7 +274,6 @@ export const usePatientsStore = defineStore(
       isLoadingAppointments.value = true;
       try {
         const res = await instance.post(`/appointments`, appointmentData);
-        // Recargar las citas para reflejar el cambio
         await fetchAppointments();
         await fetchAppointmentsToday();
         return res.data;
@@ -253,23 +293,28 @@ export const usePatientsStore = defineStore(
       appointments,
       appointmentsToday,
       allPatients,
+      pendingPatients,
       currentPatientSelectedId,
       currentPatientSelectedData,
       isLoadingPatientsStore,
       isLoadingAppointments,
       isLoadingAppointmentsToday,
       isLoadingAllPatients,
+      isLoadingPendingPatients,
       isLoadingPatientData,
+      isLoadingCreateNewPatient,
       currentPatientMedicalRecords,
       isLoadingMedicalRecords,
       hasError,
       // actions
+      createNewPatient,
       fetchPatientMedicalRecords,
       setPatientsData,
       fetchAppointments,
       fetchAppointmentsToday,
       updateAppointmentStatus,
       fetchAllPatients,
+      fetchPendingPatients,
       fetchPatientData,
       createMedicalRecord,
       updateMedicalRecord,
@@ -277,10 +322,6 @@ export const usePatientsStore = defineStore(
       fetchMedicalRecordDetails,
       uploadFile,
       downloadFile,
-      // ❌ Eliminar estas exports
-      // fetchRecipe,
-      // updateRecipe,
-      // createRecipe,
       createBasicPatient,
       createAppointment,
       clearFullRecord
@@ -292,6 +333,7 @@ export const usePatientsStore = defineStore(
         "appointments",
         "appointmentsToday",
         "allPatients",
+        "pendingPatients",
         "currentPatientSelectedId",
         "currentPatientSelectedData",
         "newPatientData",

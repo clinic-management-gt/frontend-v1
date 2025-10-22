@@ -53,14 +53,14 @@
             />
           </div>
 
-          <!-- Última visita -->
+          <!-- Fecha de registro -->
           <div class="flex flex-col">
-            <p class="mb-2 text-gray-600 block text-sm font-medium leading-6 truncate">{{ $t('patients.last-visit') }}</p>
+            <p class="mb-2 text-gray-600 block text-sm font-medium leading-6 truncate">{{ $t('patients.created-at') }}</p>
             <SearchOption
-              v-model="searchCriteria.lastVisit"
+              v-model="searchCriteria.createdAt"
               :cleanText="clearText"
               icon="MagnifyingGlassIcon"
-              textPlaceholder="patients.last-visit"
+              textPlaceholder="patients.created-at"
             />
           </div>
         </div>
@@ -88,7 +88,7 @@ const searchCriteria = reactive({
   fullName: '',
   age: '',
   contacts: '',
-  lastVisit: ''
+  createdAt: ''
 });
 
 const filteredItems = ref([]);
@@ -112,14 +112,14 @@ const normalizeText = (text) => {
   if (!text) return '';
   return text
     .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .normalize('NFD') 
+    .replace(/[\u0300-\u036f]/g, '') 
     .trim();
 };
 
 const getContactNames = (contact) => {
   if (!contact) return '';
-
+  
   if (Array.isArray(contact)) {
     return contact
       .map(c => `${c.name || ''} ${c.lastName || ''} ${c.relationship || ''}`)
@@ -145,16 +145,15 @@ watchEffect(() => {
 
     const ageMatch = !searchCriteria.age || Number(searchCriteria.age) === formatAgeFromDate(item.birthdate, 'number');
 
-    const contactData = item.contact || item.contacts || item.parents;
-    const contactNames = getContactNames(contactData);
+    const contactNames = getContactNames(item.contact);
     const inputContact = normalizeText(searchCriteria.contacts);
     const contactsMatch = !inputContact || contactNames.includes(inputContact);
 
-    const lastVisitNormalized = normalizeText(item.lastVisit || '');
-    const inputLastVisit = normalizeText(searchCriteria.lastVisit);
-    const lastVisitMatch = !inputLastVisit || lastVisitNormalized.includes(inputLastVisit);
+    const createdAtNormalized = normalizeText(item.createdAt || '');
+    const inputCreatedAt = normalizeText(searchCriteria.createdAt);
+    const createdAtMatch = !inputCreatedAt || createdAtNormalized.includes(inputCreatedAt);
 
-    return nameMatch && ageMatch && contactsMatch && lastVisitMatch;
+    return nameMatch && ageMatch && contactsMatch && createdAtMatch;
   });
 
   emit('FilteredData', filteredItems.value);

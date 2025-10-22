@@ -143,7 +143,7 @@
           <PlusCircleIcon
             class="cursor-pointer col-start-1 row-start-1 size-10 self-center text-patient-page-color"
             aria-hidden="true"
-            @click="openCreateFormDialog"
+            @click="openCreateFormDialog()"
           />
           <div class="flex items-center gap-x-4 lg:gap-x-6">
             <div

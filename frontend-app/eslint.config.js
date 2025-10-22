@@ -21,6 +21,7 @@ export default [
       globals: {
         window: true, document: true, console: true,
         fetch: true, URL: true, Blob: true, File: true, FormData: true, atob: true, btoa: true,
+        FileReader: true,
         localStorage: true, setTimeout: true, clearTimeout: true,
         alert: true, confirm: true,
       },

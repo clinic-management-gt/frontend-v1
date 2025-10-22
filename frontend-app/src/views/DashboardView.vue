@@ -2,7 +2,9 @@
   <div class="px-6 py-8 mx-auto">
     <!-- Botón para agendar nueva cita -->
     <div class="mb-6 flex justify-between items-center">
-      <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
+      <h1 class="text-xl font-bold text-back ">
+        Pacientes para hoy — {{ todayFormatted }}
+      </h1>
       <button
         type="button"
         class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -38,7 +40,7 @@
   </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { usePatientsStore } from "@stores/patientsStore";
 
 import TodayPatients from "@components/dashboardComponents/TodayPatients.vue";
@@ -75,4 +77,12 @@ function onAppointmentCreated() {
 
 // Cargar citas al montar el componente
 patientStore.fetchAppointments();
+
+const todayFormatted = computed(() =>
+  new Date().toLocaleDateString("es-GT", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }),
+);
 </script>
