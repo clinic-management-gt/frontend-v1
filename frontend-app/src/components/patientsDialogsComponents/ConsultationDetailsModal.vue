@@ -415,7 +415,7 @@ const {
   closeMedicalRecordModals,
 } = medicalRecordStore;
 
-const { openRecipeFormModal, closeRecipeModal } = recipeStore;
+const { closeRecipeModal } = recipeStore;
 
 const organizedDocuments = computed(() => {
   if (!fullRecord.value?.documents) return null;
@@ -458,10 +458,6 @@ async function loadFullRecord() {
   } finally {
     isLoadingDetails.value = false;
   }
-}
-
-function viewFullRecipe(recipe) {
-  emit("view-recipe", recipe);
 }
 
 function downloadRecord() {
