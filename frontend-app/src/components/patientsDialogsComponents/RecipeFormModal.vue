@@ -132,7 +132,6 @@
 import { ref, watch, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import { useMedicalRecordStore } from "@stores/medicalRecordStore.js";
-import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { useNotificationStore } from "@stores/notificationStore.js";
 import { formatDate } from "@utils/isoFormatDate.js";
 

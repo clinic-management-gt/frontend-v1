@@ -2,8 +2,8 @@
   <general-dialog-modal
     :isOpen="isOpen"
     dialogSize="max-w-4xl"
+    :isChildrenOpen="false"
     @close-modal="handleClose"
-    @open="handleOpen"
   >
     <template #title>
       <p class="text-xl">
@@ -274,7 +274,8 @@
       <primary-button
         v-else
         :isDisabled="!isFormValid"
-        @click.keydown.enter.prevent="handleSubmit"
+        @click.prevent="handleSubmit"
+        @keydown.enter.prevent="handleSubmit"
       >
         <p class="uppercase">
           {{ $t(isEditing ? "general.update" : "general.save") }}
@@ -285,11 +286,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useForm } from "vee-validate";
 import * as yup from "yup";
 import { useI18n } from "vue-i18n";
-import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { useMedicalRecordStore } from "@stores/medicalRecordStore.js";
 import { useFileStore } from "@stores/FileStore.js";
 import { useNotificationStore } from "@stores/notificationStore.js";
@@ -319,12 +319,11 @@ const props = defineProps({
 const emit = defineEmits(["close", "save"]);
 
 const { t } = useI18n();
-const patientsLogicStore = usePatientsLogicStore();
 const medicalRecordStore = useMedicalRecordStore();
 const fileStore = useFileStore();
 const notificationStore = useNotificationStore();
 
-const { isEditing, currentMedicalRecordId } = storeToRefs(patientsLogicStore);
+const { isEditing, currentMedicalRecordId } = storeToRefs(medicalRecordStore);
 const { closeMedicalRecordModals } = medicalRecordStore;
 
 const { 
@@ -369,7 +368,7 @@ const validationSchema = yup.object({
   examDescription: yup.string().nullable(),
 });
 
-const { values, errors, resetForm, validate, meta } = useForm({
+const { values, errors, resetForm, validate } = useForm({
   validationSchema,
   initialValues: {
     weight: "",
@@ -396,15 +395,22 @@ const isFormValid = computed(() => {
 });
 
 function handleClose() {
-  closeMedicalRecordModals();
   fileStore.clearAllFiles();
   resetForm();
   includeRecipe.value = false;
+  closeMedicalRecordModals();
+  emit("close");
 }
 
-function handleOpen() {
-  loadRecordData();
-}
+watch(
+  () => props.isOpen,
+  (newVal) => {
+    if (newVal) {
+      loadRecordData();
+    }
+  },
+  { immediate: true }
+);
 
 function loadRecordData() {
   if (isEditing.value && props.record) {
@@ -563,11 +569,13 @@ async function handleSubmit() {
       }
     }
     await fetchPatientMedicalRecords(props.patientId);
-
+    
     fileStore.clearAllFiles();
     resetForm();
     includeRecipe.value = false;
+    
     closeMedicalRecordModals();
+    
     emit("save", result);
   } finally {
     isLoading.value = false;
