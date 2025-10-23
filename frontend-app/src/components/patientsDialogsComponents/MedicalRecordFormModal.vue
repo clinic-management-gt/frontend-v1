@@ -325,7 +325,7 @@ const fileStore = useFileStore();
 const notificationStore = useNotificationStore();
 
 const { isEditing, currentMedicalRecordId } = storeToRefs(patientsLogicStore);
-const { closeHistoryLogModals } = patientsLogicStore;
+const { closeMedicalRecordModals } = medicalRecordStore;
 
 const { 
   createMedicalRecord, 
@@ -396,7 +396,7 @@ const isFormValid = computed(() => {
 });
 
 function handleClose() {
-  closeHistoryLogModals();
+  closeMedicalRecordModals();
   fileStore.clearAllFiles();
   resetForm();
   includeRecipe.value = false;
@@ -518,7 +518,6 @@ async function handleSubmit() {
       recordId = result?.id;
     }
 
-    // ✅ Guardar Recipe si está incluida
     if (includeRecipe.value && values.prescription?.trim()) {
       const recipeData = {
         prescription: values.prescription.trim(),
@@ -532,7 +531,6 @@ async function handleSubmit() {
       }
     }
 
-    // ✅ Subir archivos
     if (recordId) {
       const uploadPromises = [];
 
@@ -564,15 +562,12 @@ async function handleSubmit() {
         await Promise.all(uploadPromises);
       }
     }
-
-    // ✅ Refrescar lista de registros
     await fetchPatientMedicalRecords(props.patientId);
 
-    // ✅ Limpiar y cerrar
     fileStore.clearAllFiles();
     resetForm();
     includeRecipe.value = false;
-    closeHistoryLogModals();
+    closeMedicalRecordModals();
     emit("save", result);
   } finally {
     isLoading.value = false;

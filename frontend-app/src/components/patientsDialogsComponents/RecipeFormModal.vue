@@ -162,11 +162,10 @@ const emit = defineEmits(["close", "save"]);
 
 const { t } = useI18n();
 const medicalRecordStore = useMedicalRecordStore();
-const patientsLogicStore = usePatientsLogicStore();
 const notificationStore = useNotificationStore();
 
 const { updateRecipe, createRecipe } = medicalRecordStore;
-const { closeHistoryLogModals } = patientsLogicStore;
+const { closeMedicalRecordModals } = medicalRecordStore;
 
 // Estados
 const formData = ref({
@@ -182,7 +181,7 @@ const originalValues = ref({
 
 // Función para cerrar el modal
 function handleClose() {
-  closeHistoryLogModals();
+  closeMedicalRecordModals();
   emit("close");
 }
 

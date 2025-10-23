@@ -2,19 +2,24 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import instance from "@stores/axios.js";
 import { useNotificationStore } from "@stores/notificationStore.js";
-import { globalI18n,  } from "@/langs/index.js";
+import { globalI18n } from "@/langs/index.js";
 
 export const useMedicalRecordStore = defineStore("medicalRecord", () => {
     const medicalRecords = ref([]);
     const selectedRecord = ref(null);
     const fullRecord = ref(null);
     const currentPatientMedicalRecords = ref(null);
+    const selectedRecordForEdit = ref(null);
+    const currentMedicalRecordId = ref(null);
     const error = ref(null);
     const hasError = ref(false);
     
     const loading = ref(false);
     const isLoadingMedicalRecords = ref(false);
     const isLoadingMedicalRecordSave = ref(false);
+    const isEditing = ref(false);
+    const showFormModal = ref(false);
+    const showDetailsModal = ref(false);
     
     const { t } = globalI18n;
 
@@ -86,11 +91,11 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
             if (res.data) {
                 medicalRecords.value.push(res.data);
             }
-                  notificationStore.addNotification(
-        "success",
-        "notifications.success",
-        t("medical-records.record-created")
-      );
+            notificationStore.addNotification(
+                "success",
+                "notifications.success",
+                t("medical-records.record-created")
+            );
             return res.data;
         } finally {
             isLoadingMedicalRecords.value = false;
@@ -105,11 +110,12 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
                 `/medicalrecords/${recordId}`,
                 recordData
             );
-               notificationStore.addNotification(
-        "success",
-        "notifications.success",
-        t("medical-records.record-updated")
-      );
+            notificationStore.addNotification(
+                "success",
+                "notifications.success",
+                t("medical-records.record-updated")
+            );
+            
             // Actualizar el registro en la lista
             const index = medicalRecords.value.findIndex(r => r.id === recordId);
             if (index !== -1 && res.data) {
@@ -123,7 +129,6 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
     }
 
     async function deleteMedicalRecordById(recordId) {
-        console.log("Eliminando registro médico con ID:", recordId);
         try {
             isLoadingMedicalRecords.value = true;
             error.value = null;
@@ -144,62 +149,34 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
         }
     }
 
-    // Recipe related functions
-    async function fetchRecipe(recipeId) {
-        loading.value = true;
-        error.value = null;
-        try {
-            const res = await instance.get(`/recipes/${recipeId}`);
-            return res.data;
-        } finally {
-            loading.value = false;
-        }
+    // UI Modal functions
+    function openRecordDetailsDialog(record) {
+        selectedRecord.value = record;
+        showDetailsModal.value = true;
     }
 
-    async function createRecipe(recipeData) {
-        loading.value = true;
-        error.value = null;
-        try {
-            const res = await instance.post(`/recipes`, recipeData);
-                    notificationStore.addNotification(
-          "success",
-          "notifications.success",
-          t("recipes.recipe-created")
-        );
-            return res.data;
-        } finally {
-            loading.value = false;
-        }
+    function openCreateModal() {
+        selectedRecordForEdit.value = null;
+        currentMedicalRecordId.value = null;
+        isEditing.value = false;
+        showFormModal.value = true;
     }
 
-    async function updateRecipe(recipeId, recipeData) {
-        loading.value = true;
-        error.value = null;
-        try {
-            const res = await instance.patch(`/recipes/${recipeId}`, recipeData);
-            return res.data;
-        } finally {
-            loading.value = false;
-        }
+    function openMedicalRecordEditModal(record) {
+        selectedRecordForEdit.value = record;
+        currentMedicalRecordId.value = record.medicalRecord?.id || record.id;
+        isEditing.value = true;
+        showFormModal.value = true;
     }
 
-    async function deleteRecipe(recipeId) {
-        loading.value = true;
-        error.value = null;
-        
-        try {
-            await instance.delete(`/recipes/${recipeId}`);
-            
-            notificationStore.addNotification(
-                "success",
-                "notifications.success",
-                globalI18n.t("notifications.recipe-deleted-successfully")
-            );
-            
-            return true;
-        } finally {
-            loading.value = false;
-        }
+    function closeMedicalRecordModals() {
+        showDetailsModal.value = false;
+        showFormModal.value = false;
+        selectedRecord.value = null;
+        selectedRecordForEdit.value = null;
+        currentMedicalRecordId.value = null;
+        isEditing.value = false;
+        console.log()
     }
 
     // Medical Record state management functions
@@ -209,6 +186,10 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
 
     function setSelectedRecord(record) {
         selectedRecord.value = record;
+    }
+
+    function setSelectedRecordForEdit(record) {
+        selectedRecordForEdit.value = record;
     }
 
     function addMedicalRecord(record) {
@@ -224,6 +205,10 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
 
     function clearFullRecord() {
         fullRecord.value = null;
+    }
+
+    function clearSelectedRecord() {
+        selectedRecord.value = null;
     }
 
     function setLoading(value) {
@@ -243,8 +228,13 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
         selectedRecord.value = null;
         fullRecord.value = null;
         currentPatientMedicalRecords.value = undefined;
+        selectedRecordForEdit.value = null;
+        currentMedicalRecordId.value = null;
         loading.value = false;
         isLoadingMedicalRecords.value = false;
+        isEditing.value = false;
+        showFormModal.value = false;
+        showDetailsModal.value = false;
         error.value = null;
         hasError.value = false;
     }
@@ -255,17 +245,16 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
         selectedRecord,
         fullRecord,
         currentPatientMedicalRecords,
+        selectedRecordForEdit,
+        currentMedicalRecordId,
         loading,
         isLoadingMedicalRecords,
         isLoadingMedicalRecordSave,
+        isEditing,
+        showFormModal,
+        showDetailsModal,
         error,
         hasError,
-        
-        // recipe actions
-        fetchRecipe,
-        createRecipe,
-        updateRecipe,
-        deleteRecipe,
         
         // medical record CRUD actions
         fetchMedicalRecords,
@@ -276,12 +265,20 @@ export const useMedicalRecordStore = defineStore("medicalRecord", () => {
         updateMedicalRecordById,
         deleteMedicalRecordById,
         
+        // UI modal actions
+        openRecordDetailsDialog,
+        openCreateModal,
+        openMedicalRecordEditModal,
+        closeMedicalRecordModals,
+        
         // medical record state actions
         setMedicalRecords,
         setSelectedRecord,
+        setSelectedRecordForEdit,
         addMedicalRecord,
         updateMedicalRecord,
         clearFullRecord,
+        clearSelectedRecord,
         setLoading,
         setError,
         clearError,

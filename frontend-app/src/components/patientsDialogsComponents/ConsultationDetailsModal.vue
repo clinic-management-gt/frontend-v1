@@ -12,6 +12,10 @@
           <h2 class="text-2xl font-bold">
             {{ $t("patients.consult-detail") }}
           </h2>
+          <!-- ✅ Debug info -->
+          <div class="text-xs text-gray-500 mt-1">
+            Selected ID: {{ selectedRecord?.id }} | Has fullRecord: {{ !!fullRecord }}
+          </div>
         </div>
         <button
           class="text-black hover:text-gray-400 text-3xl font-bold leading-none"
@@ -25,9 +29,18 @@
     <!-- Body -->
     <template #body>
       <div class="overflow-y-auto max-h-[calc(95vh-160px)]">
+        <!-- ✅ Debug display -->
+        <div class="bg-yellow-50 p-2 text-xs border-b">
+          <strong>Debug:</strong> 
+          displayRecord: {{ displayRecord ? 'EXISTS' : 'NULL' }} |
+          isLoading: {{ isLoadingMedicalRecords }} |
+          hasError: {{ hasError }} |
+          selectedRecord.id: {{ selectedRecord?.id }}
+        </div>
+
         <!-- Loading -->
         <div
-          v-if="isLoadingMedicalRecords"
+          v-if="isLoadingMedicalRecords || isLoadingDetails"
           class="flex flex-col justify-center items-center py-16"
         >
           <div
@@ -37,7 +50,7 @@
             {{ $t("general.loading") }}...
           </p>
         </div>
-
+        
         <!-- Content -->
         <div
           v-else-if="displayRecord"
@@ -375,6 +388,22 @@
             {{ $t("general.retry") }}
           </button>
         </div>
+
+        <!-- ✅ Estado vacío -->
+        <div
+          v-else
+          class="text-center py-16"
+        >
+          <div class="text-gray-400 text-6xl mb-4">
+            📋
+          </div>
+          <h3 class="text-xl font-bold text-gray-600 mb-2">
+            No hay registro seleccionado
+          </h3>
+          <p class="text-gray-500">
+            Selecciona un registro médico para ver sus detalles
+          </p>
+        </div>
       </div>
     </template>
 
@@ -396,24 +425,24 @@
       </primary-button>
     </template>
   </general-dialog-modal>
+  
   <recipe-form-modal
     v-if="showRecipeFormModal"
     :isOpen="showRecipeFormModal"
     :recipe="selectedRecipeForEdit"
     :isEditing="isEditingRecipe"
-    :treatmentId="displayRecord.medicalRecord.id"
-    @close="closeHistoryLogModals"
-    @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)"
+    :treatmentId="displayRecord?.medicalRecord?.id"
+    @close="closeRecipeModal"
+    @save="(recipeData) => recipeStore.handleRecipeSave(recipeData, props.patientId, selectedRecord?.id)"
   />
 </template>
 
 <script setup>
-import { watch, computed } from "vue";
-import { usePatientsStore } from "@stores/patientsStore";
-import { usePatientsLogicStore } from "../../stores/patientsLogicStore";
+import { ref, watch, computed } from "vue";
+import { useRecipeStore } from "@stores/recipeStore";
+import { useMedicalRecordStore } from "@stores/medicalRecordStore";
 import { storeToRefs } from "pinia";
 import { formatDateShortest, formatDate } from "@/utils/isoFormatDate.js";
-import { useMedicalRecordStore } from "@stores/medicalRecordStore";
 import { nextTick } from "vue";
 
 import PrimaryButton from "@components/forms/PrimaryButton.vue";
@@ -421,10 +450,6 @@ import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
 import RecipeFormModal from "../patientsDialogsComponents/RecipeFormModal.vue";
 
 const props = defineProps({
-  record: {
-    type: Object,
-    default: null,
-  },
   isOpen: {
     type: Boolean,
     default: false,
@@ -433,39 +458,45 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "view-recipe", "edit", "download"]);
 
-const patientsStore = usePatientsStore();
-const { fullRecord, isLoadingMedicalRecords, hasError } = storeToRefs(patientsStore);
-
-const patientsLogicStore = usePatientsLogicStore();
+const recipeStore = useRecipeStore();
 const medicalRecordStore = useMedicalRecordStore();
-const { selectedRecord } = storeToRefs(medicalRecordStore);
-const {
-  closeHistoryLogModals,
-  openMedicalRecordEditModal,
-  openRecipeFormModal,
-} = patientsLogicStore;
+
+const { fullRecord, selectedRecord, isLoadingMedicalRecords, hasError } = storeToRefs(medicalRecordStore);
+
+const { 
+  showRecipeFormModal, 
+  selectedRecipeForEdit, 
+  isEditingRecipe 
+} = storeToRefs(recipeStore);
 
 const {
-  showRecipeFormModal,
-  selectedRecipeForEdit,
-  isEditingRecipe,
-} = storeToRefs(patientsLogicStore);
+  closeMedicalRecordModals,
+  openMedicalRecordEditModal,
+} = medicalRecordStore;
+
+const { openRecipeFormModal, closeRecipeModal } = recipeStore;
 
 const handleClose = () => {
-  closeHistoryLogModals();
+  closeMedicalRecordModals();
 };
 
-const displayRecord = computed(() => fullRecord.value);
+const displayRecord = computed(() => {
+  return fullRecord.value;
+});
 
-// ✅ Guard: evitar llamadas duplicadas
 const isLoadingDetails = ref(false);
 
 async function loadFullRecord() {
-  if (isLoadingDetails.value || !selectedRecord.value?.id) return;
+  if (!selectedRecord.value?.id) {
+    return;
+  }
+
+  if (isLoadingDetails.value) {
+    return;
+  }
   
   isLoadingDetails.value = true;
   try {
-    console.log("Cargando detalles de la consulta para ID:", selectedRecord.value.id);
     await medicalRecordStore.fetchMedicalRecordDetails(selectedRecord.value.id);
   } finally {
     isLoadingDetails.value = false;
@@ -496,13 +527,25 @@ const lastLoadedRecordId = ref(null);
 watch(
   () => props.isOpen,
   async (newVal) => {
-    if (newVal && selectedRecord.value?.id !== lastLoadedRecordId.value) {
-      lastLoadedRecordId.value = selectedRecord.value?.id;
-      await loadFullRecord();
-    } else if (!newVal) {
-      patientsStore.clearFullRecord();
+    if (newVal) {
+      if (currentRecordId !== lastLoadedRecordId.value) {
+        lastLoadedRecordId.value = currentRecordId;
+        await loadFullRecord();
+      }
+    } else {
+      medicalRecordStore.clearFullRecord();
       lastLoadedRecordId.value = null;
     }
   },
+);
+
+watch(
+  () => selectedRecord.value?.id,
+  async (newRecordId, oldRecordId) => {
+    if (props.isOpen && newRecordId && newRecordId !== oldRecordId) {
+      lastLoadedRecordId.value = newRecordId;
+      await loadFullRecord();
+    }
+  }
 );
 </script>

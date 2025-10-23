@@ -1,187 +1,183 @@
 <template>
-  <div>
-    <div class="flex justify-between items-center">
-      <p class="text-2xl font-bold">
-        {{ $t("patients.patient-history") }}
-      </p>
-
-      <!-- Botón para agregar nuevo registro -->
-      <div class="flex align-center items-center">
+  <div class="">
+    <!-- Header con botón de agregar -->
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">
+        {{ $t("patients.history-log") }}
+      </h2>
         <action-button-solid-icon
           icon="PlusCircleIcon"
           size="h-10 w-10"
           color="text-patient-page-color"
-          @click="openCreateModal"
-        />
-      </div>
+          :click="openCreateModal()"/>
     </div>
 
-    <!-- Lista de registros médicos -->
-    <div v-if="paginatedRecords.length > 0">
+    <!-- Lista de registros -->
+    <div class="space-y-4">
       <div
-        v-for="item in paginatedRecords"
-        :key="item.id"
-        class="mb-3 cursor-pointer"
-        @click="openRecordDetails(item)"
+        v-for="record in paginatedRecords"
+        :key="`record-${record.id}-${record.medicalRecord?.id || 'new'}`"
+        class="border border-gray-200 rounded-lg p-5 hover:shadow-lg transition-all duration-200 bg-gray-50"
       >
-        <div
-          class="bg-white shadow-md hover:bg-gray-200 rounded-lg p-4 transition-colors duration-200"
-        >
-          <div class="flex justify-between items-center gap-2">
-            <!-- Información principal -->
-            <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1">
-                <div
-                  class="w-3 h-3 rounded-full"
-                  style="background-color: var(--primary-color)"
-                ></div>
-                <p class="text-lg font-bold text-gray-800">
-                  {{ formatDateShort(item.createdAt) }}
+        <div class="flex justify-between items-start gap-4">
+          <!-- Contenido del registro -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex-shrink-0 w-10 h-10 bg-[#489FB5] rounded-full flex items-center justify-center">
+                <DocumentTextIcon class="w-6 h-6 text-white" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="font-semibold text-gray-900 text-lg">
+                  {{ $t("patients.consult") }}
+                </h3>
+                <p class="text-sm text-gray-500">
+                  {{ formatDateShort(record.date) }}
                 </p>
               </div>
-              <p
-                v-if="item.diagnosis"
-                class="text-sm text-gray-600 ml-5"
-              >
-                <strong>{{ $t("general.diagnosis-label") }}</strong> {{ item.diagnosis }}
-              </p>
+            </div>
+            
+            <!-- Notas del registro -->
+            <div
+              v-if="record.medicalRecord?.notes"
+              class="mt-3 pl-13 text-sm text-gray-700 line-clamp-2"
+            >
+              <span class="font-medium text-gray-900">{{ $t("medical-records.notes") }}:</span>
+              {{ record.medicalRecord.notes }}
             </div>
 
-            <!-- Botones de acción -->
-            <div class="flex items-center gap-2">
-              <action-button-solid-icon
-                icon="EyeIcon"
-                size="h-8 w-8"
-                color="text-patient-page-color"
-                @click.stop="openRecordDetailsDialog(item)"
-              />
-
-              <action-button-solid-icon
-                icon="PencilIcon"
-                size="h-8 w-8"
-                color="text-patient-page-color"
-                @click.stop="openMedicalRecordEditModal(item)"
-              />
-
-              <action-button-solid-icon
-                icon="TrashIcon"
-                size="h-8 w-8"
-                color="text-red-600"
-                @click.stop="deleteRecord(item)"
-              />
-
-              <action-button-solid-icon
-                icon="ArrowDownTrayIcon"
-                size="h-8 w-8"
-                color="text-patient-page-color"
-                @click.stop="downloadRecord(item)"
-              />
+            <!-- Peso y Altura -->
+            <div
+              v-if="record.medicalRecord?.weight || record.medicalRecord?.height"
+              class="mt-2 pl-13 flex gap-4 text-sm text-gray-600"
+            >
+              <span v-if="record.medicalRecord?.weight">
+                <span class="font-medium">{{ $t("medical-records.weight") }}:</span>
+                {{ record.medicalRecord.weight }} kg
+              </span>
+              <span v-if="record.medicalRecord?.height">
+                <span class="font-medium">{{ $t("medical-records.height") }}:</span>
+                {{ record.medicalRecord.height }} cm
+              </span>
             </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="flex gap-2 flex-shrink-0">
+            <button
+              class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors group relative"
+              @click="handleOpenDetails(record)"
+            >
+          </button>
+          <action-button-solid-icon
+                          icon="EyeIcon"
+                           @click="handleOpenDetails(record)"
+                          size="h-6 w-6"
+                        />
+          <EyeIcon class="w-5 h-5" />
+          <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            {{ $t("general.view") }}
+          </span>
+            <button
+              class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors group relative"
+              @click="openMedicalRecordEditModal(record)"
+            >
+              <PencilIcon class="w-5 h-5" />
+              <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                {{ $t("general.edit") }}
+              </span>
+            </button>
+            <button
+              class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors group relative"
+              @click="deleteRecord(record)"
+            >
+              <TrashIcon class="w-5 h-5" />
+              <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                {{ $t("general.delete") }}
+              </span>
+            </button>
           </div>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <label class="text-sm text-gray-600">{{ $t("general.show") }}:</label>
-        <select
-          v-model="itemsPerPage"
-          class="px-2 py-1 border rounded text-sm"
-          @change="resetPagination"
-        >
-          <option value="5">
-            5
-          </option>
-          <option value="10">
-            10
-          </option>
-          <option value="15">
-            15
-          </option>
-          <option value="20">
-            20
-          </option>
-        </select>
-        <span class="text-sm text-gray-600">{{ $t("general.elements") }}</span>
-      </div>
+
+      <!-- Estado vacío -->
       <div
-        v-if="totalPages > 1"
-        class="flex justify-between items-center mt-4 text-sm text-gray-600"
+        v-if="!paginatedRecords || paginatedRecords.length === 0"
+        class="text-center py-12"
       >
+        <DocumentTextIcon class="w-20 h-20 mx-auto text-gray-300 mb-4" />
+        <h3 class="text-xl font-semibold text-gray-600 mb-2">
+          {{ $t("patients.no-records") }}
+        </h3>
+        <p class="text-gray-500 mb-6">
+          {{ $t("patients.no-records-description") }}
+        </p>
         <button
-          :disabled="currentPage === 1"
-          class="px-3 py-1 border rounded disabled:opacity-50"
-          @click="goToPreviousPage"
+          class="px-6 py-3 bg-[#489FB5] text-white rounded-lg hover:bg-[#3a8ca0] transition-colors shadow-sm font-medium"
+          @click="openCreateModal"
         >
-          {{ $t("general.previous") }}
-        </button>
-
-        <span>
-          {{ $t("general.page") }} {{ currentPage }}
-          {{ $t("general.of") }} {{ totalPages }}
-        </span>
-
-        <button
-          :disabled="currentPage === totalPages"
-          class="px-3 py-1 border rounded disabled:opacity-50"
-          @click="goToNextPage"
-        >
-          {{ $t("general.next") }}
+          {{ $t("patients.create-first-record") }}
         </button>
       </div>
     </div>
 
-    <!-- Estado vacío -->
+    <!-- Paginación -->
     <div
-      v-else
-      class="flex flex-col w-full align-center items-center text-center py-12"
+      v-if="totalPages > 1"
+      class="flex justify-between items-center mt-8 pt-6 border-t border-gray-200"
     >
-      <document-icon class="text-patient-page-color w-9 h-9" />
-      <p class="text-gray-500 text-lg">
-        {{ $t("patients.no-medical-records") }}
-      </p>
+      <button
+        :disabled="currentPage === 1"
+        class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors font-medium text-gray-700"
+        @click="goToPreviousPage"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        {{ $t("general.previous") }}
+      </button>
+      
+      <span class="text-sm font-medium text-gray-700">
+        {{ $t("general.page") }} {{ currentPage }} {{ $t("general.of") }} {{ totalPages }}
+      </span>
+      
+      <button
+        :disabled="currentPage === totalPages"
+        class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors font-medium text-gray-700"
+        @click="goToNextPage"
+      >
+        {{ $t("general.next") }}
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
     </div>
-
-    <!-- Modal de detalles -->
-    <consultation-details-modal
-      v-if="showDetailsModal"
-      :record="selectedRecord"
-      :isOpen="showDetailsModal"
-      @close="closeHistoryLogModals"
-      @view-recipe="handleViewRecipe"
-      @edit="openMedicalRecordEditModal"
-    />
-
-    <!-- Modal de formulario -->
-    <medical-record-form-modal
-      v-if="showFormModal"
-      :isOpen="showFormModal"
-      :patientId="currentPatientSelectedId || props.patientId"
-      :record="selectedRecordForEdit"
-      :isEditing="isEditing"
-      @close="closeHistoryLogModals"
-      @save="(formData) => handleMedicalRecordSave(formData, props.patientId)"
-    />
 
     <!-- Modal de confirmación de eliminación -->
     <div
       v-if="showDeleteConfirmation"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4"
     >
-      <div class="bg-white rounded-lg p-6 max-w-md mx-4">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
-          {{ $t("general.confirm-deletion") }}
-        </h3>
-        <p class="text-gray-600 mb-6">
-          {{ $t("general.delete-confirmation-message") }}
+      <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+            <TrashIcon class="w-6 h-6 text-red-600" />
+          </div>
+          <h3 class="text-xl font-bold text-gray-900">
+            {{ $t("general.confirm-delete") }}
+          </h3>
+        </div>
+        <p class="text-gray-600 mb-6 ml-15">
+          {{ $t("patients.confirm-delete-record") }}
         </p>
-        <div class="flex justify-end space-x-3">
+        <div class="flex gap-3 justify-end">
           <button
-            class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+            class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
             @click="cancelDelete"
           >
             {{ $t("general.cancel") }}
           </button>
           <button
-            class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+            class="px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-sm"
             @click="confirmDelete"
           >
             {{ $t("general.delete") }}
@@ -189,16 +185,41 @@
         </div>
       </div>
     </div>
+
+    <!-- Modales -->
+    <consultation-details-modal
+      :isOpen="showDetailsModal"
+      @close="closeMedicalRecordModals"
+      @view-recipe="handleViewRecipe"
+      @edit="openMedicalRecordEditModal"
+      @download="downloadRecord"
+    />
+
+    <medical-record-form-modal
+      v-if="showFormModal"
+      :isOpen="showFormModal"
+      :patientId="patientId"
+      :record="selectedRecordForEdit"
+      @close="closeMedicalRecordModals"
+      @save="async () => {
+        await medicalRecordStore.fetchPatientMedicalRecords(patientId);
+        closeMedicalRecordModals();
+      }"
+    />
   </div>
 </template>
 
 <script setup>
 import { computed, ref, watch, onMounted } from "vue";
-import { usePatientsStore } from "@stores/patientsStore";
-import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { useMedicalRecordStore } from "@stores/medicalRecordStore";
 import { storeToRefs } from "pinia";
-import { DocumentIcon } from "@heroicons/vue/24/outline";
+import { 
+  EyeIcon, 
+  PencilIcon, 
+  TrashIcon, 
+  PlusIcon,
+  DocumentTextIcon 
+} from "@heroicons/vue/24/outline";
 
 import ActionButtonSolidIcon from "@components/forms/ActionButtonSolidIcon.vue";
 import ConsultationDetailsModal from "../patientsDialogsComponents/ConsultationDetailsModal.vue";
@@ -214,42 +235,38 @@ const props = defineProps({
 
 const emit = defineEmits(["view-recipe"]);
 
-// Store
 const medicalRecordStore = useMedicalRecordStore();
-const {
-  currentPatientMedicalRecords,
-  currentPatientSelectedId,
-} = storeToRefs(medicalRecordStore);
-const patientsLogicStore = usePatientsLogicStore();
+const { currentPatientMedicalRecords } = storeToRefs(medicalRecordStore);
 
-// Estado para confirmación de eliminación
-const recordToDelete = ref(null);
-const showDeleteConfirmation = ref(false);
 const {
   showFormModal,
   showDetailsModal,
-  selectedRecord,
   selectedRecordForEdit,
   isEditing,
-} = storeToRefs(patientsLogicStore);
+} = storeToRefs(medicalRecordStore);
+
 const {
   openRecordDetailsDialog,
   openCreateModal,
-  closeHistoryLogModals,
+  closeMedicalRecordModals,
   openMedicalRecordEditModal,
-  handleMedicalRecordSave,
-} = patientsLogicStore;
-// Estados locales
+  setSelectedRecord,
+} = medicalRecordStore;
+
+const recordToDelete = ref(null);
+const showDeleteConfirmation = ref(false);
+
 const itemsPerPage = ref(5);
 const currentPage = ref(1);
 
-// Computados para paginación
 const totalRecords = computed(
   () => currentPatientMedicalRecords.value?.length || 0,
 );
+
 const totalPages = computed(() =>
   Math.ceil(totalRecords.value / itemsPerPage.value),
 );
+
 const paginatedRecords = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
@@ -259,33 +276,28 @@ const paginatedRecords = computed(() => {
   return records.slice(start, end);
 });
 
-/**
- * Inicia el proceso de eliminación mostrando modal de confirmación
- * @param {Object} record - Registro médico a eliminar
- */
+function handleOpenDetails(record) {
+  console.log("📋 Abriendo detalles para record:", record);
+  setSelectedRecord(record);
+  openRecordDetailsDialog(record);
+}
+
 function deleteRecord(record) {
   recordToDelete.value = record;
   showDeleteConfirmation.value = true;
 }
 
-/**
- * Cancela la eliminación del registro médico
- */
 function cancelDelete() {
   recordToDelete.value = null;
   showDeleteConfirmation.value = false;
 }
 
-/**
- * Confirma y ejecuta la eliminación del registro médico
- */
 async function confirmDelete() {
   if (!recordToDelete.value) return;
 
   await medicalRecordStore.deleteMedicalRecordById(recordToDelete.value.id);
   await medicalRecordStore.fetchPatientMedicalRecords(props.patientId);
   
-  // Cerrar modal
   cancelDelete();
 }
 
@@ -300,28 +312,33 @@ function handleViewRecipe(recipe) {
 function resetPagination() {
   currentPage.value = 1;
 }
+
 function goToPreviousPage() {
   if (currentPage.value > 1) currentPage.value--;
 }
+
 function goToNextPage() {
   if (currentPage.value < totalPages.value) currentPage.value++;
 }
 
-// Cargar datos al montar el componente
+const lastLoadedPatientId = ref(null);
+
 onMounted(async () => {
-  if (props.patientId) {
+  if (props.patientId && props.patientId !== lastLoadedPatientId.value) {
+    lastLoadedPatientId.value = props.patientId;
     await medicalRecordStore.fetchPatientMedicalRecords(props.patientId);
   }
 });
 
-// Observar cambios en el ID del paciente
 watch(
   () => props.patientId,
-  async (newId) => {
-    if (newId) {
+  async (newId, oldId) => {
+    if (newId && newId !== oldId && newId !== lastLoadedPatientId.value) {
       currentPage.value = 1;
+      lastLoadedPatientId.value = newId;
       await medicalRecordStore.fetchPatientMedicalRecords(newId);
     }
   },
+  { immediate: false }
 );
 </script>
