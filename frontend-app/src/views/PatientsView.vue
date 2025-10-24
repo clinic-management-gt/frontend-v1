@@ -97,6 +97,7 @@
 <script setup>
 import { usePatientsStore } from "@stores/patientsStore";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
+import { useMedicalRecordStore } from "@stores/medicalRecordStore.js";
 import { ArrowUturnLeftIcon } from "@heroicons/vue/20/solid";
 import { ArrowPathIcon } from "@heroicons/vue/24/outline";
 import { ref, watch, onMounted } from "vue";
@@ -124,6 +125,8 @@ function openRecipeModal(receta) {
 }
 
 const patientsStore = usePatientsStore();
+const medicalRecordStore = useMedicalRecordStore();
+
 const {
   currentPatientSelectedId,
   currentPatientSelectedData,
@@ -133,7 +136,7 @@ const {
   isLoadingPendingPatients,
 } = storeToRefs(patientsStore);
 
-const { fetchPendingPatients } = patientsStore;
+const { fetchPendingPatients, fetchAllPatients, fetchPatientData } = patientsStore;
 
 const patientsLogicStore = usePatientsLogicStore();
 const { showDataSheetPatientDialog } = storeToRefs(patientsLogicStore);
@@ -151,25 +154,32 @@ const handlePendingFilters = (filteredData) => {
   updatedFilteredPendingPatients.value = filteredData;
 };
 
-onMounted(async () => {
-  await patientsStore.fetchAllPatients();
-});
-
-watch(currentPatientSelectedId, async (newId) => {
-  if (newId) {
-    await patientsStore.fetchPatientData(newId);
-    await patientsStore.fetchPatientMedicalRecords(newId);
-  }
-});
-
-onMounted(async () => {
-  await patientsStore.fetchAllPatients();
+const refreshPendingPatients = async () => {
   await fetchPendingPatients();
+};
 
+onMounted(async () => {
+  if (!allPatients.value || allPatients.value.length === 0) {
+    await fetchAllPatients();
+  }
   
+  if (!pendingPatients.value || pendingPatients.value.length === 0) {
+    await fetchPendingPatients();
+  }
+  
+  // Si hay un paciente seleccionado, cargar sus datos
   if (currentPatientSelectedId.value) {
-    await patientsStore.fetchPatientData(currentPatientSelectedId.value);
-    await patientsStore.fetchPatientMedicalRecords(currentPatientSelectedId.value);
+    if (!currentPatientSelectedData.value) {
+      await fetchPatientData(currentPatientSelectedId.value);
+    }
+    await medicalRecordStore.fetchPatientMedicalRecords(currentPatientSelectedId.value);
   }
 });
+
+watch(currentPatientSelectedId, async (newId, oldId) => {
+  if (newId && newId !== oldId) {
+    await fetchPatientData(newId);
+    await medicalRecordStore.fetchPatientMedicalRecords(newId);
+  }
+}, { immediate: false });
 </script>

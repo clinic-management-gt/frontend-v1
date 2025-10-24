@@ -100,10 +100,12 @@ const props = defineProps({
     default: false,
   },
 });
+
 const closeModal = () => {
   if (!props.isChildrenOpen) {
     emit("closeModal", false);
   }
 };
+
 defineExpose({ closeModal });
 </script>

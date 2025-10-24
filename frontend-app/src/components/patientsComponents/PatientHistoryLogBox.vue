@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- Header con botón de agregar -->
     <div class="flex justify-between items-center">
       <p class="text-2xl font-bold">
         {{ $t("patients.patient-history") }}
@@ -8,7 +9,7 @@
       <!-- Botón para agregar nuevo registro -->
       <div class="flex align-center items-center">
         <action-button-solid-icon
-          icon="PlusCircleIcon"
+          icon="PlusIcon"
           size="h-10 w-10"
           color="text-patient-page-color"
           @click="openCreateModal"
@@ -22,7 +23,7 @@
         v-for="item in paginatedRecords"
         :key="item.id"
         class="mb-3 cursor-pointer"
-        @click="openRecordDetails(item)"
+        @click="handleOpenDetails(item)"
       >
         <div
           class="bg-white shadow-md hover:bg-gray-200 rounded-lg p-4 transition-colors duration-200"
@@ -36,14 +37,16 @@
                   style="background-color: var(--primary-color)"
                 ></div>
                 <p class="text-lg font-bold text-gray-800">
-                  {{ formatDateShort(item.createdAt) }}
+                  {{ formatDateShort(item.date || item.createdAt) }}
                 </p>
               </div>
               <p
-                v-if="item.diagnosis"
+                v-if="item.medicalRecord?.notes"
                 class="text-sm text-gray-600 ml-5"
               >
-                <strong>{{ $t("general.diagnosis-label") }}</strong> {{ item.diagnosis }}
+                <strong>{{ $t("medical-records.notes") }}:</strong> 
+                {{ item.medicalRecord.notes.substring(0, 100) }}
+                <span v-if="item.medicalRecord.notes.length > 100">...</span>
               </p>
             </div>
 
@@ -52,14 +55,14 @@
               <action-button-solid-icon
                 icon="EyeIcon"
                 size="h-8 w-8"
-                color="text-patient-page-color"
-                @click.stop="openRecordDetailsDialog(item)"
+                color="text-gray-500"
+                @click.stop="handleOpenDetails(item)"
               />
 
               <action-button-solid-icon
-                icon="PencilIcon"
+                icon="PencilSquareIcon"
                 size="h-8 w-8"
-                color="text-patient-page-color"
+                color="text-gray-500"
                 @click.stop="openMedicalRecordEditModal(item)"
               />
 
@@ -69,39 +72,28 @@
                 color="text-red-600"
                 @click.stop="deleteRecord(item)"
               />
-
-              <action-button-solid-icon
-                icon="ArrowDownTrayIcon"
-                size="h-8 w-8"
-                color="text-patient-page-color"
-                @click.stop="downloadRecord(item)"
-              />
             </div>
           </div>
         </div>
       </div>
-      <div class="flex items-center gap-2">
+
+      <!-- Selector de items por página -->
+      <div class="flex items-center gap-2 mt-4">
         <label class="text-sm text-gray-600">{{ $t("general.show") }}:</label>
         <select
           v-model="itemsPerPage"
           class="px-2 py-1 border rounded text-sm"
           @change="resetPagination"
         >
-          <option value="5">
-            5
-          </option>
-          <option value="10">
-            10
-          </option>
-          <option value="15">
-            15
-          </option>
-          <option value="20">
-            20
-          </option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
         </select>
         <span class="text-sm text-gray-600">{{ $t("general.elements") }}</span>
       </div>
+
+      <!-- Controles de paginación -->
       <div
         v-if="totalPages > 1"
         class="flex justify-between items-center mt-4 text-sm text-gray-600"
@@ -134,7 +126,7 @@
       v-else
       class="flex flex-col w-full align-center items-center text-center py-12"
     >
-      <document-icon class="text-patient-page-color w-9 h-9" />
+      <document-text-icon class="text-patient-page-color w-9 h-9" />
       <p class="text-gray-500 text-lg">
         {{ $t("patients.no-medical-records") }}
       </p>
@@ -142,10 +134,8 @@
 
     <!-- Modal de detalles -->
     <consultation-details-modal
-      v-if="showDetailsModal"
-      :record="selectedRecord"
       :isOpen="showDetailsModal"
-      @close="closeHistoryLogModals"
+      @close="closeMedicalRecordModals"
       @view-recipe="handleViewRecipe"
       @edit="openMedicalRecordEditModal"
     />
@@ -154,11 +144,10 @@
     <medical-record-form-modal
       v-if="showFormModal"
       :isOpen="showFormModal"
-      :patientId="currentPatientSelectedId || props.patientId"
+      :patientId="patientId"
       :record="selectedRecordForEdit"
-      :isEditing="isEditing"
-      @close="closeHistoryLogModals"
-      @save="(formData) => handleMedicalRecordSave(formData, props.patientId)"
+      @close="handleFormModalClose"
+      @save="handleFormModalSave"
     />
 
     <!-- Modal de confirmación de eliminación -->
@@ -194,12 +183,13 @@
 
 <script setup>
 import { computed, ref, watch, onMounted } from "vue";
-import { usePatientsStore } from "@stores/patientsStore";
-import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
+import { useMedicalRecordStore } from "@stores/medicalRecordStore";
 import { storeToRefs } from "pinia";
-import { DocumentIcon } from "@heroicons/vue/24/outline";
+import { 
+  DocumentTextIcon 
+} from "@heroicons/vue/24/outline";
 
-import ActionButtonSolidIcon from "@components/forms/ActionButtonSolidIcon.vue";
+import ActionButtonSolidIcon from "@components/forms/ActionButtonOutlinedIcon.vue";
 import ConsultationDetailsModal from "../patientsDialogsComponents/ConsultationDetailsModal.vue";
 import MedicalRecordFormModal from "../patientsDialogsComponents/MedicalRecordFormModal.vue";
 import { formatDateShort } from "@/utils/isoFormatDate.js";
@@ -213,42 +203,37 @@ const props = defineProps({
 
 const emit = defineEmits(["view-recipe"]);
 
-// Store
-const patientsStore = usePatientsStore();
-const {
-  currentPatientMedicalRecords,
-  currentPatientSelectedId,
-} = storeToRefs(patientsStore);
-const patientsLogicStore = usePatientsLogicStore();
+const medicalRecordStore = useMedicalRecordStore();
+const { currentPatientMedicalRecords } = storeToRefs(medicalRecordStore);
 
-// Estado para confirmación de eliminación
-const recordToDelete = ref(null);
-const showDeleteConfirmation = ref(false);
 const {
   showFormModal,
   showDetailsModal,
-  selectedRecord,
   selectedRecordForEdit,
-  isEditing,
-} = storeToRefs(patientsLogicStore);
+} = storeToRefs(medicalRecordStore);
+
 const {
   openRecordDetailsDialog,
   openCreateModal,
-  closeHistoryLogModals,
+  closeMedicalRecordModals,
   openMedicalRecordEditModal,
-  handleMedicalRecordSave,
-} = patientsLogicStore;
-// Estados locales
+  setSelectedRecord,
+} = medicalRecordStore;
+
+const recordToDelete = ref(null);
+const showDeleteConfirmation = ref(false);
+
 const itemsPerPage = ref(5);
 const currentPage = ref(1);
 
-// Computados para paginación
 const totalRecords = computed(
   () => currentPatientMedicalRecords.value?.length || 0,
 );
+
 const totalPages = computed(() =>
   Math.ceil(totalRecords.value / itemsPerPage.value),
 );
+
 const paginatedRecords = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
@@ -258,38 +243,28 @@ const paginatedRecords = computed(() => {
   return records.slice(start, end);
 });
 
-/**
- * Inicia el proceso de eliminación mostrando modal de confirmación
- * @param {Object} record - Registro médico a eliminar
- */
+function handleOpenDetails(record) {
+  setSelectedRecord(record);
+  openRecordDetailsDialog(record);
+}
+
 function deleteRecord(record) {
   recordToDelete.value = record;
   showDeleteConfirmation.value = true;
 }
 
-/**
- * Cancela la eliminación del registro médico
- */
 function cancelDelete() {
   recordToDelete.value = null;
   showDeleteConfirmation.value = false;
 }
 
-/**
- * Confirma y ejecuta la eliminación del registro médico
- */
 async function confirmDelete() {
   if (!recordToDelete.value) return;
 
-  await patientsStore.deleteMedicalRecord(recordToDelete.value.id);
-  await patientsStore.fetchPatientMedicalRecords(props.patientId);
+  await medicalRecordStore.deleteMedicalRecordById(recordToDelete.value.id);
+  await medicalRecordStore.fetchPatientMedicalRecords(props.patientId);
   
-  // Cerrar modal
   cancelDelete();
-}
-
-function downloadRecord() {
-  // TODO: Implementar funcionalidad de descarga de PDF
 }
 
 function handleViewRecipe(recipe) {
@@ -299,28 +274,44 @@ function handleViewRecipe(recipe) {
 function resetPagination() {
   currentPage.value = 1;
 }
+
 function goToPreviousPage() {
   if (currentPage.value > 1) currentPage.value--;
 }
+
 function goToNextPage() {
   if (currentPage.value < totalPages.value) currentPage.value++;
 }
 
-// Cargar datos al montar el componente
+const lastLoadedPatientId = ref(null);
+
 onMounted(async () => {
-  if (props.patientId) {
-    await patientsStore.fetchPatientMedicalRecords(props.patientId);
+  if (props.patientId && props.patientId !== lastLoadedPatientId.value) {
+    lastLoadedPatientId.value = props.patientId;
+    await medicalRecordStore.fetchPatientMedicalRecords(props.patientId);
   }
 });
 
-// Observar cambios en el ID del paciente
 watch(
   () => props.patientId,
-  async (newId) => {
-    if (newId) {
+  async (newId, oldId) => {
+    if (newId && newId !== oldId && newId !== lastLoadedPatientId.value) {
       currentPage.value = 1;
-      await patientsStore.fetchPatientMedicalRecords(newId);
+      lastLoadedPatientId.value = newId;
+      await medicalRecordStore.fetchPatientMedicalRecords(newId);
     }
   },
+  { immediate: false }
 );
+
+// ✅ Handler para cerrar el modal de formulario
+function handleFormModalClose() {
+  closeMedicalRecordModals();
+}
+
+// ✅ Handler para cuando se guarda exitosamente
+async function handleFormModalSave() {
+  await medicalRecordStore.fetchPatientMedicalRecords(props.patientId);
+  closeMedicalRecordModals();
+}
 </script>

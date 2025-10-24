@@ -4,302 +4,296 @@ import instance from "@stores/axios.js";
 import { useNotificationStore } from "@stores/notificationStore.js";
 import { globalI18n } from "@/langs/index.js";
 
-export const useMedicalRecordStore = defineStore("medicalRecord", () => {
+export const useMedicalRecordStore = defineStore(
+  "medicalRecord",
+  () => {
     const medicalRecords = ref([]);
     const selectedRecord = ref(null);
-    const loading = ref(false);
+    const fullRecord = ref(null);
+    const currentPatientMedicalRecords = ref(null);
+    const selectedRecordForEdit = ref(null);
+    const currentMedicalRecordId = ref(null);
     const error = ref(null);
+    const hasError = ref(false);
 
-    // Recipe related functions
-    async function fetchRecipe(recipeId) {
-        loading.value = true;
-        error.value = null;
-        try {
-            const res = await instance.get(`/recipes/${recipeId}`);
-            return res.data;
-        } catch (err) {
-            error.value = err.message;
-            throw err;
-        } finally {
-            loading.value = false;
-        }
-    }
+    const loading = ref(false);
+    const isLoadingMedicalRecords = ref(false);
+    const isLoadingMedicalRecordSave = ref(false);
+    const isEditing = ref(false);
+    const showFormModal = ref(false);
+    const showDetailsModal = ref(false);
 
-    async function createRecipe(recipeData) {
-        loading.value = true;
-        error.value = null;
-        try {
-            const res = await instance.post(`/recipes`, recipeData);
-            return res.data;
-        } catch (err) {
-            error.value = err.message;
-            throw err;
-        } finally {
-            loading.value = false;
-        }
-    }
+    const { t } = globalI18n;
 
-    async function updateRecipe(recipeId, recipeData) {
-        loading.value = true;
-        error.value = null;
-        try {
-            const res = await instance.patch(`/recipes/${recipeId}`, recipeData);
-            return res.data;
-        } catch (err) {
-            error.value = err.message;
-            throw err;
-        } finally {
-            loading.value = false;
-        }
-    }
-
-    async function deleteRecipe(recipeId) {
-        const notificationStore = useNotificationStore();
-        loading.value = true;
-        error.value = null;
-        
-        try {
-            await instance.delete(`/recipes/${recipeId}`);
-            
-            notificationStore.addNotification(
-                "success",
-                "notifications.success",
-                globalI18n.t("notifications.recipe-deleted-successfully")
-            );
-            
-            return true;
-        } catch (err) {
-            error.value = err.message;
-            throw new Error(globalI18n.t("notifications.error-deleting-recipe"));
-        } finally {
-            loading.value = false;
-        }
-    }
+    const notificationStore = useNotificationStore();
 
     // Medical Record CRUD functions
     async function fetchMedicalRecords(patientId) {
-        loading.value = true;
-        error.value = null;
-        try {
-            const res = await instance.get(`/medical-records/patient/${patientId}`);
-            medicalRecords.value = res.data;
-            return res.data;
-        } catch (err) {
-            error.value = err.message;
-            throw err;
-        } finally {
-            loading.value = false;
-        }
+      isLoadingMedicalRecords.value = true;
+      error.value = null;
+      try {
+        const res = await instance.get(`/patients/${patientId}/medicalrecords`);
+        medicalRecords.value = res.data;
+        return res.data;
+      } catch (err) {
+        error.value = err.message;
+        throw err;
+      } finally {
+        isLoadingMedicalRecords.value = false;
+      }
+    }
+
+    async function fetchPatientMedicalRecords(patientId) {
+      isLoadingMedicalRecords.value = true;
+      if (!patientId) return;
+      try {
+        const res = await instance.get(
+          `/patients/${patientId}/medicalrecords?page=1&limit=50`
+        );
+        currentPatientMedicalRecords.value = res.data.records || [];
+        return res.data;
+      } catch (err) {
+        error.value = err.message;
+        throw err;
+      } finally {
+        isLoadingMedicalRecords.value = false;
+      }
     }
 
     async function fetchMedicalRecordById(recordId) {
+      try {
         loading.value = true;
         error.value = null;
-        try {
-            const res = await instance.get(`/medical-records/${recordId}`);
-            selectedRecord.value = res.data;
-            return res.data;
-        } catch (err) {
-            error.value = err.message;
-            throw err;
-        } finally {
-            loading.value = false;
-        }
+        const res = await instance.get(`/medicalrecords/${recordId}`);
+        selectedRecord.value = res.data;
+        return res.data;
+      } finally {
+        loading.value = false;
+      }
+    }
+
+    async function fetchMedicalRecordDetails(recordId) {
+      try {
+        isLoadingMedicalRecords.value = true;
+        hasError.value = false;
+        const res = await instance.get(`/medicalrecords/${recordId}/details`);
+        fullRecord.value = res.data;
+        return res.data;
+      } finally {
+        isLoadingMedicalRecords.value = false;
+      }
     }
 
     async function createMedicalRecord(patientId, recordData) {
-        loading.value = true;
+      try {
+        isLoadingMedicalRecords.value = true;
         error.value = null;
-        try {
-            const res = await instance.post(
-                `/medical-records/${patientId}`,
-                recordData
-            );
-            
-            // Agregar el nuevo registro a la lista
-            if (res.data) {
-                medicalRecords.value.push(res.data);
-            }
-            
-            return res.data;
-        } catch (err) {
-            error.value = err.message;
-            throw err;
-        } finally {
-            loading.value = false;
+        const dataToSend = { ...recordData, PatientId: patientId };
+        const res = await instance.post(`/medicalrecords`, dataToSend);
+        if (res.data) {
+          medicalRecords.value.push(res.data);
         }
+        notificationStore.addNotification(
+          "success",
+          "notifications.success",
+          t("medical-records.record-created")
+        );
+        return res.data;
+      } finally {
+        isLoadingMedicalRecords.value = false;
+      }
     }
 
     async function updateMedicalRecordById(recordId, recordData) {
-        loading.value = true;
+      try {
+        isLoadingMedicalRecords.value = true;
         error.value = null;
-        try {
-            const res = await instance.patch(
-                `/medical-records/${recordId}`,
-                recordData
-            );
-            
-            // Actualizar el registro en la lista
-            const index = medicalRecords.value.findIndex(r => r.id === recordId);
-            if (index !== -1 && res.data) {
-                medicalRecords.value[index] = { ...medicalRecords.value[index], ...res.data };
-            }
-            
-            return res.data;
-        } catch (err) {
-            error.value = err.message;
-            throw err;
-        } finally {
-            loading.value = false;
+        const res = await instance.patch(
+          `/medicalrecords/${recordId}`,
+          recordData
+        );
+        notificationStore.addNotification(
+          "success",
+          "notifications.success",
+          t("medical-records.record-updated")
+        );
+
+        // Actualizar el registro en la lista
+        const index = medicalRecords.value.findIndex((r) => r.id === recordId);
+        if (index !== -1 && res.data) {
+          medicalRecords.value[index] = {
+            ...medicalRecords.value[index],
+            ...res.data,
+          };
         }
+
+        return res.data;
+      } finally {
+        isLoadingMedicalRecords.value = false;
+      }
     }
 
     async function deleteMedicalRecordById(recordId) {
-        const notificationStore = useNotificationStore();
-        loading.value = true;
+      try {
+        isLoadingMedicalRecords.value = true;
         error.value = null;
-        
-        try {
-            await instance.delete(`/medical-records/${recordId}`);
-            
-            // Eliminar el registro de la lista
-            medicalRecords.value = medicalRecords.value.filter(r => r.id !== recordId);
-            
-            notificationStore.addNotification(
-                "success",
-                "notifications.success",
-                globalI18n.t("notifications.record-deleted-successfully")
-            );
-            
-            return true;
-        } catch (err) {
-            error.value = err.message;
-            notificationStore.addNotification(
-                "error",
-                "notifications.error",
-                globalI18n.t("notifications.error-deleting-record")
-            );
-            throw err;
-        } finally {
-            loading.value = false;
-        }
+        await instance.delete(`/medicalrecords/${recordId}`);
+
+        // Eliminar el registro de la lista
+        medicalRecords.value = medicalRecords.value.filter(
+          (r) => r.id !== recordId
+        );
+
+        notificationStore.addNotification(
+          "success",
+          "notifications.success",
+          t("notifications.medical-record-deleted-successfully")
+        );
+
+        return true;
+      } finally {
+        isLoadingMedicalRecords.value = false;
+      }
     }
 
-    // Handle Medical Record Save (Create or Update)
-    async function handleMedicalRecordSave(recordData, patientId, isEditing = false, recordId = null) {
-        const notificationStore = useNotificationStore();
-        
-        try {
-            let result;
-
-            if (isEditing && recordId) {
-                // Actualizar registro existente
-                result = await updateMedicalRecordById(recordId, recordData);
-                
-                notificationStore.addNotification(
-                    "success",
-                    "notifications.success",
-                    globalI18n.t("medical-records.record-updated")
-                );
-            } else {
-                // Crear nuevo registro
-                result = await createMedicalRecord(patientId, recordData);
-                
-                notificationStore.addNotification(
-                    "success",
-                    "notifications.success",
-                    globalI18n.t("medical-records.record-created")
-                );
-            }
-
-            // Recargar los registros médicos del paciente
-            await fetchMedicalRecords(patientId);
-
-            return result;
-        } catch (err) {
-            error.value = err.message;
-            notificationStore.addNotification(
-                "error",
-                "notifications.error",
-                err.message || globalI18n.t("medical-records.error-saving-record")
-            );
-            throw err;
-        }
+    // UI Modal functions
+    function openRecordDetailsDialog(record) {
+      selectedRecord.value = record;
+      showDetailsModal.value = true;
     }
 
-    // Medical Record state management functions
+    function openCreateModal() {
+      selectedRecordForEdit.value = null;
+      currentMedicalRecordId.value = null;
+      isEditing.value = false;
+      showFormModal.value = true;
+    }
+
+    function openMedicalRecordEditModal(record) {
+      selectedRecordForEdit.value = record;
+      currentMedicalRecordId.value = record.medicalRecord?.id || record.id;
+      isEditing.value = true;
+      showFormModal.value = true;
+    }
+
+    function closeMedicalRecordModals() {
+      showDetailsModal.value = false;
+      showFormModal.value = false;
+      selectedRecord.value = null;
+      selectedRecordForEdit.value = null;
+      currentMedicalRecordId.value = null;
+      isEditing.value = false;
+    }
+
     function setMedicalRecords(records) {
-        medicalRecords.value = records;
+      medicalRecords.value = records;
     }
 
     function setSelectedRecord(record) {
-        selectedRecord.value = record;
+      selectedRecord.value = record;
+    }
+
+    function setSelectedRecordForEdit(record) {
+      selectedRecordForEdit.value = record;
     }
 
     function addMedicalRecord(record) {
-        medicalRecords.value.push(record);
+      medicalRecords.value.push(record);
     }
 
     function updateMedicalRecord(id, updatedRecord) {
-        const index = medicalRecords.value.findIndex(r => r.id === id);
-        if (index !== -1) {
-            medicalRecords.value[index] = { ...medicalRecords.value[index], ...updatedRecord };
-        }
+      const index = medicalRecords.value.findIndex((r) => r.id === id);
+      if (index !== -1) {
+        medicalRecords.value[index] = {
+          ...medicalRecords.value[index],
+          ...updatedRecord,
+        };
+      }
     }
 
-    function deleteMedicalRecord(id) {
-        medicalRecords.value = medicalRecords.value.filter(r => r.id !== id);
+    function clearFullRecord() {
+      fullRecord.value = null;
+    }
+
+    function clearSelectedRecord() {
+      selectedRecord.value = null;
     }
 
     function setLoading(value) {
-        loading.value = value;
+      loading.value = value;
     }
 
     function setError(err) {
-        error.value = err;
+      error.value = err;
     }
 
     function clearError() {
-        error.value = null;
+      error.value = null;
     }
 
     function reset() {
-        medicalRecords.value = [];
-        selectedRecord.value = null;
-        loading.value = false;
-        error.value = null;
+      medicalRecords.value = [];
+      selectedRecord.value = null;
+      fullRecord.value = null;
+      currentPatientMedicalRecords.value = undefined;
+      selectedRecordForEdit.value = null;
+      currentMedicalRecordId.value = null;
+      loading.value = false;
+      isLoadingMedicalRecords.value = false;
+      isEditing.value = false;
+      showFormModal.value = false;
+      showDetailsModal.value = false;
+      error.value = null;
+      hasError.value = false;
     }
 
     return {
-        // state
-        medicalRecords,
-        selectedRecord,
-        loading,
-        error,
-        
-        // recipe actions
-        fetchRecipe,
-        createRecipe,
-        updateRecipe,
-        deleteRecipe,
-        
-        // medical record CRUD actions
-        fetchMedicalRecords,
-        fetchMedicalRecordById,
-        createMedicalRecord,
-        updateMedicalRecordById,
-        deleteMedicalRecordById,
-        handleMedicalRecordSave,
-        
-        // medical record state actions
-        setMedicalRecords,
-        setSelectedRecord,
-        addMedicalRecord,
-        updateMedicalRecord,
-        deleteMedicalRecord,
-        setLoading,
-        setError,
-        clearError,
-        reset,
+      // state
+      medicalRecords,
+      selectedRecord,
+      fullRecord,
+      currentPatientMedicalRecords,
+      selectedRecordForEdit,
+      currentMedicalRecordId,
+      loading,
+      isLoadingMedicalRecords,
+      isLoadingMedicalRecordSave,
+      isEditing,
+      showFormModal,
+      showDetailsModal,
+      error,
+      hasError,
+
+      // medical record CRUD actions
+      fetchMedicalRecords,
+      fetchPatientMedicalRecords,
+      fetchMedicalRecordById,
+      fetchMedicalRecordDetails,
+      createMedicalRecord,
+      updateMedicalRecordById,
+      deleteMedicalRecordById,
+
+      // UI modal actions
+      openRecordDetailsDialog,
+      openCreateModal,
+      openMedicalRecordEditModal,
+      closeMedicalRecordModals,
+
+      // medical record state actions
+      setMedicalRecords,
+      setSelectedRecord,
+      setSelectedRecordForEdit,
+      addMedicalRecord,
+      updateMedicalRecord,
+      clearFullRecord,
+      clearSelectedRecord,
+      setLoading,
+      setError,
+      clearError,
+      reset,
     };
-});
+  },
+  {
+    persist: false,
+  }
+);

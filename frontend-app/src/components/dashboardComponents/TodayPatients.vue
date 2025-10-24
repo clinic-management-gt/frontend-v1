@@ -70,10 +70,11 @@ const patientsStore = usePatientsStore();
 const { appointmentsToday, isLoadingAppointmentsToday } = storeToRefs(patientsStore);
 const router = useRouter();
 
-onMounted(() => {
-  patientsStore.fetchAppointmentsToday();
+onMounted(async () => {
+  if (!appointmentsToday.value || appointmentsToday.value.length === 0) {
+    await patientsStore.fetchAppointmentsToday();
+  }
 });
-
 
 const statuses = [
   { key: "pendiente",   label: "Pendiente",   class: "bg-[#F4A261] text-yellow-900" },
@@ -90,16 +91,11 @@ async function changueStatus(appointment) {
   const idx = statuses.findIndex((s) => s.key === currKey);
   const next = statuses[(idx + 1) % statuses.length];
   
-  // Guardamos el estado anterior para restaurarlo si falla
   const prevStatus = appointment.status;
-  
-  // Actualizamos localmente primero para dar feedback instantáneo
   appointment.status = next.key;
   
-  // Actualizamos en el servidor sin bloquear la UI
   const ok = await patientsStore.updateAppointmentStatus(appointment.id, next.label);
   if (!ok) {
-    // Restauramos el estado anterior si falla
     appointment.status = prevStatus;
   }
 }
@@ -120,10 +116,6 @@ function formatDateTime(dateString) {
   });
 }
 
-/**
- * Navega al detalle del paciente seleccionado
- * @param {Object} appointment - Objeto de cita que contiene patientId
- */
 function navigateToPatient(appointment) {
   if (appointment.patientId) {
     patientsStore.setPatientsData(appointment.patientId);

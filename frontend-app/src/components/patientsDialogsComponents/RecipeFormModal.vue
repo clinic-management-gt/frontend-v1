@@ -132,7 +132,6 @@
 import { ref, watch, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import { useMedicalRecordStore } from "@stores/medicalRecordStore.js";
-import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { useNotificationStore } from "@stores/notificationStore.js";
 import { formatDate } from "@utils/isoFormatDate.js";
 
@@ -162,11 +161,10 @@ const emit = defineEmits(["close", "save"]);
 
 const { t } = useI18n();
 const medicalRecordStore = useMedicalRecordStore();
-const patientsLogicStore = usePatientsLogicStore();
 const notificationStore = useNotificationStore();
 
 const { updateRecipe, createRecipe } = medicalRecordStore;
-const { closeHistoryLogModals } = patientsLogicStore;
+const { closeMedicalRecordModals } = medicalRecordStore;
 
 // Estados
 const formData = ref({
@@ -182,7 +180,7 @@ const originalValues = ref({
 
 // Función para cerrar el modal
 function handleClose() {
-  closeHistoryLogModals();
+  closeMedicalRecordModals();
   emit("close");
 }
 

@@ -8,6 +8,7 @@ export default {
         "primary-color-variation-1": "#3bc0ae",
         "primary-color-variation-2": "#1edfc5",
         "patient-page-color": "#B300C7",
+        "document-color": "#8440d7",
       },
     },
   },

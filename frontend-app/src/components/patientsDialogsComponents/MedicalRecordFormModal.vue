@@ -2,8 +2,8 @@
   <general-dialog-modal
     :isOpen="isOpen"
     dialogSize="max-w-4xl"
+    :isChildrenOpen="false"
     @close-modal="handleClose"
-    @open="handleOpen"
   >
     <template #title>
       <p class="text-xl">
@@ -33,9 +33,9 @@
               <div>
                 <div
                   v-if="isEditing && originalValues.weight"
-                  class="mb-2 text-xs text-gray-500 bg-white p-2 rounded border"
+                  class="flex items-center mb-2 text-xs text-gray-500 bg-white p-2 rounded border"
                 >
-                  📊 {{ $t("medical-records.current-value") }}:
+                  <chart-bar-icon class="w-5 h-5 mr-2" /> {{ $t("medical-records.current-value") }}:
                   {{ originalValues.weight }} kg
                 </div>
                 <text-input
@@ -46,6 +46,7 @@
                   inputPlaceholder="medical-records.weight-placeholder"
                   inputColor="patient-page-color"
                   labelCss="text-sm font-medium text-gray-700"
+                  :required="true"
                 />
               </div>
 
@@ -53,9 +54,9 @@
               <div>
                 <div
                   v-if="isEditing && originalValues.height"
-                  class="mb-2 text-xs text-gray-500 bg-white p-2 rounded border"
+                  class="flex items-center mb-2 text-xs text-gray-500 bg-white p-2 rounded border"
                 >
-                  📊 {{ $t("medical-records.current-value") }}:
+                  <chart-bar-icon class="w-5 h-5 mr-2" />{{ $t("medical-records.current-value") }}:
                   {{ originalValues.height }} cm
                 </div>
                 <text-input
@@ -66,6 +67,7 @@
                   inputPlaceholder="medical-records.height-placeholder"
                   inputColor="patient-page-color"
                   labelCss="text-sm font-medium text-gray-700"
+                  :required="true"
                 />
               </div>
             </div>
@@ -79,6 +81,7 @@
                 inputColor="patient-page-color"
                 labelCss="text-sm font-medium text-gray-700"
                 :rows="3"
+                :required="true"
               />
             </div>
 
@@ -95,141 +98,8 @@
               />
             </div>
 
-            <!-- Subir archivos -->
-            <div class="mb-4">
-              <h4 class="block text-sm font-medium text-gray-700 mb-3">
-                {{ $t("files.upload-file") }}
-              </h4>
-
-              <!-- Sección de Laboratorio -->
-              <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div class="flex items-center justify-between mb-2">
-                  <label class="text-sm font-medium text-blue-900 flex items-center">
-                    <DocumentTextIcon class="w-5 h-5 mr-2" />
-                    {{ $t("files.upload-laboratory") }}
-                  </label>
-                  <span
-                    v-if="fileStore.laboratoryFile"
-                    class="text-xs text-green-600 font-medium flex items-center"
-                  >
-                    <CheckIcon class="w-4 h-4 mr-1" />
-                    {{ $t("files.file-selected") }}
-                  </span>
-                </div>
-
-                <div class="flex items-center gap-3">
-                  <input
-                    ref="laboratoryInput"
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                    class="hidden"
-                    @change="handleLaboratoryFileChange"
-                  />
-                  <button
-                    type="button"
-                    class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors flex items-center"
-                    @click="$refs.laboratoryInput.click()"
-                  >
-                    <ArrowUpTrayIcon class="w-4 h-4 mr-1" />
-                    {{ $t("files.select-file") }}
-                  </button>
-                  <span
-                    v-if="fileStore.laboratoryFile"
-                    class="text-sm text-gray-700 truncate max-w-xs flex items-center"
-                  >
-                    <DocumentIcon class="w-4 h-4 mr-1" />
-                    {{ fileStore.laboratoryFile.name }}
-                  </span>
-                  <button
-                    v-if="fileStore.laboratoryFile"
-                    type="button"
-                    class="ml-auto p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
-                    @click="fileStore.clearLaboratoryFile()"
-                  >
-                    <XMarkIcon class="w-5 h-5" />
-                  </button>
-                </div>
-
-                <div class="mt-3">
-                  <input
-                    v-model="fileStore.laboratoryDescription"
-                    type="text"
-                    :placeholder="$t('files.description-placeholder')"
-                    class="w-full px-3 py-2 text-sm border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              <!-- Sección de Examen -->
-              <div class="p-4 bg-green-50 rounded-lg border border-green-200">
-                <div class="flex items-center justify-between mb-2">
-                  <label class="text-sm font-medium text-green-900 flex items-center">
-                    <DocumentTextIcon class="w-5 h-5 mr-2" />
-                    {{ $t("files.upload-exam") }}
-                  </label>
-                  <span
-                    v-if="fileStore.examFile"
-                    class="text-xs text-green-600 font-medium flex items-center"
-                  >
-                    <CheckIcon class="w-4 h-4 mr-1" />
-                    {{ $t("files.file-selected") }}
-                  </span>
-                </div>
-
-                <div class="flex items-center gap-3">
-                  <input
-                    ref="examInput"
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                    class="hidden"
-                    @change="handleExamFileChange"
-                  />
-                  <button
-                    type="button"
-                    class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center"
-                    @click="$refs.examInput.click()"
-                  >
-                    <ArrowUpTrayIcon class="w-4 h-4 mr-1" />
-                    {{ $t("files.select-file") }}
-                  </button>
-                  <span
-                    v-if="fileStore.examFile"
-                    class="text-sm text-gray-700 truncate max-w-xs flex items-center"
-                  >
-                    <DocumentIcon class="w-4 h-4 mr-1" />
-                    {{ fileStore.examFile.name }}
-                  </span>
-                  <button
-                    v-if="fileStore.examFile"
-                    type="button"
-                    class="ml-auto p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
-                    @click="fileStore.clearExamFile()"
-                  >
-                    <XMarkIcon class="w-5 h-5" />
-                  </button>
-                </div>
-
-                <div class="mt-3">
-                  <input
-                    v-model="fileStore.examDescription"
-                    type="text"
-                    :placeholder="$t('files.description-placeholder')"
-                    class="w-full px-3 py-2 text-sm border border-green-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              <div class="mt-3 text-xs text-gray-500 flex items-start">
-                <InformationCircleIcon class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
-                <span>{{ $t("files.file-format-help") }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Receta médica (Nuevo apartado para CLINIC-134) -->
-          <div class="bg-green-50 p-4 rounded-lg mt-4">
             <div class="flex items-center justify-between mb-3">
-              <h3 class="text-lg font-semibold text-green-800">
+              <h3 class="text-sm font-medium text-gray-700">
                 {{ $t("patients.medical-recipe") }}
               </h3>
               <div class="flex items-center">
@@ -244,37 +114,150 @@
                 </label>
               </div>
             </div>
-            
+
             <div v-if="includeRecipe" class="mb-4">
-              <label for="prescription" class="block mb-2 text-sm font-medium text-gray-700">
-                {{ $t("recipes.prescription") }}
-              </label>
               <div class="mb-2 p-2 bg-yellow-50 border border-yellow-200 text-yellow-700 text-sm rounded-md">
                 <p class="flex items-center">
-                  <svg 
-                    class="w-4 h-4 mr-2" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24" 
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path 
-                      stroke-linecap="round" 
-                      stroke-linejoin="round" 
-                      stroke-width="2" 
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
-                    />
-                  </svg>
+                  <exclamation-triangle-icon class="w-5 h-5 mr-2 flex-shrink-0" />
                   {{ $t("recipes.warning-recipe-note") }}
                 </p>
               </div>
-              <textarea
-                id="prescription"
-                v-model="recipeData.prescription"
-                rows="4"
-                class="w-full p-2 border rounded-md"
-                :placeholder="$t('recipes.prescription-placeholder')"
-              ></textarea>
+              <textarea-input
+                name="prescription"
+                inputPlaceholder="recipes.prescription-placeholder"
+                inputColor="patient-page-color"
+                :rows="4"
+              />
+            </div>
+          </div>
+
+          <!-- Subir archivos -->
+          <div class="mb-4 bg-gray-50 p-4 rounded-lg">
+            <h4 class="block text-sm font-medium text-gray-700 mb-3">
+              {{ $t("files.upload-file") }}
+            </h4>
+
+            <!-- Sección de Laboratorio -->
+            <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-sm font-medium text-blue-900 flex items-center">
+                  <document-text-icon class="w-5 h-5 mr-2" />
+                  {{ $t("files.upload-laboratory") }} ({{ $t("general.optional") }})
+                </label>
+                <span
+                  v-if="fileStore.laboratoryFile"
+                  class="text-xs text-green-600 font-medium flex items-center"
+                >
+                  <check-icon class="w-4 h-4 mr-1" />
+                  {{ $t("files.file-selected") }}
+                </span>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <input
+                  ref="laboratoryInput"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  class="hidden"
+                  @change="handleLaboratoryFileChange"
+                />
+                <button
+                  type="button"
+                  class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors flex items-center"
+                  @click="$refs.laboratoryInput.click()"
+                >
+                  <arrow-up-tray-icon class="w-4 h-4 mr-1" />
+                  {{ $t("files.select-file") }}
+                </button>
+                <span
+                  v-if="fileStore.laboratoryFile"
+                  class="text-sm text-gray-700 truncate max-w-xs flex items-center"
+                >
+                  <document-icon class="w-4 h-4 mr-1" />
+                  {{ fileStore.laboratoryFile.name }}
+                </span>
+                <button
+                  v-if="fileStore.laboratoryFile"
+                  type="button"
+                  class="ml-auto p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
+                  @click="fileStore.clearLaboratoryFile()"
+                >
+                  <x-mark-icon class="w-5 h-5" />
+                </button>
+              </div>
+
+              <div class="mt-3">
+                <text-input
+                  name="laboratoryDescription"
+                  type="text"
+                  inputPlaceholder="files.description-placeholder"
+                  inputColor="patient-page-color"
+                />
+              </div>
+            </div>
+
+            <!-- Sección de Examen -->
+            <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-sm font-medium text-green-900 flex items-center">
+                  <document-text-icon class="w-5 h-5 mr-2" />
+                  {{ $t("files.upload-exam") }} ({{ $t("general.optional") }})
+                </label>
+                <span
+                  v-if="fileStore.examFile"
+                  class="text-xs text-green-600 font-medium flex items-center"
+                >
+                  <check-icon class="w-4 h-4 mr-1" />
+                  {{ $t("files.file-selected") }}
+                </span>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <input
+                  ref="examInput"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  class="hidden"
+                  @change="handleExamFileChange"
+                />
+                <button
+                  type="button"
+                  class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center"
+                  @click="$refs.examInput.click()"
+                >
+                  <arrow-up-tray-icon class="w-4 h-4 mr-1" />
+                  {{ $t("files.select-file") }}
+                </button>
+                <span
+                  v-if="fileStore.examFile"
+                  class="text-sm text-gray-700 truncate max-w-xs flex items-center"
+                >
+                  <document-icon class="w-4 h-4 mr-1" />
+                  {{ fileStore.examFile.name }}
+                </span>
+                <button
+                  v-if="fileStore.examFile"
+                  type="button"
+                  class="ml-auto p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
+                  @click="fileStore.clearExamFile()"
+                >
+                  <x-mark-icon class="w-5 h-5" />
+                </button>
+              </div>
+
+              <div class="mt-3">
+                <text-input
+                  name="examDescription"
+                  type="text"
+                  inputPlaceholder="files.description-placeholder"
+                  inputColor="patient-page-color"
+                />
+              </div>
+            </div>
+
+            <div class="mt-3 text-xs text-gray-500 flex items-center items-start">
+              <information-circle-icon class="w-4 h-4 mr-2 flex-shrink-0" />
+              <span>{{ $t("files.file-format-help") }}</span>
             </div>
           </div>
         </form>
@@ -284,17 +267,18 @@
     <template #buttons>
       <primary-button
         v-if="isLoading || fileStore.isLoadingUpload"
-        :disabled="true"
+        :isDisabled="true"
       >
         <span class="flex items-center">
-          <ArrowPathIcon class="animate-spin -ml-1 mr-2 h-4 w-4" />
+          <arrow-path-icon class="animate-spin -ml-1 mr-2 h-4 w-4" />
           {{ $t(fileStore.isLoadingUpload ? "files.uploading" : "medical-records.saving") }}
         </span>
       </primary-button>
       <primary-button
         v-else
-        :disabled="!isFormValid || isLoading"
-        @click="handleSubmit"
+        :isDisabled="!isFormValid"
+        @click.prevent="handleSubmit"
+        @keydown.enter.prevent="handleSubmit"
       >
         <p class="uppercase">
           {{ $t(isEditing ? "general.update" : "general.save") }}
@@ -305,11 +289,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useForm } from "vee-validate";
 import * as yup from "yup";
 import { useI18n } from "vue-i18n";
-import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
+import { useMedicalRecordStore } from "@stores/medicalRecordStore.js";
 import { useFileStore } from "@stores/FileStore.js";
 import { useNotificationStore } from "@stores/notificationStore.js";
 import { storeToRefs } from "pinia";
@@ -321,6 +305,8 @@ import {
   DocumentIcon,
   InformationCircleIcon,
   ArrowPathIcon,
+  ExclamationTriangleIcon,
+  ChartBarIcon
 } from "@heroicons/vue/24/outline";
 
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
@@ -329,46 +315,34 @@ import TextInput from "@components/forms/TextInput.vue";
 import TextareaInput from "@components/forms/TextareaInput.vue";
 
 const props = defineProps({
-  isOpen: {
-    type: Boolean,
-    default: false,
-  },
-  patientId: {
-    type: [String, Number],
-    required: true,
-  },
-  record: {
-    type: Object,
-    default: () => null,
-  },
+  isOpen: { type: Boolean, default: false },
+  patientId: { type: [String, Number], required: true },
+  record: { type: Object, default: () => null },
 });
 
 const emit = defineEmits(["close", "save"]);
 
 const { t } = useI18n();
-const patientsLogicStore = usePatientsLogicStore();
+const medicalRecordStore = useMedicalRecordStore();
 const fileStore = useFileStore();
 const notificationStore = useNotificationStore();
 
-const { isEditing } = storeToRefs(patientsLogicStore);
-const { closeHistoryLogModals } = patientsLogicStore;
+const { isEditing, currentMedicalRecordId } = storeToRefs(medicalRecordStore);
+const { closeMedicalRecordModals } = medicalRecordStore;
 
-// Estados
+const { 
+  createMedicalRecord, 
+  updateMedicalRecordById, 
+  fetchPatientMedicalRecords 
+} = medicalRecordStore;
+
+const { uploadFile } = fileStore;
+
 const isLoading = ref(false);
-
-// Referencias a inputs
 const laboratoryInput = ref(null);
 const examInput = ref(null);
-
-// Valores originales para referencia
 const includeRecipe = ref(false);
 
-// Estado para la receta médica
-const recipeData = ref({
-  prescription: "",
-});
-
-// Valores originales para mostrar como referencia
 const originalValues = ref({
   weight: "",
   height: "",
@@ -376,7 +350,6 @@ const originalValues = ref({
   notes: "",
 });
 
-// Schema de validación con yup (mensajes i18n)
 const validationSchema = yup.object({
   weight: yup
     .number()
@@ -394,9 +367,11 @@ const validationSchema = yup.object({
     .positive(t("medical-records.height-must-be-positive")),
   familyHistory: yup.string().nullable(),
   notes: yup.string().required(t("medical-records.notes-required")),
+  prescription: yup.string().nullable(),
+  laboratoryDescription: yup.string().nullable(),
+  examDescription: yup.string().nullable(),
 });
 
-// Configurar vee-validate
 const { values, errors, resetForm, validate } = useForm({
   validationSchema,
   initialValues: {
@@ -404,25 +379,42 @@ const { values, errors, resetForm, validate } = useForm({
     height: "",
     familyHistory: "",
     notes: "",
+    prescription: "",
+    laboratoryDescription: "",
+    examDescription: "",
   },
 });
 
-// Validación del formulario
 const isFormValid = computed(() => {
+  // Verificar que no haya errores de validación
   const hasNoErrors = Object.keys(errors.value).length === 0;
-  const hasRequiredField = values.notes && values.notes.trim() !== "";
-  return hasNoErrors && hasRequiredField;
+  const notesValue = values.notes?.trim() || "";
+  const hasRequiredNotes = notesValue.length > 0;
+  let recipeValid = true;
+  if (includeRecipe.value) {
+    const prescriptionValue = values.prescription?.trim() || "";
+    recipeValid = prescriptionValue.length > 0;
+  }
+  return hasNoErrors && hasRequiredNotes && recipeValid;;
 });
 
 function handleClose() {
-  closeHistoryLogModals();
   fileStore.clearAllFiles();
   resetForm();
+  includeRecipe.value = false;
+  closeMedicalRecordModals();
+  emit("close");
 }
 
-function handleOpen() {
-  loadRecordData();
-}
+watch(
+  () => props.isOpen,
+  (newVal) => {
+    if (newVal) {
+      loadRecordData();
+    }
+  },
+  { immediate: true }
+);
 
 function loadRecordData() {
   if (isEditing.value && props.record) {
@@ -441,6 +433,9 @@ function loadRecordData() {
         height: "",
         familyHistory: record.familyHistory || "",
         notes: record.notes || "",
+        prescription: "",
+        laboratoryDescription: "",
+        examDescription: "",
       },
     });
   } else {
@@ -457,11 +452,15 @@ function loadRecordData() {
         height: "",
         familyHistory: "",
         notes: "",
+        prescription: "",
+        laboratoryDescription: "",
+        examDescription: "",
       },
     });
   }
   
   fileStore.clearAllFiles();
+  includeRecipe.value = false;
 }
 
 function handleLaboratoryFileChange(event) {
@@ -489,10 +488,9 @@ async function handleSubmit() {
     );
     return;
   }
-  
-  isLoading.value = true;
 
   try {
+    isLoading.value = true;
     let weightToSend = null;
     let heightToSend = null;
 
@@ -508,7 +506,6 @@ async function handleSubmit() {
       heightToSend = parseFloat(originalValues.value.height);
     }
 
-    // Preparar datos del registro médico
     const medicalRecordData = {
       Weight: weightToSend,
       Height: heightToSend,
@@ -516,58 +513,74 @@ async function handleSubmit() {
       Notes: values.notes || null,
     };
 
-    // Validar que tenemos los datos mínimos necesarios
-    if (
-      !medicalRecordData.Weight &&
-      !medicalRecordData.Height &&
-      !medicalRecordData.FamilyHistory &&
-      !medicalRecordData.Notes
-    ) {
-      notificationStore.addNotification(
-        "warning",
-        "general.warning",
-        "Por favor completa al menos un campo",
-      );
-      return;
-    }
+    let result = null;
+    let recordId = null;
 
-    // Preparar estructura de datos que incluye medical record y opcionalmente receta
-    const dataToSend = {
-      medicalRecord: medicalRecordData
-    };
-
-    // Si se seleccionó incluir receta y hay texto en la receta, agregarla
-    if (includeRecipe.value && recipeData.value.prescription.trim()) {
-      dataToSend.recipe = {
-        prescription: recipeData.value.prescription.trim()
-      };
-    }
-
-    if (isEditing.value && props.record) {
-      // Actualizar registro existente - usar el store de lógica
-      await patientsLogicStore.handleMedicalRecordSave(
-        dataToSend,
-        props.patientId,
+    if (isEditing.value && currentMedicalRecordId.value) {
+      result = await updateMedicalRecordById(
+        currentMedicalRecordId.value, 
+        medicalRecordData
       );
-    } else if (!isEditing.value && props.patientId) {
-      // Crear nuevo registro usando el store de lógica
-      await patientsLogicStore.handleMedicalRecordSave(
-        dataToSend,
-        props.patientId,
-      );
+      recordId = currentMedicalRecordId.value;
+      
     } else {
-      console.error("No se pudo obtener el ID del registro médico");
-      notificationStore.addNotification(
-        "warning",
-        "general.warning",
-        t("medical-records.error-getting-record-id")
-      );
+      result = await createMedicalRecord(props.patientId, medicalRecordData);
+      recordId = result?.id;
     }
 
-    // El store de lógica ya maneja el cierre del modal y recarga de datos
-    emit("save", dataToSend);
-  } catch {
-    // El manejo de errores lo hace el store de lógica
+    if (includeRecipe.value && values.prescription?.trim()) {
+      const recipeData = {
+        prescription: values.prescription.trim(),
+        medicalRecordId: recordId
+      };
+      
+      try {
+        await medicalRecordStore.createRecipe(recipeData);
+      } finally {
+        // No hacer nada especial aquí
+      }
+    }
+
+    if (recordId) {
+      const uploadPromises = [];
+
+      if (fileStore.laboratoryFile) {
+        uploadPromises.push(
+          uploadFile(
+            fileStore.laboratoryFile,
+            "Laboratory",
+            props.patientId,
+            values.laboratoryDescription || t("files.upload-laboratory"),
+            recordId,
+          ),
+        );
+      }
+
+      if (fileStore.examFile) {
+        uploadPromises.push(
+          uploadFile(
+            fileStore.examFile,
+            "Exam",
+            props.patientId,
+            values.examDescription || t("files.upload-exam"),
+            recordId,
+          ),
+        );
+      }
+
+      if (uploadPromises.length > 0) {
+        await Promise.all(uploadPromises);
+      }
+    }
+    await fetchPatientMedicalRecords(props.patientId);
+    
+    fileStore.clearAllFiles();
+    resetForm();
+    includeRecipe.value = false;
+    
+    closeMedicalRecordModals();
+    
+    emit("save", result);
   } finally {
     isLoading.value = false;
   }

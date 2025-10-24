@@ -1,8 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import instance from "@stores/axios.js";
-import { useNotificationStore } from "@stores/notificationStore.js";
-import { globalI18n } from "@/langs/index.js";
 
 export const usePatientsStore = defineStore(
   "patients",
@@ -12,7 +10,6 @@ export const usePatientsStore = defineStore(
     const allPatients = ref([]);
     const pendingPatients = ref([]);
     const newPatientData = ref([]);
-    const fullRecord = ref([]);
     const currentPatientSelectedId = ref(null);
     const currentPatientSelectedData = ref(null);
 
@@ -24,33 +21,28 @@ export const usePatientsStore = defineStore(
     const isLoadingPatientData = ref(false);
     const isLoadingCreateNewPatient = ref(false);
 
-    const currentPatientMedicalRecords = ref(undefined);
-    const isLoadingMedicalRecords = ref(false);
-    const hasError = ref(false);
-
     function setPatientsData(id) {
       currentPatientSelectedId.value = id;
       fetchPatientData(id);
-      fetchPatientMedicalRecords();
     }
 
     async function createNewPatient(data){
       isLoadingCreateNewPatient.value = true;
       try {
         const formData = new FormData();
-        formData.append("Name", data.Name)
-        formData.append("LastName", data.LastName)
-        formData.append("Birthdate", data.Birthdate)
-        formData.append("Gender", data.Gender)
-        formData.append("Address", data.Address)
-        formData.append("Alergies", data.Alergies)
-        formData.append("Syndromes", data.Syndromes)
-        formData.append("Pediatrician", data.Pediatrician)
-        formData.append("Contacts", data.Contacts)
-        formData.append("InsuranceId", data.Insurance)
-        formData.append("InfoSheetFile", data.File)
-        formData.append("BloodTypeId", data.BloodTypeId)
-        formData.append("PatientTypeId", data.PatientTypeId)
+        formData.append("Name", data.Name);
+        formData.append("LastName", data.LastName);
+        formData.append("Birthdate", data.Birthdate);
+        formData.append("Gender", data.Gender);
+        formData.append("Address", data.Address);
+        formData.append("Alergies", data.Alergies);
+        formData.append("Syndromes", data.Syndromes);
+        formData.append("Pediatrician", data.Pediatrician);
+        formData.append("Contacts", data.Contacts);
+        formData.append("InsuranceId", data.Insurance);
+        formData.append("InfoSheetFile", data.File);
+        formData.append("BloodTypeId", data.BloodTypeId);
+        formData.append("PatientTypeId", data.PatientTypeId);
         const res = await instance.post("/patients", data, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -85,13 +77,11 @@ export const usePatientsStore = defineStore(
 
     async function updateAppointmentStatus(id, newStatus) {
       try {
-        // No activamos el loading global para evitar recargar todo el componente
         await instance.patch(`/appointments/${id}`, {
           status: newStatus,
         });
         const idx = appointmentsToday.value.findIndex((a) => a.id === id);
         if (idx !== -1) {
-          // Actualizamos solo el estado sin modificar la referencia completa
           appointmentsToday.value[idx].status = newStatus;
         }
         return true;
@@ -127,95 +117,18 @@ export const usePatientsStore = defineStore(
 
     async function fetchPatientData(patientId) {
       isLoadingPatientData.value = true;
-      // Usar el ID proporcionado o el guardado en el store
       const id = patientId.value || currentPatientSelectedId.value;
       if (!id) {
         return null;
       }
       try {
         const res = await instance.get(`/patients/${id}`);
-        // Si estamos obteniendo datos para el paciente seleccionado, actualizar el store
         if (id === currentPatientSelectedId.value) {
           currentPatientSelectedData.value = res.data;
         }
         return res.data;
       } finally {
         isLoadingPatientData.value = false;
-      }
-    }
-
-    async function fetchPatientMedicalRecords(patientId) {
-      isLoadingMedicalRecords.value = true;
-      patientId = patientId || currentPatientSelectedId.value;
-      if (!patientId) return;
-      try {
-        const res = await instance.get(
-          `/patients/${patientId}/medicalrecords?page=1&limit=50`,
-        );
-        currentPatientMedicalRecords.value = res.data.records || [];
-        return res.data;
-      } finally {
-        isLoadingMedicalRecords.value = false;
-      }
-    }
-
-    async function createMedicalRecord(patientId, recordData) {
-      isLoadingMedicalRecords.value = true;
-      try {
-        const dataToSend = { ...recordData, PatientId: patientId };
-        const res = await instance.post(`/medicalrecords`, dataToSend);
-        return res.data;
-      } finally {
-        isLoadingMedicalRecords.value = false;
-      }
-    }
-
-    async function updateMedicalRecord(recordId, recordData) {
-      isLoadingMedicalRecords.value = true;
-      try {
-        const res = await instance.patch(
-          `/medicalrecords/${recordId}`,
-          recordData,
-        );
-        return res.data;
-      } finally {
-        isLoadingMedicalRecords.value = false;
-      }
-    }
-
-    async function deleteMedicalRecord(recordId) {
-      const notificationStore = useNotificationStore();
-      isLoadingMedicalRecords.value = true;
-      
-      try {
-        await instance.delete(`/medicalrecords/${recordId}`);
-        
-        notificationStore.addNotification(
-          "success",
-          "notifications.success",
-          globalI18n.t("notifications.medical-record-deleted-successfully")
-        );
-        
-        return true;
-      } catch {
-        throw new Error(globalI18n.t("notifications.error-deleting-record"));
-      } finally {
-        isLoadingMedicalRecords.value = false;
-      }
-    }
-
-    async function fetchMedicalRecordDetails(recordId) {
-      isLoadingMedicalRecords.value = true;
-      hasError.value = false;
-      try {
-        const res = await instance.get(`/medicalrecords/${recordId}/details`);
-        fullRecord.value = res.data;
-        return res.data; // Devolver los datos para que puedan ser usados directamente
-      } catch (error) {
-        hasError.value = true;
-        throw error;
-      } finally {
-        isLoadingMedicalRecords.value = false;
       }
     }
 
@@ -226,7 +139,6 @@ export const usePatientsStore = defineStore(
       description,
       medicalRecordID,
     ) {
-      isLoadingMedicalRecords.value = true;
       try {
         const formData = new FormData();
         formData.append("patientId", patientId);
@@ -241,8 +153,9 @@ export const usePatientsStore = defineStore(
           },
         });
         return res.data;
-      } finally {
-        isLoadingMedicalRecords.value = false;
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        throw error;
       }
     }
 
@@ -262,7 +175,6 @@ export const usePatientsStore = defineStore(
       isLoadingPendingPatients.value = true;
       try {
         const res = await instance.post(`/patients/basic`, patientData);
-        // Actualizar la lista de pacientes pendientes
         await fetchPendingPatients();
         return res.data;
       } finally {
@@ -282,13 +194,8 @@ export const usePatientsStore = defineStore(
       }
     }
 
-    function clearFullRecord() {
-      fullRecord.value = null;
-    }
-
     return {
       // state
-      fullRecord,
       newPatientData,
       appointments,
       appointmentsToday,
@@ -303,12 +210,8 @@ export const usePatientsStore = defineStore(
       isLoadingPendingPatients,
       isLoadingPatientData,
       isLoadingCreateNewPatient,
-      currentPatientMedicalRecords,
-      isLoadingMedicalRecords,
-      hasError,
       // actions
       createNewPatient,
-      fetchPatientMedicalRecords,
       setPatientsData,
       fetchAppointments,
       fetchAppointmentsToday,
@@ -316,15 +219,10 @@ export const usePatientsStore = defineStore(
       fetchAllPatients,
       fetchPendingPatients,
       fetchPatientData,
-      createMedicalRecord,
-      updateMedicalRecord,
-      deleteMedicalRecord,
-      fetchMedicalRecordDetails,
       uploadFile,
       downloadFile,
       createBasicPatient,
       createAppointment,
-      clearFullRecord
     };
   },
   {

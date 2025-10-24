@@ -10,11 +10,93 @@ export const useFileStore = defineStore(
     const isLoadingDownload = ref(false);
     const isLoadingUpload = ref(false);
     
-    // Estado de archivos seleccionados
     const laboratoryFile = ref(null);
     const laboratoryDescription = ref("");
     const examFile = ref(null);
     const examDescription = ref("");
+
+    const { t } = globalI18n;
+
+    const organizeDocumentsByType = (documents) => {
+    if (!documents || typeof documents !== 'object') {
+      return {
+        laboratories: [],
+        exams: [],
+        general: [],
+        all: []
+      };
+    }
+
+    const organized = {
+      laboratories: [],
+      exams: [],
+      general: [],
+      all: []
+    };
+
+    const documentArray = Object.entries(documents).map(([id, doc]) => ({
+      id,
+      ...doc
+    }));
+
+    documentArray.forEach(doc => {
+      organized.all.push(doc);
+
+      const type = (doc.type || '').toLowerCase();
+      
+      if (type.includes('lab') || type.includes('laboratorio')) {
+        organized.laboratories.push(doc);
+      } else if (type.includes('exam') || type.includes('examen')) {
+        organized.exams.push(doc);
+      } else {
+        organized.general.push(doc);
+      }
+    });
+
+    return organized;
+  };
+
+  const getDocumentTypeLabel = (type) => {
+    const typeLower = (type || '').toLowerCase();
+    
+    if (typeLower.includes('lab') || typeLower.includes('laboratorio')) {
+      return t('files.laboratory');
+    } else if (typeLower.includes('exam') || typeLower.includes('examen')) {
+      return t('files.exam');
+    } else if (typeLower.includes('document') || typeLower.includes('documento')) {
+      return t('files.document');
+    }
+    
+    return type || t('files.general-document');
+  };
+
+  const getDocumentTypeColor = (type) => {
+    const typeLower = (type || '').toLowerCase();
+    
+    if (typeLower.includes('lab') || typeLower.includes('laboratorio')) {
+      return '#e74c3c'; 
+    } else if (typeLower.includes('exam') || typeLower.includes('examen')) {
+      return '#f39c12';
+    } else if (typeLower.includes('document') || typeLower.includes('documento')) {
+      return '#3498db'; 
+    }
+    
+    return '#95a5a6'; 
+  };
+
+  const getDocumentTypeIcon = (type) => {
+    const typeLower = (type || '').toLowerCase();
+    
+    if (typeLower.includes('lab') || typeLower.includes('laboratorio')) {
+      return 'BeakerIcon';
+    } else if (typeLower.includes('exam') || typeLower.includes('examen')) {
+      return 'ClipboardDocumentCheckIcon';
+    } else if (typeLower.includes('document') || typeLower.includes('documento')) {
+      return 'DocumentTextIcon';
+    }
+    
+    return 'DocumentIcon';
+  };
 
     async function downloadFile(PatientId, type, MedicalRecordId) {
       try {
@@ -65,13 +147,13 @@ export const useFileStore = defineStore(
 
         // Crear FormData
         const formData = new FormData();
-        formData.append("file", file);
-        formData.append("type", type);
-        formData.append("patientId", patientId);
-        formData.append("description", description || "");
+        formData.append("File", file);
+        formData.append("Type", type);
+        formData.append("PatientId", patientId);
+        formData.append("Description", description || "");
         
         if (medicalRecordID) {
-          formData.append("medicalRecordID", medicalRecordID);
+          formData.append("MedicalRecordID", medicalRecordID);
         }
 
         // Subir archivo
@@ -88,14 +170,6 @@ export const useFileStore = defineStore(
         );
 
         return res.data;
-      } catch (error) {
-        const notificationStore = useNotificationStore();
-        notificationStore.addNotification(
-          "error",
-          "notifications.error",
-          globalI18n.t("files.error-uploading-file"),
-        );
-        throw error;
       } finally {
         isLoadingUpload.value = false;
       }
@@ -154,6 +228,10 @@ export const useFileStore = defineStore(
       clearExamFile();
     }
 
+    function viewFile(fileUrl) {
+      window.open(fileUrl, '_blank');
+    }
+
     return {
       // state
       isLoadingDownload,
@@ -164,6 +242,10 @@ export const useFileStore = defineStore(
       examDescription,
       
       // actions
+      organizeDocumentsByType,
+      getDocumentTypeLabel,
+      getDocumentTypeColor,
+      getDocumentTypeIcon,
       uploadFile,
       downloadFile,
       setLaboratoryFile,
@@ -171,6 +253,7 @@ export const useFileStore = defineStore(
       clearLaboratoryFile,
       clearExamFile,
       clearAllFiles,
+      viewFile
     };
   },
   {

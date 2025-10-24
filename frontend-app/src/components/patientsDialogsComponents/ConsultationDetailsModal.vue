@@ -27,7 +27,7 @@
       <div class="overflow-y-auto max-h-[calc(95vh-160px)]">
         <!-- Loading -->
         <div
-          v-if="isLoadingMedicalRecords"
+          v-if="isLoadingMedicalRecords || isLoadingDetails"
           class="flex flex-col justify-center items-center py-16"
         >
           <div
@@ -37,49 +37,49 @@
             {{ $t("general.loading") }}...
           </p>
         </div>
-
+        
         <!-- Content -->
         <div
           v-else-if="displayRecord"
-          class="p-6 space-y-6"
+          class="space-y-2"
         >
           <div class="bg-gray-100 rounded-lg p-4">
             <h3 class="text-lg font-bold text-gray-800 mb-3">
               {{ $t("general.general-info") }}
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
               <div>
-                <span class="text-sm text-gray-600 font-semibold">{{ $t("general.date") }}:</span>
+                <span class="text-sm text-gray-600 font-semibold mr-3">{{ $t("general.date") }}:</span>
                 <span class="text-gray-800 font-medium">
                   {{ formatDateShortest(displayRecord.medicalRecord.createdAt) }}
                 </span>
               </div>
               <div>
-                <span class="text-sm text-gray-600 font-semibold">{{ $t("general.status") }}:</span>
+                <span class="text-sm text-gray-600 font-semibold mr-3">{{ $t("general.status") }}:</span>
                 <span
                   class="inline-block px-3 py-1 text-sm font-bold rounded-full text-white"
                   style="background-color: #48c9b0"
                 >
-                  {{ displayRecord.status || "Completado" }}
+                  {{ displayRecord.medicalRecord.status || "Completado" }}
                 </span>
               </div>
-              <div v-if="displayRecord.diagnosis">
-                <span class="text-sm text-gray-600 font-semibold">{{ $t("general.diagnosis") }}:</span>
-                <p class="text-gray-800 font-medium">
-                  {{ displayRecord.diagnosis }}
-                </p>
+              <div v-if="displayRecord.medicalRecord.diagnosis">
+                <span class="text-sm text-gray-600 font-semibold mr-3">{{ $t("general.diagnosis") }}:</span>
+                <span class="text-gray-800 font-medium">
+                  {{ displayRecord.medicalRecord.diagnosis }}
+                </span>
               </div>
-              <div v-if="displayRecord.weight">
-                <span class="text-sm text-gray-600 font-semibold">{{ $t("patients.weight") }}:</span>
-                <p class="text-gray-800 font-medium">
-                  {{ displayRecord.weight }} kg
-                </p>
+              <div v-if="displayRecord.medicalRecord.weight">
+                <span class="text-sm text-gray-600 font-semibold mr-3">{{ $t("patients.weight") }}:</span>
+                <span class="text-gray-800 font-medium">
+                  {{ displayRecord.medicalRecord.weight }} kg
+                </span>
               </div>
-              <div v-if="displayRecord.height">
-                <span class="text-sm text-gray-600 font-semibold">{{ $t("patients.height") }}:</span>
-                <p class="text-gray-800 font-medium">
-                  {{ displayRecord.height }} cm
-                </p>
+              <div v-if="displayRecord.medicalRecord.height">
+                <span class="text-sm text-gray-600 font-semibold mr-3">{{ $t("patients.height") }}:</span>
+                <span class="text-gray-800 font-medium">
+                  {{ displayRecord.medicalRecord.height }} cm
+                </span>
               </div>
             </div>
           </div>
@@ -106,7 +106,6 @@
             </div>
           </div>
 
-          <!-- Nota de evolución - Modificada para ocupar todo el ancho de la pantalla -->
           <div class="bg-gray-100 rounded-lg p-4 w-full">
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center">
@@ -121,12 +120,6 @@
                   {{ displayRecord?.updatedAt ? formatDate(displayRecord.updatedAt) : (displayRecord?.createdAt ? formatDate(displayRecord.createdAt) : '') }}
                 </span>
               </div>
-              <button
-                class="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm font-medium rounded flex items-center gap-1"
-                @click="editEvolutionNote"
-              >
-                ✏️ {{ $t("general.edit") }}
-              </button>
             </div>
             <div
               v-if="displayRecord.notes && displayRecord.notes.trim()"
@@ -154,17 +147,11 @@
               class="text-center py-6 min-h-[300px] flex flex-col items-center justify-center"
             >
               <div class="text-gray-400 text-4xl mb-2">
-                📝
+                <document-icon class="h-10 w-10" />
               </div>
               <p class="text-gray-500">
                 {{ $t("patients.no-evolution-note") }}
               </p>
-              <button
-                class="mt-3 px-4 py-2 text-blue-600 hover:text-blue-800 font-medium"
-                @click="editEvolutionNote"
-              >
-                ✏️ {{ $t("general.edit") }}
-              </button>
             </div>
           </div>
 
@@ -182,36 +169,19 @@
               </div>
             </div>
             <div
-              v-if="displayRecord.recipes && displayRecord.recipes.length > 0"
+              v-if="displayRecord.treatments && displayRecord.treatments.length > 0"
               class="space-y-3"
             >
               <div
-                v-for="recipe in displayRecord.recipes"
+                v-for="recipe in displayRecord.treatments"
                 :key="recipe.id"
                 class="bg-white rounded-lg p-4 border relative"
               >
-                <button
-                  class="absolute top-3 right-3 px-2 py-1 text-green-600 hover:text-green-800 text-sm font-medium rounded flex items-center gap-1"
-                  title="Editar receta"
-                  @click="openRecipeFormModal(recipe)"
-                >
-                  ✏️ Editar
-                </button>
-                <div class="text-sm text-gray-600 mb-2 font-semibold pr-16">
-                  📅 {{ formatDate(recipe.createdAt) }}
-                </div>
                 <div class="bg-gray-50 rounded p-3 mb-3">
                   <pre
                     class="text-gray-800 text-sm whitespace-pre-wrap font-mono"
                   >{{ recipe.prescription }}</pre>
                 </div>
-                <button
-                  class="px-4 py-2 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
-                  style="background-color: var(--primary-color)"
-                  @click="viewFullRecipe(recipe)"
-                >
-                  {{ $t("patients.view-full-recipe") }}
-                </button>
               </div>
             </div>
             <div
@@ -219,135 +189,123 @@
               class="text-center py-6"
             >
               <div class="text-gray-400 text-4xl mb-2">
-                💊
+                <document-icon class="h-10 w-10 mx-auto" />
               </div>
               <p class="text-gray-500">
                 {{ $t("patients.no-prescription") }}
               </p>
-              <button
-                class="mt-3 px-4 py-2 text-blue-600 hover:text-blue-800 font-medium"
-                @click="openRecipeFormModal()"
-              >
-                ✏️ {{ $t("general.edit") }}
-              </button>
             </div>
           </div>
 
-          <!-- Exámenes -->
-          <div
-            v-if="displayRecord.exams && displayRecord.exams.length > 0"
-            class="bg-gray-100 rounded-lg p-4"
-          >
+          <!-- Documents UNIFICADA -->
+          <div class="bg-gray-100 rounded-lg p-4">
             <div class="flex items-center mb-3">
               <div
                 class="w-4 h-4 rounded-full mr-2"
-                style="background-color: #f4a261"
+                style="background-color: var(--document-color)"
               ></div>
               <h3 class="text-lg font-bold text-gray-800">
-                {{ $t("patients.exams") }}
+                {{ $t("general.documents") }}
               </h3>
             </div>
-            <div class="space-y-3">
-              <div
-                v-for="exam in displayRecord.exams"
-                :key="exam.id"
-                class="bg-white rounded-lg p-4 border"
-              >
-                <div class="flex justify-between items-start mb-2">
-                  <h4 class="font-bold text-gray-800">
-                    {{ exam.exam?.name || exam.name || "Examen" }}
-                  </h4>
-                  <span
-                    class="text-xs px-2 py-1 rounded-full text-white font-semibold"
-                    style="background-color: #f4a261"
-                  >
-                    {{ formatDate(exam.createdAt) }}
-                  </span>
-                </div>
+            <div
+              v-if="organizedDocuments && organizedDocuments.all.length > 0"
+              class="bg-gray-100 rounded-lg p-4"
+            >
+              <div class="flex items-center mb-4">
                 <div
-                  v-if="exam.exam?.description"
-                  class="text-sm text-gray-600 mb-2"
-                >
-                  <strong>Descripción:</strong> {{ exam.exam.description }}
-                </div>
-                <div
-                  v-if="exam.resultText"
-                  class="bg-gray-50 rounded p-3 mb-2"
-                >
-                  <div class="text-sm text-gray-600 mb-1 font-semibold">
-                    Resultados:
-                  </div>
-                  <p class="text-gray-800 whitespace-pre-line">
-                    {{ exam.resultText }}
-                  </p>
-                </div>
+                  class="w-4 h-4 rounded-full mr-2"
+                  style="background-color: #3498db"
+                ></div>
+                <h3 class="text-lg font-bold text-gray-800">
+                  {{ $t("general.documents") }}
+                </h3>
               </div>
-            </div>
-          </div>
-
-          <!-- Tratamientos -->
-          <div
-            v-if="
-              displayRecord.treatments && displayRecord.treatments.length > 0
-            "
-            class="bg-gray-100 rounded-lg p-4"
-          >
-            <div class="flex items-center mb-3">
-              <div
-                class="w-4 h-4 rounded-full mr-2"
-                style="background-color: #48c9b0"
-              ></div>
-              <h3 class="text-lg font-bold text-gray-800">
-                {{ $t("patients.treatments") }}
-              </h3>
-            </div>
-            <div class="space-y-3">
-              <div
-                v-for="treatment in displayRecord.treatments"
-                :key="treatment.id"
-                class="bg-white rounded-lg p-4 border"
+            
+              <template
+                v-for="(category, categoryKey) in [
+                  { key: 'laboratories', label: 'files.laboratory', icon: BeakerIcon, color: 'text-red-600' },
+                  { key: 'exams', label: 'files.exam', icon: ClipboardDocumentCheckIcon, color: 'text-orange-600' },
+                  { key: 'general', label: 'files.general-document', icon: DocumentTextIcon, color: 'text-blue-600' }
+                ]"
+                :key="categoryKey"
               >
-                <div class="flex justify-between items-start mb-2">
-                  <h4 class="font-bold text-gray-800">
-                    {{ treatment.medicine?.name || "Medicamento" }}
+                <div
+                  v-if="organizedDocuments[category.key].length > 0"
+                  class="mb-4"
+                >
+                  <h4 class="text-md font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <component
+                      :is="category.icon"
+                      class="h-5 w-5"
+                      :class="category.color"
+                    />
+                    {{ $t(category.label) }} ({{ organizedDocuments[category.key].length }})
                   </h4>
-                  <span
-                    class="text-xs px-2 py-1 rounded-full text-white font-semibold"
-                    style="background-color: #48c9b0"
-                  >
-                    {{ formatDate(treatment.createdAt) }}
-                  </span>
-                </div>
-                <div
-                  class="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-600 mb-2"
-                >
-                  <div v-if="treatment.dosage">
-                    <strong>Dosis:</strong> {{ treatment.dosage }}
+              
+                  <div class="space-y-2">
+                    <div
+                      v-for="doc in organizedDocuments[category.key]"
+                      :key="doc.id"
+                      class="bg-white rounded-lg p-4 border-l-4 flex justify-between items-start hover:shadow-md transition-shadow"
+                      :style="{ borderColor: fileStore.getDocumentTypeColor(doc.type) }"
+                    >
+                      <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                          <component
+                            :is="getIconComponent(doc.type)"
+                            class="h-5 w-5"
+                            :style="{ color: fileStore.getDocumentTypeColor(doc.type) }"
+                          />
+                          <h5 class="font-bold text-gray-800">
+                            {{ fileStore.getDocumentTypeLabel(doc.type) }}
+                          </h5>
+                        </div>
+                        <p
+                          v-if="doc.description"
+                          class="text-sm text-gray-600 mb-2"
+                        >
+                          <strong>{{ $t('general.description') }}:</strong> {{ doc.description }}
+                        </p>
+                      </div>
+                    
+                      <div class="flex gap-2 ml-4">
+                        <button
+                          class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors group relative"
+                          :title="$t('files.view-file')"
+                          @click="handleViewDocument(doc)"
+                        >
+                          <document-icon class="h-5 w-5" />
+                          <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                            {{ $t('files.view-file') }}
+                          </span>
+                        </button>
+                        <button
+                          class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors group relative"
+                          :title="$t('files.download-file')"
+                          @click="handleDownloadDocument(doc)"
+                        >
+                          <calendar-icon class="h-5 w-5 rotate-180" />
+                          <span class="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                            {{ $t('files.download-file') }}
+                          </span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div v-if="treatment.frequency">
-                    <strong>Frecuencia:</strong> {{ treatment.frequency }}
-                  </div>
-                  <div v-if="treatment.duration">
-                    <strong>Duración:</strong> {{ treatment.duration }}
-                  </div>
                 </div>
-                <div
-                  v-if="treatment.medicine?.type"
-                  class="text-sm text-gray-600 mb-2"
-                >
-                  <strong>Tipo:</strong> {{ treatment.medicine.type }}
+              </template>
+            </div>
+            <div
+              v-else
+            >
+              <div class="text-center py-6">
+                <div class="text-gray-400 text-4xl mb-2">
+                  <document-icon class="h-10 w-10 mx-auto" />
                 </div>
-                <div
-                  v-if="treatment.observations"
-                  class="bg-gray-50 rounded p-3"
-                >
-                  <div class="text-sm text-gray-600 mb-1 font-semibold">
-                    Observaciones:
-                  </div>
-                  <p class="text-gray-800">
-                    {{ treatment.observations }}
-                  </p>
-                </div>
+                <p class="text-gray-500">
+                  {{ $t("files.no-documents") }}
+                </p>
               </div>
             </div>
           </div>
@@ -365,7 +323,7 @@
             {{ $t("general.error-loading-data") }}
           </h3>
           <p class="text-gray-600 mb-6">
-            No se pudieron cargar los detalles de la consulta
+            {{ $t('medical-records.error-loading-consultation-details') }}
           </p>
           <button
             class="px-6 py-3 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
@@ -375,20 +333,24 @@
             {{ $t("general.retry") }}
           </button>
         </div>
+
+        <!-- Estado vacío -->
+        <div
+          v-else
+          class="text-center py-16"
+        >
+          <div class="text-gray-400 text-6xl mb-4">
+            <folder-open-icon class="h-16 w-16 mx-auto" />
+          </div>
+          <h3 class="text-xl font-bold text-gray-600 mb-2">
+            {{ $t('medical-records.no-records') }}
+          </h3>
+        </div>
       </div>
     </template>
 
     <!-- Footer -->
     <template #buttons>
-      <primary-button
-        class="mr-2"
-        bgColor="orange"
-        @click="editRecord"
-      >
-        <p class="uppercase">
-          {{ $t("general.edit") }}
-        </p>
-      </primary-button>
       <primary-button @click="downloadRecord">
         <p class="uppercase">
           {{ $t("general.download") }}
@@ -396,35 +358,39 @@
       </primary-button>
     </template>
   </general-dialog-modal>
+  
   <recipe-form-modal
     v-if="showRecipeFormModal"
     :isOpen="showRecipeFormModal"
     :recipe="selectedRecipeForEdit"
     :isEditing="isEditingRecipe"
-    :treatmentId="displayRecord.medicalRecord.id"
-    @close="closeHistoryLogModals"
-    @save="(recipeData) => handleRecipeSave(recipeData, props.patientId)"
+    :treatmentId="displayRecord?.medicalRecord?.id"
+    @close="closeRecipeModal"
+    @save="(recipeData) => recipeStore.handleRecipeSave(recipeData, props.patientId, selectedRecord?.id)"
   />
 </template>
 
 <script setup>
-import { onMounted, watch, computed, nextTick } from "vue";
-import { usePatientsStore } from "@stores/patientsStore";
-import { usePatientsLogicStore } from "../../stores/patientsLogicStore";
+import { ref, watch, computed } from "vue";
+import { useRecipeStore } from "@stores/recipeStore";
+import { useMedicalRecordStore } from "@stores/medicalRecordStore";
+import { useFileStore } from "@stores/fileStore";
+import { 
+  DocumentIcon, 
+  FolderOpenIcon, 
+  CalendarIcon,
+  BeakerIcon,
+  ClipboardDocumentCheckIcon,
+  DocumentTextIcon,
+} from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
-import { formatDateShortest } from "@/utils/isoFormatDate.js";
-
-import { formatDate } from "@/utils/isoFormatDate.js";
+import { formatDateShortest, formatDate } from "@/utils/isoFormatDate.js";
 
 import PrimaryButton from "@components/forms/PrimaryButton.vue";
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
 import RecipeFormModal from "../patientsDialogsComponents/RecipeFormModal.vue";
 
 const props = defineProps({
-  record: {
-    type: Object,
-    default: null,
-  },
   isOpen: {
     type: Boolean,
     default: false,
@@ -433,55 +399,81 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "view-recipe", "edit", "download"]);
 
-const patientsStore = usePatientsStore();
-const { fullRecord, isLoadingMedicalRecords, hasError } =
-  storeToRefs(patientsStore);
+const recipeStore = useRecipeStore();
+const medicalRecordStore = useMedicalRecordStore();
+const fileStore = useFileStore();
 
+const { fullRecord, selectedRecord, isLoadingMedicalRecords, hasError } = storeToRefs(medicalRecordStore);
 
-const patientsLogicStore = usePatientsLogicStore();
-const { selectedRecord } = storeToRefs(patientsLogicStore);
+const { 
+  showRecipeFormModal, 
+  selectedRecipeForEdit, 
+  isEditingRecipe 
+} = storeToRefs(recipeStore);
+
 const {
-  closeHistoryLogModals,
-  openMedicalRecordEditModal,
-  openRecipeFormModal,
-} = patientsLogicStore;
+  closeMedicalRecordModals,
+} = medicalRecordStore;
 
-const {
-  showRecipeFormModal,
-  selectedRecipeForEdit,
-  isEditingRecipe,
-} = storeToRefs(patientsLogicStore);
+const { closeRecipeModal } = recipeStore;
 
-const handleClose = () => {
-  closeHistoryLogModals();
+const organizedDocuments = computed(() => {
+  if (!fullRecord.value?.documents) return null;
+  return fileStore.organizeDocumentsByType(fullRecord.value.documents);
+});
+
+const getIconComponent = (type) => {
+  const iconName = fileStore.getDocumentTypeIcon(type);
+  const iconMap = {
+    'BeakerIcon': BeakerIcon,
+    'ClipboardDocumentCheckIcon': ClipboardDocumentCheckIcon,
+    'DocumentTextIcon': DocumentTextIcon,
+    'DocumentIcon': DocumentIcon,
+  };
+  return iconMap[iconName] || DocumentIcon;
 };
 
-const displayRecord = computed(() => fullRecord.value);
-// 🎯 Solo llama a la store (sin try/catch)
+const handleClose = () => {
+  closeMedicalRecordModals();
+};
+
+const displayRecord = computed(() => {
+  return fullRecord.value;
+});
+
+const isLoadingDetails = ref(false);
+
 async function loadFullRecord() {
-  await patientsStore.fetchMedicalRecordDetails(selectedRecord.value.id);
-}
+  if (!selectedRecord.value?.id) {
+    return;
+  }
 
-function editRecord() {
-  emit("edit", displayRecord.value);
-}
-
-function editEvolutionNote() {
-  // Cerrar el modal actual primero
-  handleClose();
-  // Luego abrir modal de edición de medical record
-  nextTick(() => {
-    openMedicalRecordEditModal(displayRecord.value);
-  });
-}
-
-function viewFullRecipe(recipe) {
-  emit("view-recipe", recipe);
+  if (isLoadingDetails.value) {
+    return;
+  }
+  
+  isLoadingDetails.value = true;
+  try {
+    await medicalRecordStore.fetchMedicalRecordDetails(selectedRecord.value.id);
+  } finally {
+    isLoadingDetails.value = false;
+  }
 }
 
 function downloadRecord() {
   emit("download", displayRecord.value);
 }
+
+function handleDownloadDocument(doc) {
+  const fileName = `${fileStore.getDocumentTypeLabel(doc.type)}_${doc.id}.pdf`;
+  fileStore.downloadFile(doc.file, fileName);
+}
+
+function handleViewDocument(doc) {
+  fileStore.viewFile(doc.file);
+}
+
+const lastLoadedRecordId = ref(null);
 
 watch(
   () => props.isOpen,
@@ -489,14 +481,19 @@ watch(
     if (newVal) {
       await loadFullRecord();
     } else {
-      patientsStore.clearFullRecord();
+      medicalRecordStore.clearFullRecord();
+      lastLoadedRecordId.value = null;
     }
   },
 );
 
-onMounted(() => {
-  if (props.isOpen) {
-    loadFullRecord();
+watch(
+  () => selectedRecord.value?.id,
+  async (newRecordId, oldRecordId) => {
+    if (props.isOpen && newRecordId && newRecordId !== oldRecordId) {
+      lastLoadedRecordId.value = newRecordId;
+      await loadFullRecord();
+    }
   }
-});
+);
 </script>

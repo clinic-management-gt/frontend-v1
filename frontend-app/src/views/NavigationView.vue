@@ -230,7 +230,7 @@ import {
   Bars3Icon,
   XMarkIcon,
   PlusCircleIcon,
-} from "@heroicons/vue/20/solid";
+} from "@heroicons/vue/24/outline";
 import NavigationBar from "@/components/navigation/NavigationBar.vue";
 import ComboBoxAutocompleteInputSearchPatient from "@components/forms/ComboBoxAutocompleteInputSearchPatient.vue";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore";
@@ -252,21 +252,17 @@ function handlePatientSelection(patientId) {
   }
 }
 
-// Cargar todos los pacientes al iniciar
-onMounted(() => {
-  // Asegúrate de que los pacientes estén disponibles para la búsqueda
+onMounted(async () => {
   if (!allPatients.value || allPatients.value.length === 0) {
-    patientsStore.fetchAllPatients();
+    await patientsStore.fetchAllPatients();
   }
 });
 
-// Saludo dinámico
 const greeting = computed(() => {
   const u = authStore.user;
   return u ? `${u.first_name} ${u.last_name}` : "";
 });
 
-// Menú de usuario
 const userNavigation = [
   {
     name: "login.your-profile",
@@ -281,6 +277,5 @@ const userNavigation = [
   },
 ];
 
-// Control de la sidebar en móvil
 const sidebarOpen = ref(false);
 </script>
