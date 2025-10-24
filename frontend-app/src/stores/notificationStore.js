@@ -22,14 +22,14 @@ export const useNotificationStore = defineStore(
       const timeoutId = setTimeout(() => {
         hideNotification(id);
       }, 5000);
-      const notification = notifications.value.find((n) => n.id === id);
+      const notification = notifications.value.find((notification) => notification.id === id);
       if (notification) {
         notification.timeoutId = timeoutId;
       }
     }
 
     function hideNotification(Id) {
-      const index = notifications.value.findIndex((n) => n.id === Id);
+      const index = notifications.value.findIndex((notification) => notification.id === Id);
 
       if (index !== -1) {
         const notification = notifications.value[index];
@@ -42,7 +42,7 @@ export const useNotificationStore = defineStore(
 
     function startHovering(notificationId) {
       const notification = notifications.value.find(
-        (n) => n.id === notificationId,
+        (notification) => notification.id === notificationId,
       );
       if (notification && notification.timeoutId) {
         clearTimeout(notification.timeoutId);
@@ -52,7 +52,7 @@ export const useNotificationStore = defineStore(
 
     function stopHovering(notificationId) {
       const notification = notifications.value.find(
-        (n) => n.id === notificationId,
+        (notification) => notification.id === notificationId,
       );
       if (notification && !notification.timeoutId) {
         const timeoutId = setTimeout(() => {
