@@ -33,9 +33,9 @@
               <div>
                 <div
                   v-if="isEditing && originalValues.weight"
-                  class="mb-2 text-xs text-gray-500 bg-white p-2 rounded border"
+                  class="flex items-center mb-2 text-xs text-gray-500 bg-white p-2 rounded border"
                 >
-                  📊 {{ $t("medical-records.current-value") }}:
+                  <chart-bar-icon class="w-5 h-5 mr-2" /> {{ $t("medical-records.current-value") }}:
                   {{ originalValues.weight }} kg
                 </div>
                 <text-input
@@ -54,9 +54,9 @@
               <div>
                 <div
                   v-if="isEditing && originalValues.height"
-                  class="mb-2 text-xs text-gray-500 bg-white p-2 rounded border"
+                  class="flex items-center mb-2 text-xs text-gray-500 bg-white p-2 rounded border"
                 >
-                  📊 {{ $t("medical-records.current-value") }}:
+                  <chart-bar-icon class="w-5 h-5 mr-2" />{{ $t("medical-records.current-value") }}:
                   {{ originalValues.height }} cm
                 </div>
                 <text-input
@@ -141,14 +141,14 @@
             <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <div class="flex items-center justify-between mb-2">
                 <label class="text-sm font-medium text-blue-900 flex items-center">
-                  <DocumentTextIcon class="w-5 h-5 mr-2" />
+                  <document-text-icon class="w-5 h-5 mr-2" />
                   {{ $t("files.upload-laboratory") }} ({{ $t("general.optional") }})
                 </label>
                 <span
                   v-if="fileStore.laboratoryFile"
                   class="text-xs text-green-600 font-medium flex items-center"
                 >
-                  <CheckIcon class="w-4 h-4 mr-1" />
+                  <check-icon class="w-4 h-4 mr-1" />
                   {{ $t("files.file-selected") }}
                 </span>
               </div>
@@ -166,14 +166,14 @@
                   class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors flex items-center"
                   @click="$refs.laboratoryInput.click()"
                 >
-                  <ArrowUpTrayIcon class="w-4 h-4 mr-1" />
+                  <arrow-up-tray-icon class="w-4 h-4 mr-1" />
                   {{ $t("files.select-file") }}
                 </button>
                 <span
                   v-if="fileStore.laboratoryFile"
                   class="text-sm text-gray-700 truncate max-w-xs flex items-center"
                 >
-                  <DocumentIcon class="w-4 h-4 mr-1" />
+                  <document-icon class="w-4 h-4 mr-1" />
                   {{ fileStore.laboratoryFile.name }}
                 </span>
                 <button
@@ -182,7 +182,7 @@
                   class="ml-auto p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
                   @click="fileStore.clearLaboratoryFile()"
                 >
-                  <XMarkIcon class="w-5 h-5" />
+                  <x-mark-icon class="w-5 h-5" />
                 </button>
               </div>
 
@@ -200,14 +200,14 @@
             <div class="p-4 bg-green-50 rounded-lg border border-green-200">
               <div class="flex items-center justify-between mb-2">
                 <label class="text-sm font-medium text-green-900 flex items-center">
-                  <DocumentTextIcon class="w-5 h-5 mr-2" />
+                  <document-text-icon class="w-5 h-5 mr-2" />
                   {{ $t("files.upload-exam") }} ({{ $t("general.optional") }})
                 </label>
                 <span
                   v-if="fileStore.examFile"
                   class="text-xs text-green-600 font-medium flex items-center"
                 >
-                  <CheckIcon class="w-4 h-4 mr-1" />
+                  <check-icon class="w-4 h-4 mr-1" />
                   {{ $t("files.file-selected") }}
                 </span>
               </div>
@@ -225,14 +225,14 @@
                   class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center"
                   @click="$refs.examInput.click()"
                 >
-                  <ArrowUpTrayIcon class="w-4 h-4 mr-1" />
+                  <arrow-up-tray-icon class="w-4 h-4 mr-1" />
                   {{ $t("files.select-file") }}
                 </button>
                 <span
                   v-if="fileStore.examFile"
                   class="text-sm text-gray-700 truncate max-w-xs flex items-center"
                 >
-                  <DocumentIcon class="w-4 h-4 mr-1" />
+                  <document-icon class="w-4 h-4 mr-1" />
                   {{ fileStore.examFile.name }}
                 </span>
                 <button
@@ -241,7 +241,7 @@
                   class="ml-auto p-1 text-red-600 hover:text-red-800 hover:bg-red-100 rounded transition-colors"
                   @click="fileStore.clearExamFile()"
                 >
-                  <XMarkIcon class="w-5 h-5" />
+                  <x-mark-icon class="w-5 h-5" />
                 </button>
               </div>
 
@@ -255,8 +255,8 @@
               </div>
             </div>
 
-            <div class="mt-3 text-xs text-gray-500 flex items-start">
-              <InformationCircleIcon class="w-4 h-4 mr-1 mt-0.5 flex-shrink-0" />
+            <div class="mt-3 text-xs text-gray-500 flex items-center items-start">
+              <information-circle-icon class="w-4 h-4 mr-2 flex-shrink-0" />
               <span>{{ $t("files.file-format-help") }}</span>
             </div>
           </div>
@@ -270,7 +270,7 @@
         :isDisabled="true"
       >
         <span class="flex items-center">
-          <ArrowPathIcon class="animate-spin -ml-1 mr-2 h-4 w-4" />
+          <arrow-path-icon class="animate-spin -ml-1 mr-2 h-4 w-4" />
           {{ $t(fileStore.isLoadingUpload ? "files.uploading" : "medical-records.saving") }}
         </span>
       </primary-button>
@@ -305,7 +305,8 @@ import {
   DocumentIcon,
   InformationCircleIcon,
   ArrowPathIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  ChartBarIcon
 } from "@heroicons/vue/24/outline";
 
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
