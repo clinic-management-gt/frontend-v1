@@ -10,7 +10,7 @@ export const useNotificationStore = defineStore(
     const isLoadingNotificationStore = ref(false);
 
     function addNotification(type, statusTitle, statusMessage) {
-      const id = DateTime.now();
+      const id = DateTime.now().toMillis();
       notifications.value.push({
         id,
         type,
@@ -22,17 +22,20 @@ export const useNotificationStore = defineStore(
       const timeoutId = setTimeout(() => {
         hideNotification(id);
       }, 5000);
-      const notification = notifications.value.find(({ id }) => id === id);
+      const notification = notifications.value.find((n) => n.id === id);
       if (notification) {
         notification.timeoutId = timeoutId;
       }
     }
 
     function hideNotification(Id) {
-      const notification = notifications.value.find(({ id }) => id === Id);
-      const index = notifications.value.indexOf(notification);
-      if (notification) {
-        notification.visible = false;
+      const index = notifications.value.findIndex((n) => n.id === Id);
+
+      if (index !== -1) {
+        const notification = notifications.value[index];
+        if (notification.timeoutId) {
+          clearTimeout(notification.timeoutId);
+        }
         notifications.value.splice(index, 1);
       }
     }
