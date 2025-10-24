@@ -3,7 +3,7 @@
     <h1 class="text-2xl">
       {{ $t("patients.data-sheet") }}
     </h1>
-    <action-button-solid-icon
+    <action-button-outlined-icon
       icon="EyeIcon"
       size="h-10 w-10"
       color="text-patient-page-color"
@@ -12,7 +12,7 @@
   </div>
 </template>
 <script setup>
-import ActionButtonSolidIcon from "@components/forms/ActionButtonSolidIcon.vue";
+import ActionButtonOutlinedIcon from "@components/forms/ActionButtonOutlinedIcon.vue";
 const props = defineProps({
   viewDataSheet: {
     type: Function,

@@ -15,7 +15,7 @@
       <div>{{ $t("general.status") }}: <span :class="[statusColors[data.patientTypeId]]">{{ data.patientType }}</span></div>
     </div>
     <div class="flex justify-between">
-      <action-button-solid-icon
+      <action-button-outlined-icon
         icon="ChartBarSquareIcon"
         size="h-16 w-16"
         color="text-patient-page-color"
@@ -28,7 +28,7 @@
 import { formatAgeFromDate } from "@utils/formatAge";
 import { normalizeGender } from "@utils/normalizeGender";
 
-import ActionButtonSolidIcon from "@components/forms/ActionButtonSolidIcon.vue";
+import ActionButtonOutlinedIcon from "@components/forms/ActionButtonOutlinedIcon.vue";
 
 const props = defineProps({
   data: {

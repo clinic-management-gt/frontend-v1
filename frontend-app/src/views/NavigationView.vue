@@ -230,7 +230,7 @@ import {
   Bars3Icon,
   XMarkIcon,
   PlusCircleIcon,
-} from "@heroicons/vue/20/solid";
+} from "@heroicons/vue/24/outline";
 import NavigationBar from "@/components/navigation/NavigationBar.vue";
 import ComboBoxAutocompleteInputSearchPatient from "@components/forms/ComboBoxAutocompleteInputSearchPatient.vue";
 import { usePatientsLogicStore } from "@stores/patientsLogicStore";

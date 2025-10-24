@@ -46,6 +46,7 @@
                   inputPlaceholder="medical-records.weight-placeholder"
                   inputColor="patient-page-color"
                   labelCss="text-sm font-medium text-gray-700"
+                  :required="true"
                 />
               </div>
 
@@ -66,6 +67,7 @@
                   inputPlaceholder="medical-records.height-placeholder"
                   inputColor="patient-page-color"
                   labelCss="text-sm font-medium text-gray-700"
+                  :required="true"
                 />
               </div>
             </div>
@@ -79,6 +81,7 @@
                 inputColor="patient-page-color"
                 labelCss="text-sm font-medium text-gray-700"
                 :rows="3"
+                :required="true"
               />
             </div>
 
