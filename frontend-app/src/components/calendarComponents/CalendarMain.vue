@@ -342,9 +342,11 @@ async function fetchAppointments() {
   try {
     const response = await instance.get('/appointments');
     const data = response.data;
+    
+    // Actualizar appointments primero
     appointments.value = data;
 
-    // Limpia eventos previos de tipo 'Cita'
+    // Limpia TODOS los eventos de tipo 'Cita' para evitar duplicados
     events.value = events.value.filter((e) => e.type !== "Cita");
 
     // Agrega las citas como eventos
@@ -493,7 +495,7 @@ async function saveAppointment() {
       notes: editForm.value.notes,
     };
 
-    await instance.put(
+    await instance.patch(
       `/appointments/${editingAppointment.value.id}`,
       appointmentData
     );
@@ -510,10 +512,19 @@ async function saveAppointment() {
     );
   } catch (e) {
     console.error("Error al guardar la cita:", e);
+    
+    // Mensaje de error más específico
+    let errorMessage = t("calendar.error-updating-appointment");
+    if (e.response?.data?.message) {
+      errorMessage = e.response.data.message;
+    } else if (e.message) {
+      errorMessage = e.message;
+    }
+    
     notificationStore.addNotification(
       "error",
       "notifications.error",
-      t("calendar.error-updating-appointment")
+      errorMessage
     );
   }
 }
@@ -554,7 +565,7 @@ async function confirmDelete() {
     // Intentar eliminar la cita
     await instance.delete(`/appointments/${appointmentId}`);
 
-    // Refrescar las citas
+    // Refrescar las citas - esto actualizará la lista
     await fetchAppointments();
     closeEditModal();
     
@@ -567,11 +578,21 @@ async function confirmDelete() {
       "notifications.success",
       t("calendar.appointment-deleted-successfully")
     );
-  } catch {
+  } catch (e) {
+    console.error("Error al eliminar la cita:", e);
+    
+    // Mensaje de error más específico
+    let errorMessage = t("calendar.error-deleting-appointment") || "Error al eliminar la cita";
+    if (e.response?.data?.message) {
+      errorMessage = e.response.data.message;
+    } else if (e.message) {
+      errorMessage = e.message;
+    }
+    
     notificationStore.addNotification(
       "error", 
       "notifications.error",
-      t("calendar.error-deleting-appointment") || "Error al eliminar la cita"
+      errorMessage
     );
   }
 }

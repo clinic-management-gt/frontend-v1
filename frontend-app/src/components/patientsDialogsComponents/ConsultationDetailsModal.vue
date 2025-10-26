@@ -172,17 +172,22 @@
               v-if="displayRecord.treatments && displayRecord.treatments.length > 0"
               class="space-y-3"
             >
-              <div
-                v-for="recipe in displayRecord.treatments"
-                :key="recipe.id"
-                class="bg-white rounded-lg p-4 border relative"
+              <template
+                v-for="treatment in displayRecord.treatments"
+                :key="treatment.id"
               >
-                <div class="bg-gray-50 rounded p-3 mb-3">
-                  <pre
-                    class="text-gray-800 text-sm whitespace-pre-wrap font-mono"
-                  >{{ recipe.prescription }}</pre>
+                <div
+                  v-for="recipe in treatment.recipes"
+                  :key="recipe.id"
+                  class="bg-white rounded-lg p-4 border relative"
+                >
+                  <div class="bg-gray-50 rounded p-3 mb-3">
+                    <pre
+                      class="text-gray-800 text-sm whitespace-pre-wrap font-mono"
+                    >{{ recipe.prescription }}</pre>
+                  </div>
                 </div>
-              </div>
+              </template>
             </div>
             <div
               v-else
