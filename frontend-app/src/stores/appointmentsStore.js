@@ -75,9 +75,11 @@ export const useAppointmentsStore = defineStore(
       try {
         const res = await instance.post('/appointments', appointmentData);
         
-        if (res.data) {
-          appointments.value.push(res.data);
+        if (!res.data) {
+          throw new Error('No se recibió respuesta del servidor');
         }
+        
+        appointments.value.push(res.data);
         
         notificationStore.addNotification(
           "success",
@@ -105,8 +107,12 @@ export const useAppointmentsStore = defineStore(
       try {
         const res = await instance.patch(`/appointments/${appointmentId}`, appointmentData);
         
+        if (!res.data) {
+          throw new Error('No se recibió respuesta del servidor');
+        }
+        
         const index = appointments.value.findIndex(apt => apt.id === appointmentId);
-        if (index !== -1 && res.data) {
+        if (index !== -1) {
           appointments.value[index] = { ...appointments.value[index], ...res.data };
         }
         
