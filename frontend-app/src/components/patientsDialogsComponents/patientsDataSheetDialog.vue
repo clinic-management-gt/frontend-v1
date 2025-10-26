@@ -210,7 +210,7 @@ import { ChevronDownIcon } from '@heroicons/vue/20/solid';
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { usePatientsStore } from "@stores/patientsStore.js";
 import { useFileStore } from '@stores/FileStore';
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 import { formatDateShortest } from "@/utils/isoFormatDate.js";
@@ -268,10 +268,13 @@ async function fetchFirstMedicalRecord(patientId) {
   isLoadingFirstRecord.value = true;
   try {
     const res = await instance.get(`/patients/${patientId}/medicalrecords?page=1&limit=1&offset=0`);
-    if (res.data?.Records && res.data.Records.length > 0) {
+    
+    const records = res.data?.Records || res.data?.records;
+    
+    if (records && records.length > 0) {
       // Ordenar por fecha de creación (más antigua primero) y tomar el primero
-      const sortedRecords = [...res.data.Records].sort((a, b) => 
-        new Date(a.CreatedAt) - new Date(b.CreatedAt)
+      const sortedRecords = [...records].sort((a, b) => 
+        new Date(a.CreatedAt || a.createdAt) - new Date(b.CreatedAt || b.createdAt)
       );
       firstMedicalRecord.value = sortedRecords[0];
     } else {
@@ -286,11 +289,18 @@ async function fetchFirstMedicalRecord(patientId) {
 }
 
 // Watch para cargar el primer medical record cuando se abre el diálogo
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen && patientData.value?.id) {
+watch([() => props.isOpen, () => patientData.value?.id], ([isOpen, patientId]) => {
+  if (isOpen && patientId) {
+    fetchFirstMedicalRecord(patientId);
+  }
+}, { immediate: true });
+
+// Ejecutar al montar el componente si el diálogo ya está abierto
+onMounted(() => {
+  if (props.isOpen && patientData.value?.id) {
     fetchFirstMedicalRecord(patientData.value.id);
   }
-}, { immediate: false });
+});
 
 // Watch para limpiar el estado cuando cambie el paciente
 watch(() => patientData.value?.id, () => {
@@ -331,11 +341,11 @@ const displayData = computed(() => [
     title: t('patients.first-medical-record'), 
     value: firstMedicalRecord.value ? [{
       id: 1,
-      notes: firstMedicalRecord.value.Notes || t('general.nodata'),
-      weight: firstMedicalRecord.value.Weight,
-      height: firstMedicalRecord.value.Height,
-      familyHistory: firstMedicalRecord.value.FamilyHistory,
-      createdAt: firstMedicalRecord.value.CreatedAt
+      notes: firstMedicalRecord.value.Notes || firstMedicalRecord.value.notes || t('general.nodata'),
+      weight: firstMedicalRecord.value.Weight || firstMedicalRecord.value.weight,
+      height: firstMedicalRecord.value.Height || firstMedicalRecord.value.height,
+      familyHistory: firstMedicalRecord.value.FamilyHistory || firstMedicalRecord.value.familyHistory,
+      createdAt: firstMedicalRecord.value.CreatedAt || firstMedicalRecord.value.createdAt
     }] : []
   },
   { key: 'current-illnesses', title: t('patients.current-illnesses'), value: "" },
