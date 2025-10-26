@@ -73,7 +73,7 @@
                 >
                   <!-- Loading state -->
                   <div
-                    v-if="item.key === 'first-medical-record' && isLoadingFirstRecord"
+                    v-if="item.key === 'first-medical-record' && medicalRecordStore.isLoadingMedicalRecords"
                     class="text-center py-4"
                   >
                     <p>{{ $t('general.loading') }}...</p>
@@ -210,12 +210,11 @@ import { ChevronDownIcon } from '@heroicons/vue/20/solid';
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { usePatientsStore } from "@stores/patientsStore.js";
 import { useFileStore } from '@stores/FileStore';
-import { useNotificationStore } from '@stores/notificationStore.js';
+import { useMedicalRecordStore } from '@stores/medicalRecordStore.js';
 import { computed, ref, watch, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 import { formatDateShortest } from "@/utils/isoFormatDate.js";
-import instance from "@stores/axios.js";
 
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
 import AppPanel from "@components/forms/AppPanel.vue";
@@ -227,12 +226,11 @@ const patientsStore = usePatientsStore();
 const { currentPatientSelectedData } = storeToRefs(patientsStore);
 const { closeAllPatientDialog } = usePatientsLogicStore();
 
-const notificationStore = useNotificationStore();
+const medicalRecordStore = useMedicalRecordStore();
 const { downloadFile } = useFileStore();
 
 // Estado para el primer Medical Record
 const firstMedicalRecord = ref(null);
-const isLoadingFirstRecord = ref(false);
 
 // Estado para controlar qué acordeones están abiertos
 const openDisclosures = ref({});
@@ -267,28 +265,8 @@ async function fetchFirstMedicalRecord(patientId) {
   if (!patientId) return;
   
   firstMedicalRecord.value = null;
-  isLoadingFirstRecord.value = true;
-  try {
-    const res = await instance.get(`/patients/${patientId}/medicalrecords?page=1&limit=1&offset=0`);
-    
-    const records = res.data?.Records || res.data?.records;
-    
-    if (records && records.length > 0) {
-      const sortedRecords = [...records].sort((a, b) => 
-        new Date(a.CreatedAt || a.createdAt) - new Date(b.CreatedAt || b.createdAt)
-      );
-      firstMedicalRecord.value = sortedRecords[0];
-    }
-  } catch {
-    notificationStore.addNotification(
-      "error",
-      t('general.error'),
-      t('patients.error-loading-medical-record')
-    );
-    firstMedicalRecord.value = null;
-  } finally {
-    isLoadingFirstRecord.value = false;
-  }
+  const record = await medicalRecordStore.fetchFirstMedicalRecord(patientId);
+  firstMedicalRecord.value = record;
 }
 
 // Watch para cargar el primer medical record cuando se abre el diálogo
@@ -344,11 +322,11 @@ const displayData = computed(() => [
     title: t('patients.first-medical-record'), 
     value: firstMedicalRecord.value ? [{
       id: 1,
-      notes: firstMedicalRecord.value.Notes || firstMedicalRecord.value.notes || t('general.nodata'),
-      weight: firstMedicalRecord.value.Weight || firstMedicalRecord.value.weight,
-      height: firstMedicalRecord.value.Height || firstMedicalRecord.value.height,
-      familyHistory: firstMedicalRecord.value.FamilyHistory || firstMedicalRecord.value.familyHistory,
-      createdAt: firstMedicalRecord.value.CreatedAt || firstMedicalRecord.value.createdAt
+      notes: firstMedicalRecord.value.notes || t('general.nodata'),
+      weight: firstMedicalRecord.value.weight,
+      height: firstMedicalRecord.value.height,
+      familyHistory: firstMedicalRecord.value.familyHistory,
+      createdAt: firstMedicalRecord.value.createdAt
     }] : []
   },
   { key: 'current-illnesses', title: t('patients.current-illnesses'), value: "" },

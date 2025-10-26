@@ -60,6 +60,39 @@ export const useMedicalRecordStore = defineStore(
       }
     }
 
+    async function fetchFirstMedicalRecord(patientId) {
+      isLoadingMedicalRecords.value = true;
+      if (!patientId) return null;
+      
+      try {
+        const res = await instance.get(
+          `/patients/${patientId}/medicalrecords?page=1&limit=1&offset=0`
+        );
+        
+        const records = res.data?.records;
+        
+        if (records && records.length > 0) {
+          // Ordenar por fecha de creación (más antigua primero) y retornar el primero
+          const sortedRecords = [...records].sort((a, b) => 
+            new Date(a.createdAt) - new Date(b.createdAt)
+          );
+          return sortedRecords[0];
+        }
+        
+        return null;
+      } catch (err) {
+        error.value = err.message;
+        notificationStore.addNotification(
+          "error",
+          t("general.error"),
+          t("patients.error-loading-medical-record")
+        );
+        return null;
+      } finally {
+        isLoadingMedicalRecords.value = false;
+      }
+    }
+
     async function fetchMedicalRecordById(recordId) {
       try {
         loading.value = true;
@@ -267,6 +300,7 @@ export const useMedicalRecordStore = defineStore(
       // medical record CRUD actions
       fetchMedicalRecords,
       fetchPatientMedicalRecords,
+      fetchFirstMedicalRecord,
       fetchMedicalRecordById,
       fetchMedicalRecordDetails,
       createMedicalRecord,

@@ -6,8 +6,9 @@ import AppointmentModal from "@components/dashboardComponents/AppointmentModal.v
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
 import ConfirmationModal from "@components/forms/ConfirmationModal.vue";
 import { useNotificationStore } from "@/stores/notificationStore";
+import { useAppointmentsStore } from "@/stores/appointmentsStore";
+import { usePatientsStore } from "@/stores/patientsStore";
 import { useI18n } from "vue-i18n";
-import instance from "@stores/axios.js";
 
 const today = new Date();
 const currentMonth = ref(today.getMonth());
@@ -16,8 +17,10 @@ const showYearSelect = ref(false);
 const selectedDayObj = ref(null);
 const events = ref([]); // [{ day, month, year, text, startTime, endTime, color, type }]
 
-// Store de notificaciones
+// Stores
 const notificationStore = useNotificationStore();
+const appointmentsStore = useAppointmentsStore();
+const patientsStore = usePatientsStore();
 
 // Instancia de i18n
 const { t } = useI18n();
@@ -336,15 +339,10 @@ function deleteEvent(i) {
   }
 }
 
-const appointments = ref([]);
-
+// Función para obtener citas desde el store
 async function fetchAppointments() {
   try {
-    const response = await instance.get('/appointments');
-    const data = response.data;
-    
-    // Actualizar appointments primero
-    appointments.value = data;
+    const data = await appointmentsStore.fetchAppointments();
 
     // Limpia TODOS los eventos de tipo 'Cita' para evitar duplicados
     events.value = events.value.filter((e) => e.type !== "Cita");
@@ -371,8 +369,12 @@ async function fetchAppointments() {
         type: "Cita",
       });
     });
-  } catch (e) {
-    console.error("Error al obtener citas:", e);
+  } catch {
+    notificationStore.addNotification(
+      "error",
+      t("general.error"),
+      t("appointments.error-fetching-appointments")
+    );
   }
 }
 
@@ -422,12 +424,15 @@ const appointmentStatuses = [
 // Nuevas funciones para manejar la edición
 async function fetchPatients() {
   try {
-    const response = await instance.get('/patients');
-    const data = response.data;
+    const data = await patientsStore.fetchAllPatients();
     patients.value = data;
     filteredPatients.value = data;
-  } catch (e) {
-    console.error("Error al obtener pacientes:", e);
+  } catch {
+    notificationStore.addNotification(
+      "error",
+      t("general.error"),
+      t("patients.error-fetching-patients")
+    );
   }
 }
 
@@ -495,37 +500,16 @@ async function saveAppointment() {
       notes: editForm.value.notes,
     };
 
-    await instance.patch(
-      `/appointments/${editingAppointment.value.id}`,
+    await appointmentsStore.updateAppointment(
+      editingAppointment.value.id,
       appointmentData
     );
 
     // Refrescar las citas
     await fetchAppointments();
     closeEditModal();
-
-    // Mostrar mensaje de éxito
-    notificationStore.addNotification(
-      "success",
-      "notifications.success", 
-      t("calendar.appointment-updated-successfully")
-    );
-  } catch (e) {
-    console.error("Error al guardar la cita:", e);
-    
-    // Mensaje de error más específico
-    let errorMessage = t("calendar.error-updating-appointment");
-    if (e.response?.data?.message) {
-      errorMessage = e.response.data.message;
-    } else if (e.message) {
-      errorMessage = e.message;
-    }
-    
-    notificationStore.addNotification(
-      "error",
-      "notifications.error",
-      errorMessage
-    );
+  } catch {
+    // El error ya está manejado por el store
   }
 }
 
@@ -559,11 +543,16 @@ async function confirmDelete() {
                           appointmentToDelete.value.appointmentId;
     
     if (!appointmentId) {
-      throw new Error("No se pudo obtener el ID de la cita para eliminar");
+      notificationStore.addNotification(
+        "error",
+        t("general.error"),
+        t("appointments.error-no-appointment-id")
+      );
+      return;
     }
     
-    // Intentar eliminar la cita
-    await instance.delete(`/appointments/${appointmentId}`);
+    // Eliminar la cita usando el store
+    await appointmentsStore.deleteAppointment(appointmentId);
 
     // Refrescar las citas - esto actualizará la lista
     await fetchAppointments();
@@ -571,29 +560,8 @@ async function confirmDelete() {
     
     // Limpiar la referencia a la cita eliminada
     appointmentToDelete.value = null;
-
-    // Mostrar mensaje de éxito
-    notificationStore.addNotification(
-      "success",
-      "notifications.success",
-      t("calendar.appointment-deleted-successfully")
-    );
-  } catch (e) {
-    console.error("Error al eliminar la cita:", e);
-    
-    // Mensaje de error más específico
-    let errorMessage = t("calendar.error-deleting-appointment") || "Error al eliminar la cita";
-    if (e.response?.data?.message) {
-      errorMessage = e.response.data.message;
-    } else if (e.message) {
-      errorMessage = e.message;
-    }
-    
-    notificationStore.addNotification(
-      "error", 
-      "notifications.error",
-      errorMessage
-    );
+  } catch {
+    // El error ya está manejado por el store
   }
 }
 
@@ -617,8 +585,8 @@ function closeEditModal() {
 // Modificar la función de eventos para citas para agregar función de edición
 function openAppointmentEdit(event) {
   if (event.type === "Cita") {
-    // Buscar la cita original en appointments
-    const appointment = appointments.value.find((app) =>
+    // Buscar la cita original en appointments del store
+    const appointment = appointmentsStore.appointments.find((app) =>
       // Ahora comparamos con el nombre del paciente directamente
       (app.PatientName || app.patientName) === event.text
     );
