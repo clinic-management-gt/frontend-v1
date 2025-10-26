@@ -15,10 +15,6 @@ export const useAppointmentsStore = defineStore(
     const { t } = globalI18n;
     const notificationStore = useNotificationStore();
 
-    /**
-     * Obtener todas las citas
-     * @param {Object} filters - Filtros opcionales (date, status, etc.)
-     */
     async function fetchAppointments(filters = {}) {
       isLoadingAppointments.value = true;
       error.value = null;
@@ -53,15 +49,11 @@ export const useAppointmentsStore = defineStore(
       }
     }
 
-    /**
-     * Obtener una cita por ID
-     * @param {number} id - ID de la cita
-     */
-    async function fetchAppointmentById(id) {
+    async function fetchAppointmentById(appointmentId) {
       isLoadingAppointments.value = true;
       error.value = null;
       try {
-        const res = await instance.get(`/appointments/${id}`);
+        const res = await instance.get(`/appointments/${appointmentId}`);
         selectedAppointment.value = res.data;
         return res.data;
       } catch (err) {
@@ -77,10 +69,6 @@ export const useAppointmentsStore = defineStore(
       }
     }
 
-    /**
-     * Crear una nueva cita
-     * @param {Object} appointmentData - Datos de la cita
-     */
     async function createAppointment(appointmentData) {
       isLoadingAppointments.value = true;
       error.value = null;
@@ -111,19 +99,13 @@ export const useAppointmentsStore = defineStore(
       }
     }
 
-    /**
-     * Actualizar una cita existente
-     * @param {number} id - ID de la cita
-     * @param {Object} appointmentData - Datos actualizados
-     */
-    async function updateAppointment(id, appointmentData) {
+    async function updateAppointment(appointmentId, appointmentData) {
       isLoadingAppointments.value = true;
       error.value = null;
       try {
-        const res = await instance.patch(`/appointments/${id}`, appointmentData);
+        const res = await instance.patch(`/appointments/${appointmentId}`, appointmentData);
         
-        // Actualizar en la lista local
-        const index = appointments.value.findIndex(apt => apt.id === id);
+        const index = appointments.value.findIndex(apt => apt.id === appointmentId);
         if (index !== -1 && res.data) {
           appointments.value[index] = { ...appointments.value[index], ...res.data };
         }
@@ -148,18 +130,13 @@ export const useAppointmentsStore = defineStore(
       }
     }
 
-    /**
-     * Eliminar una cita
-     * @param {number} id - ID de la cita
-     */
-    async function deleteAppointment(id) {
+    async function deleteAppointment(appointmentId) {
       isLoadingAppointments.value = true;
       error.value = null;
       try {
-        await instance.delete(`/appointments/${id}`);
+        await instance.delete(`/appointments/${appointmentId}`);
         
-        // Eliminar de la lista local
-        appointments.value = appointments.value.filter(apt => apt.id !== id);
+        appointments.value = appointments.value.filter(apt => apt.id !== appointmentId);
         
         notificationStore.addNotification(
           "success",
@@ -181,23 +158,14 @@ export const useAppointmentsStore = defineStore(
       }
     }
 
-    /**
-     * Limpiar el error
-     */
     function clearError() {
       error.value = null;
     }
 
-    /**
-     * Limpiar la cita seleccionada
-     */
     function clearSelectedAppointment() {
       selectedAppointment.value = null;
     }
 
-    /**
-     * Resetear el store
-     */
     function reset() {
       appointments.value = [];
       selectedAppointment.value = null;
@@ -206,13 +174,10 @@ export const useAppointmentsStore = defineStore(
     }
 
     return {
-      // State
       appointments,
       selectedAppointment,
       isLoadingAppointments,
       error,
-
-      // Actions
       fetchAppointments,
       fetchAppointmentById,
       createAppointment,

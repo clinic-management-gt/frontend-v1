@@ -361,11 +361,11 @@ async function fetchAppointments() {
         day: date.getDate(),
         month: date.getMonth(),
         year: date.getFullYear(),
-        text: `${app.PatientName || app.patientName}`,  // Guardamos nombre del paciente
-        displayText: timeStr,  // Solo mostramos la hora en el calendario
+        text: app.patientName,
+        displayText: timeStr,
         startTime: timeStr,
         endTime: null,
-        color: getColorByStatus(app.Status || app.status),  // Color según estado
+        color: getColorByStatus(app.status),
         type: "Cita",
       });
     });
@@ -479,12 +479,12 @@ function openEditModal(appointment) {
   // Llenar el formulario con los datos actuales
   const date = new Date(appointment.date || appointment.appointment_date);
   editForm.value = {
-    patientId: appointment.PatientID || appointment.patientId || "",
-    patientName: appointment.PatientName || appointment.patientName || "",
+    patientId: appointment.patientId || "",
+    patientName: appointment.patientName || "",
     date: date.toISOString().split("T")[0],
     time: date.toTimeString().substring(0, 5),
-    status: appointment.Status || appointment.status || "Pendiente",
-    notes: appointment.Notes || appointment.notes || "",
+    status: appointment.status || "Pendiente",
+    notes: appointment.notes || "",
   };
 
   searchPatient.value = editForm.value.patientName;
@@ -536,11 +536,7 @@ async function confirmDelete() {
   showDeleteConfirmation.value = false;
   
   try {
-    // Verificar si usa ID o id y asegurarse de que existe
-    const appointmentId = appointmentToDelete.value.ID || 
-                          appointmentToDelete.value.id || 
-                          appointmentToDelete.value.AppointmentID || 
-                          appointmentToDelete.value.appointmentId;
+    const appointmentId = appointmentToDelete.value.id;
     
     if (!appointmentId) {
       notificationStore.addNotification(
@@ -585,10 +581,8 @@ function closeEditModal() {
 // Modificar la función de eventos para citas para agregar función de edición
 function openAppointmentEdit(event) {
   if (event.type === "Cita") {
-    // Buscar la cita original en appointments del store
     const appointment = appointmentsStore.appointments.find((app) =>
-      // Ahora comparamos con el nombre del paciente directamente
-      (app.PatientName || app.patientName) === event.text
+      app.patientName === event.text
     );
     
     if (appointment) {
