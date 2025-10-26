@@ -128,6 +128,7 @@
     "first-medical-record": "Primer Registro Médico",
     "first-visit-notes": "Notas de la primera visita",
     "notes": "Notas",
+    "error-loading-medical-record": "Error al cargar el registro médico del paciente",
     "laboratories": "Laboratorios",
     "current-illnesses": "Enfermedades actuales",
     "fill-out-form": "Llene el formulario",

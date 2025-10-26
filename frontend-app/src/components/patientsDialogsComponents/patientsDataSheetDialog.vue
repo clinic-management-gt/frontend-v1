@@ -210,6 +210,7 @@ import { ChevronDownIcon } from '@heroicons/vue/20/solid';
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { usePatientsStore } from "@stores/patientsStore.js";
 import { useFileStore } from '@stores/FileStore';
+import { useNotificationStore } from '@stores/notificationStore.js';
 import { computed, ref, watch, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
@@ -226,7 +227,7 @@ const patientsStore = usePatientsStore();
 const { currentPatientSelectedData } = storeToRefs(patientsStore);
 const { closeAllPatientDialog } = usePatientsLogicStore();
 
-
+const notificationStore = useNotificationStore();
 const { downloadFile } = useFileStore();
 
 // Estado para el primer Medical Record
@@ -265,6 +266,7 @@ const patientInfo = computed(() => [
 async function fetchFirstMedicalRecord(patientId) {
   if (!patientId) return;
   
+  firstMedicalRecord.value = null;
   isLoadingFirstRecord.value = true;
   try {
     const res = await instance.get(`/patients/${patientId}/medicalrecords?page=1&limit=1&offset=0`);
@@ -272,16 +274,17 @@ async function fetchFirstMedicalRecord(patientId) {
     const records = res.data?.Records || res.data?.records;
     
     if (records && records.length > 0) {
-      // Ordenar por fecha de creación (más antigua primero) y tomar el primero
       const sortedRecords = [...records].sort((a, b) => 
         new Date(a.CreatedAt || a.createdAt) - new Date(b.CreatedAt || b.createdAt)
       );
       firstMedicalRecord.value = sortedRecords[0];
-    } else {
-      firstMedicalRecord.value = null;
     }
-  } catch (error) {
-    console.error("Error al obtener el primer Medical Record:", error);
+  } catch {
+    notificationStore.addNotification(
+      "error",
+      t('general.error'),
+      t('patients.error-loading-medical-record')
+    );
     firstMedicalRecord.value = null;
   } finally {
     isLoadingFirstRecord.value = false;
