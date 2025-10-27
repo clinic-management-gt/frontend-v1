@@ -58,14 +58,48 @@
           <!-- Input para nuevo paciente -->
           <div v-if="patientType === 'new'">
             <div class="space-y-4">
-              <input
-                v-model="newPatientName"
-                type="text"
-                required
-                :placeholder="$t('dashboard.patient-name')"
-                class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
-              />
-              
+              <!-- Nombre -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ $t('general.first-name') }}
+                </label>
+                <input
+                  v-model="newPatientFirstName"
+                  type="text"
+                  required
+                  :placeholder="$t('general.first-name')"
+                  class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                />
+              </div>
+
+              <!-- Apellido -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ $t('general.last-name') }}
+                </label>
+                <input
+                  v-model="newPatientLastName"
+                  type="text"
+                  required
+                  :placeholder="$t('general.last-name')"
+                  class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                />
+              </div>
+
+              <!-- Fecha de nacimiento -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ $t('general.birthdate') }}
+                </label>
+                <input
+                  v-model="newPatientBirthdate"
+                  type="date"
+                  required
+                  :max="todayDate"
+                  class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
+                />
+              </div>
+
               <!-- Selección de género -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -100,6 +134,58 @@
                     {{ $t("general.not-specified") }}
                   </label>
                 </div>
+              </div>
+
+              <!-- Contactos -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ $t('patients.contacts') }}
+                </label>
+                <div
+                  v-for="(contact, index) in newPatientContacts"
+                  :key="index"
+                  class="mb-3 p-3 border rounded-md bg-gray-50"
+                >
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium text-gray-700">Contacto {{ index + 1 }}</span>
+                    <button
+                      v-if="newPatientContacts.length > 1"
+                      type="button"
+                      @click="removeContact(index)"
+                      class="text-red-600 hover:text-red-800 text-sm font-medium"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+
+                  <div class="space-y-2">
+                    <select
+                      v-model="contact.type"
+                      class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 sm:text-sm"
+                    >
+                      <option value="">Seleccionar tipo</option>
+                      <option value="Padre">Padre</option>
+                      <option value="Madre">Madre</option>
+                      <option value="Tutor">Tutor</option>
+                      <option value="Otro">Otro</option>
+                    </select>
+
+                    <input
+                      v-model="contact.phoneNumber"
+                      type="tel"
+                      placeholder="Número de teléfono"
+                      class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 sm:text-sm"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  @click="addContact"
+                  class="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  + Agregar contacto
+                </button>
               </div>
             </div>
           </div>
@@ -194,8 +280,11 @@ const { allPatients } = storeToRefs(patientsStore);
 // Estado del formulario
 const patientType = ref("existing");
 const selectedPatientId = ref(null);
-const newPatientName = ref("");
+const newPatientFirstName = ref("");
+const newPatientLastName = ref("");
+const newPatientBirthdate = ref("");
 const newPatientGender = ref("no_especificado");
+const newPatientContacts = ref([{ type: "", phoneNumber: "" }]);
 const appointmentDate = ref("");
 const appointmentTime = ref("");
 const appointmentReason = ref("");
@@ -237,19 +326,36 @@ function handleClose() {
 }
 
 /**
+ * Agrega un nuevo contacto
+ */
+function addContact() {
+  newPatientContacts.value.push({ type: "", phoneNumber: "" });
+}
+
+/**
+ * Elimina un contacto
+ */
+function removeContact(index) {
+  newPatientContacts.value.splice(index, 1);
+}
+
+/**
  * Resetea todos los campos del formulario
  */
 function resetForm() {
   patientType.value = "existing";
   selectedPatientId.value = null;
-  newPatientName.value = "";
+  newPatientFirstName.value = "";
+  newPatientLastName.value = "";
+  newPatientBirthdate.value = "";
   newPatientGender.value = "no_especificado";
-  
+  newPatientContacts.value = [{ type: "", phoneNumber: "" }];
+
   // Mantenemos la fecha preseleccionada si existe, si no la reseteamos
   if (!props.preselectedDate) {
     appointmentDate.value = "";
   }
-  
+
   appointmentTime.value = "";
   appointmentReason.value = "";
   isLoading.value = false;
@@ -271,19 +377,30 @@ async function handleSubmit() {
     return;
   }
 
-  if (patientType.value === "new" && !newPatientName.value.trim()) {
-    notificationStore.addNotification(
-      "warning", 
-      "general.warning",
-      globalI18n.t("dashboard.please-enter-patient-name")
-    );
-    return;
+  if (patientType.value === "new") {
+    if (!newPatientFirstName.value.trim() || !newPatientLastName.value.trim()) {
+      notificationStore.addNotification(
+        "warning",
+        "general.warning",
+        "Por favor ingrese nombre y apellido completos"
+      );
+      return;
+    }
+
+    if (!newPatientBirthdate.value) {
+      notificationStore.addNotification(
+        "warning",
+        "general.warning",
+        "Por favor ingrese la fecha de nacimiento"
+      );
+      return;
+    }
   }
 
   if (!appointmentDate.value || !appointmentTime.value) {
     notificationStore.addNotification(
       "warning",
-      "general.warning", 
+      "general.warning",
       globalI18n.t("dashboard.please-complete-date-time")
     );
     return;
@@ -296,24 +413,31 @@ async function handleSubmit() {
 
     // Si es paciente nuevo, crearlo primero
     if (patientType.value === "new") {
-      const nameParts = newPatientName.value.trim().split(" ");
-      const firstName = nameParts[0] || "";
-      const lastName = nameParts.slice(1).join(" ") || "";
+      // Filtrar contactos que tengan al menos el número de teléfono
+      const validContacts = newPatientContacts.value
+        .filter(c => c.phoneNumber.trim() !== "")
+        .map(c => ({
+          type: c.type || "Otro",
+          phoneNumber: c.phoneNumber
+        }));
 
-      const newPatient = await patientsStore.createBasicPatient({
-        name: firstName,
-        lastName: lastName,
-        gender: newPatientGender.value
+      const newPatient = await patientsStore.createPendingPatient({
+        name: newPatientFirstName.value.trim(),
+        lastName: newPatientLastName.value.trim(),
+        birthdate: newPatientBirthdate.value,
+        gender: newPatientGender.value,
+        contacts: validContacts
       });
-      
+
       patientId = newPatient.id;
     }
 
     // Crear la cita
     const appointmentDateTime = `${appointmentDate.value}T${appointmentTime.value}:00`;
-    
+
     await patientsStore.createAppointment({
       patientId: patientId,
+      isPendingPatient: patientType.value === "new",
       appointmentDate: appointmentDateTime,
       reason: appointmentReason.value || null,
       status: "pendiente"
@@ -326,8 +450,10 @@ async function handleSubmit() {
       globalI18n.t("dashboard.appointment-scheduled-successfully")
     );
 
+    handleClose();
     emit("appointment-created");
-  } catch {
+  } catch (error) {
+    console.error("Error:", error);
     notificationStore.addNotification(
       "error",
       "general.error",
