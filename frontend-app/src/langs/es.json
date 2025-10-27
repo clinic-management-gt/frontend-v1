@@ -125,6 +125,11 @@
     "loading-patients-data": "Cargando datos del paciente",
     "patients-data": "Datos del paciente",
     "record": "Antecedentes",
+    "first-medical-record": "Primer Registro Médico",
+    "first-visit-notes": "Notas de la primera visita",
+    "notes": "Notas",
+    "error-loading-medical-record": "Error al cargar el registro médico del paciente",
+    "error-fetching-patients": "Error al obtener la lista de pacientes",
     "laboratories": "Laboratorios",
     "current-illnesses": "Enfermedades actuales",
     "fill-out-form": "Llene el formulario",
@@ -429,5 +434,16 @@
     "view-file": "Ver archivo",
     "download-file": "Descargar archivo",
     "no-documents": "No hay documentos disponibles"
+  },
+  "appointments": {
+    "appointment-created": "Cita creada exitosamente",
+    "appointment-updated": "Cita actualizada exitosamente",
+    "appointment-deleted": "Cita eliminada exitosamente",
+    "error-fetching-appointments": "Error al obtener las citas",
+    "error-fetching-appointment": "Error al obtener la cita",
+    "error-creating-appointment": "Error al crear la cita",
+    "error-updating-appointment": "Error al actualizar la cita",
+    "error-deleting-appointment": "Error al eliminar la cita",
+    "error-no-appointment-id": "No se pudo obtener el ID de la cita"
   }
 }
