@@ -78,49 +78,47 @@ const pendingPatientsHeader = computed(() => ({
   iconType: 'solidIcon',
 }));
 
-const formatContactsArray = (contact) => {
-  if (!contact) return ['-'];
-  
-  // Si es un array de contactos
-  if (Array.isArray(contact)) {
-    return contact.map(c => {
-      const name = c.name || '';
-      const lastName = c.lastName || '';
-      const relationship = c.relationship || '';
-      return `${name} ${lastName} - ${relationship}`.trim();
-    });
+const formatContactsArray = (contacts) => {
+  if (!contacts || !Array.isArray(contacts) || contacts.length === 0) {
+    return ['-'];
   }
-  
-  // Si es un objeto único
-  const name = contact.name || '';
-  const lastName = contact.lastName || '';
-  const relationship = contact.relationship || '';
-  return [`${name} ${lastName} - ${relationship}`.trim()];
+
+  // Formatear cada contacto: "Tipo - Teléfono(s)"
+  return contacts.map(c => {
+    const type = c.type || 'Contacto';
+    const phones = c.phoneNumbers || [];
+
+    if (phones.length > 0) {
+      return `${type} - ${phones.join(', ')}`;
+    }
+
+    return type;
+  });
 };
 
 const tableData = computed(() => ({
   ...pendingPatientsHeader.value,
   displayData: props.data.map(patient => ({
     id: patient.id,
-    name: [{ 
-      name: `${patient.name} ${patient.lastName}`, 
-      style: 'px-3 py-4 text-sm text-start text-gray-700' 
+    name: [{
+      name: `${patient.name} ${patient.lastName}`,
+      style: 'px-3 py-4 text-sm text-start text-gray-700'
     }],
-    age: [{ 
-      age: formatAgeFromDate(patient.birthdate, 'number'), 
-      hasLabel: true, 
-      label: formatAgeFromDate(patient.birthdate, 'number'), 
-      style: 'px-3 py-4 text-sm text-center text-gray-700' 
+    age: [{
+      age: formatAgeFromDate(patient.birthdate, 'number'),
+      hasLabel: true,
+      label: formatAgeFromDate(patient.birthdate, 'number'),
+      style: 'px-3 py-4 text-sm text-center text-gray-700'
     }],
-    contacts: [{ 
-      contacts: formatContactsArray(patient.contact).join('\n'), 
-      isMultiLine: true 
+    contacts: [{
+      contacts: formatContactsArray(patient.contacts).join('\n'),
+      isMultiLine: true
     }],
-    createdAt: [{ 
-      date: patient.createdAt, 
-      hasLabel: true, 
-      label: formatDateLong(patient.createdAt), 
-      style: 'px-3 py-4 text-sm text-start text-gray-700' 
+    createdAt: [{
+      date: patient.createdAt,
+      hasLabel: true,
+      label: formatDateLong(patient.createdAt),
+      style: 'px-3 py-4 text-sm text-start text-gray-700'
     }],
     action: () => selectPatientById(patient.id),
   }))
