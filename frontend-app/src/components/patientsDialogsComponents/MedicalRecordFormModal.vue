@@ -294,7 +294,7 @@ import { useForm } from "vee-validate";
 import * as yup from "yup";
 import { useI18n } from "vue-i18n";
 import { useMedicalRecordStore } from "@stores/medicalRecordStore.js";
-import { useFileStore } from "@stores/FileStore.js";
+import { useFileStore } from "@stores/fileStore.js";
 import { useNotificationStore } from "@stores/notificationStore.js";
 import { storeToRefs } from "pinia";
 import {
