@@ -209,7 +209,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
 import { ChevronDownIcon } from '@heroicons/vue/20/solid';
 import { usePatientsLogicStore } from "@stores/patientsLogicStore.js";
 import { usePatientsStore } from "@stores/patientsStore.js";
-import { useFileStore } from '@stores/FileStore';
+import { useFileStore } from '@stores/fileStore';
 import { useMedicalRecordStore } from '@stores/medicalRecordStore.js';
 import { computed, ref, watch, onMounted } from "vue";
 import { storeToRefs } from "pinia";
