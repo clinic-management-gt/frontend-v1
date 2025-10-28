@@ -304,6 +304,14 @@
     "invalid-phone": "El número de teléfono no es válido",
     "phone-min-length": "El teléfono debe tener al menos 7 dígitos"
   },
+  "validation": {
+    "first-name-required": "El nombre es requerido",
+    "last-name-required": "El apellido es requerido",
+    "birthdate-required": "La fecha de nacimiento es requerida",
+    "gender-required": "El género es requerido",
+    "appointment-date-required": "La fecha de la cita es requerida",
+    "appointment-time-required": "La hora de la cita es requerida"
+  },
   "http-errors": {
     "network-error": "Error de red",
     "network-error-message": "No se pudo contactar al servidor.",

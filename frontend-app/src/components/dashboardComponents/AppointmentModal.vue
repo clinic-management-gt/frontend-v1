@@ -236,26 +236,26 @@ const { allPatients } = storeToRefs(patientsStore);
 const validationSchema = yup.object({
   newPatientFirstName: yup.string().when("$patientType", {
     is: "new",
-    then: (schema) => schema.required(globalI18n.t("general.first-name") + " es requerido"),
+    then: (schema) => schema.required(globalI18n.t("validation.first-name-required")),
     otherwise: (schema) => schema.notRequired(),
   }),
   newPatientLastName: yup.string().when("$patientType", {
     is: "new",
-    then: (schema) => schema.required(globalI18n.t("general.last-name") + " es requerido"),
+    then: (schema) => schema.required(globalI18n.t("validation.last-name-required")),
     otherwise: (schema) => schema.notRequired(),
   }),
   newPatientBirthdate: yup.string().when("$patientType", {
     is: "new",
-    then: (schema) => schema.required(globalI18n.t("general.birthdate") + " es requerido"),
+    then: (schema) => schema.required(globalI18n.t("validation.birthdate-required")),
     otherwise: (schema) => schema.notRequired(),
   }),
   newPatientGender: yup.string().when("$patientType", {
     is: "new",
-    then: (schema) => schema.required(globalI18n.t("general.gender") + " es requerido"),
+    then: (schema) => schema.required(globalI18n.t("validation.gender-required")),
     otherwise: (schema) => schema.notRequired(),
   }),
-  appointmentDate: yup.string().required(globalI18n.t("dashboard.appointment-date") + " es requerido"),
-  appointmentTime: yup.string().required(globalI18n.t("dashboard.appointment-time") + " es requerido"),
+  appointmentDate: yup.string().required(globalI18n.t("validation.appointment-date-required")),
+  appointmentTime: yup.string().required(globalI18n.t("validation.appointment-time-required")),
   appointmentReason: yup.string().nullable(),
 });
 
@@ -405,10 +405,10 @@ async function handleSubmit() {
     if (patientType.value === "new") {
       // Filtrar contactos que tengan al menos el número de teléfono
       const validContacts = newPatientContacts.value
-        .filter(c => c.phoneNumber.trim() !== "")
-        .map(c => ({
-          type: c.type || "Otro",
-          phoneNumber: c.phoneNumber
+        .filter(contact => contact.phoneNumber.trim() !== "")
+        .map(contact => ({
+          type: contact.type || "Otro",
+          phoneNumber: contact.phoneNumber
         }));
 
       const newPatient = await patientsStore.createPendingPatient({

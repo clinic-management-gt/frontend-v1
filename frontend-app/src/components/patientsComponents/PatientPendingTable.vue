@@ -86,9 +86,9 @@ const formatContactsArray = (contacts) => {
   }
 
   // Formatear cada contacto: "Tipo - Teléfono(s)"
-  return contacts.map(c => {
-    const type = c.type || t('patients.contact');
-    const phones = c.phoneNumbers || [];
+  return contacts.map(contact => {
+    const type = contact.type || t('patients.contact');
+    const phones = contact.phoneNumbers || [];
 
     if (phones.length > 0) {
       return `${type} - ${phones.join(', ')}`;
