@@ -260,7 +260,7 @@ const validationSchema = yup.object({
 });
 
 // Initialize vee-validate form
-const { values, errors, resetForm: resetVeeForm, validate } = useForm({
+const { values, resetForm: resetVeeForm, validate } = useForm({
   validationSchema,
   initialValues: {
     newPatientFirstName: "",
@@ -304,11 +304,6 @@ watch(
   },
   { immediate: true }
 );
-
-// Fecha mínima (hoy)
-const todayDate = computed(() => {
-  return new Date().toISOString().split('T')[0];
-});
 
 /**
  * Maneja la selección de paciente existente
