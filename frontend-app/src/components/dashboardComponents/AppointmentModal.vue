@@ -200,7 +200,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useForm } from "vee-validate";
 import * as yup from "yup";
 import { usePatientsStore } from "@stores/patientsStore";
