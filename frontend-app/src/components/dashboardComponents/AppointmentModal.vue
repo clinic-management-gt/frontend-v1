@@ -59,82 +59,43 @@
           <div v-if="patientType === 'new'">
             <div class="space-y-4">
               <!-- Nombre -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ $t('general.first-name') }}
-                </label>
-                <input
-                  v-model="newPatientFirstName"
-                  type="text"
-                  required
-                  :placeholder="$t('general.first-name')"
-                  class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
-                />
-              </div>
+              <text-input
+                name="newPatientFirstName"
+                type="text"
+                title="general.first-name"
+                inputPlaceholder="general.first-name"
+                labelCss="text-sm font-medium text-gray-700"
+                :required="true"
+              />
 
               <!-- Apellido -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ $t('general.last-name') }}
-                </label>
-                <input
-                  v-model="newPatientLastName"
-                  type="text"
-                  required
-                  :placeholder="$t('general.last-name')"
-                  class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
-                />
-              </div>
+              <text-input
+                name="newPatientLastName"
+                type="text"
+                title="general.last-name"
+                inputPlaceholder="general.last-name"
+                labelCss="text-sm font-medium text-gray-700"
+                :required="true"
+              />
 
               <!-- Fecha de nacimiento -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ $t('general.birthdate') }}
-                </label>
-                <input
-                  v-model="newPatientBirthdate"
-                  type="date"
-                  required
-                  :max="todayDate"
-                  class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
-                />
-              </div>
+              <text-input
+                name="newPatientBirthdate"
+                type="date"
+                title="general.birthdate"
+                inputPlaceholder="general.birthdate"
+                labelCss="text-sm font-medium text-gray-700"
+                :required="true"
+              />
 
               <!-- Selección de género -->
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  {{ $t("dashboard.patient-gender") }}
-                </label>
-                <div class="flex space-x-4">
-                  <label class="flex items-center">
-                    <input
-                      v-model="newPatientGender"
-                      type="radio"
-                      value="masculino"
-                      class="mr-2"
-                    />
-                    {{ $t("general.male") }}
-                  </label>
-                  <label class="flex items-center">
-                    <input
-                      v-model="newPatientGender"
-                      type="radio"
-                      value="femenino"
-                      class="mr-2"
-                    />
-                    {{ $t("general.female") }}
-                  </label>
-                  <label class="flex items-center">
-                    <input
-                      v-model="newPatientGender"
-                      type="radio"
-                      value="no_especificado"
-                      class="mr-2"
-                    />
-                    {{ $t("general.not-specified") }}
-                  </label>
-                </div>
-              </div>
+              <radio-group
+                name="newPatientGender"
+                title="dashboard.patient-gender"
+                :data="genderOptions"
+                labelCss="text-sm font-medium text-gray-700"
+                :required="true"
+              />
 
               <!-- Contactos -->
               <div>
@@ -147,14 +108,14 @@
                   class="mb-3 p-3 border rounded-md bg-gray-50"
                 >
                   <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium text-gray-700">Contacto {{ index + 1 }}</span>
+                    <span class="text-sm font-medium text-gray-700">{{ $t('patients.contact') }} {{ index + 1 }}</span>
                     <button
                       v-if="newPatientContacts.length > 1"
                       type="button"
                       @click="removeContact(index)"
                       class="text-red-600 hover:text-red-800 text-sm font-medium"
                     >
-                      Eliminar
+                      {{ $t('dashboard.remove-contact') }}
                     </button>
                   </div>
 
@@ -163,17 +124,17 @@
                       v-model="contact.type"
                       class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 sm:text-sm"
                     >
-                      <option value="">Seleccionar tipo</option>
-                      <option value="Padre">Padre</option>
-                      <option value="Madre">Madre</option>
-                      <option value="Tutor">Tutor</option>
-                      <option value="Otro">Otro</option>
+                      <option value="">{{ $t('dashboard.select-contact-type') }}</option>
+                      <option value="Padre">{{ $t('dashboard.contact-type-father') }}</option>
+                      <option value="Madre">{{ $t('dashboard.contact-type-mother') }}</option>
+                      <option value="Tutor">{{ $t('dashboard.contact-type-tutor') }}</option>
+                      <option value="Otro">{{ $t('dashboard.contact-type-other') }}</option>
                     </select>
 
                     <input
                       v-model="contact.phoneNumber"
                       type="tel"
-                      placeholder="Número de teléfono"
+                      :placeholder="$t('patients.phone-contact-placeholder')"
                       class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 sm:text-sm"
                     />
                   </div>
@@ -184,7 +145,7 @@
                   @click="addContact"
                   class="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
                 >
-                  + Agregar contacto
+                  + {{ $t('dashboard.add-contact') }}
                 </button>
               </div>
             </div>
@@ -192,44 +153,33 @@
         </div>
 
         <!-- Fecha de la cita -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            {{ $t("dashboard.appointment-date") }}
-          </label>
-          <input
-            v-model="appointmentDate"
-            type="date"
-            required
-            :min="todayDate"
-            class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
-          />
-        </div>
+        <text-input
+          name="appointmentDate"
+          type="date"
+          title="dashboard.appointment-date"
+          inputPlaceholder="dashboard.appointment-date"
+          labelCss="text-sm font-medium text-gray-700"
+          :required="true"
+        />
 
         <!-- Hora de la cita -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            {{ $t("dashboard.appointment-time") }}
-          </label>
-          <input
-            v-model="appointmentTime"
-            type="time"
-            required
-            class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm"
-          />
-        </div>
+        <text-input
+          name="appointmentTime"
+          type="time"
+          title="dashboard.appointment-time"
+          inputPlaceholder="dashboard.appointment-time"
+          labelCss="text-sm font-medium text-gray-700"
+          :required="true"
+        />
 
         <!-- Motivo de la cita -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            {{ $t("dashboard.appointment-reason") }}
-          </label>
-          <textarea
-            v-model="appointmentReason"
-            rows="3"
-            :placeholder="$t('dashboard.appointment-reason-placeholder')"
-            class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:text-sm resize-none"
-          ></textarea>
-        </div>
+        <textarea-input
+          name="appointmentReason"
+          title="dashboard.appointment-reason"
+          inputPlaceholder="dashboard.appointment-reason-placeholder"
+          labelCss="text-sm font-medium text-gray-700"
+          :rows="3"
+        />
       </form>
     </template>
 
@@ -251,6 +201,8 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
+import { useForm } from "vee-validate";
+import * as yup from "yup";
 import { usePatientsStore } from "@stores/patientsStore";
 import { useNotificationStore } from "@stores/notificationStore.js";
 import { storeToRefs } from "pinia";
@@ -258,6 +210,9 @@ import { globalI18n } from "@/langs/index.js";
 
 import GeneralDialogModal from "@components/forms/GeneralDialogModal.vue";
 import ComboBoxAutocompleteInputSearchPatient from "@components/forms/ComboBoxAutocompleteInputSearchPatient.vue";
+import TextInput from "@components/forms/TextInput.vue";
+import TextareaInput from "@components/forms/TextareaInput.vue";
+import RadioGroup from "@components/forms/RadioGroup.vue";
 
 const props = defineProps({
   isOpen: {
@@ -277,18 +232,59 @@ const patientsStore = usePatientsStore();
 const notificationStore = useNotificationStore();
 const { allPatients } = storeToRefs(patientsStore);
 
-// Estado del formulario
+// Validation Schema
+const validationSchema = yup.object({
+  newPatientFirstName: yup.string().when("$patientType", {
+    is: "new",
+    then: (schema) => schema.required(globalI18n.t("general.first-name") + " es requerido"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  newPatientLastName: yup.string().when("$patientType", {
+    is: "new",
+    then: (schema) => schema.required(globalI18n.t("general.last-name") + " es requerido"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  newPatientBirthdate: yup.string().when("$patientType", {
+    is: "new",
+    then: (schema) => schema.required(globalI18n.t("general.birthdate") + " es requerido"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  newPatientGender: yup.string().when("$patientType", {
+    is: "new",
+    then: (schema) => schema.required(globalI18n.t("general.gender") + " es requerido"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  appointmentDate: yup.string().required(globalI18n.t("dashboard.appointment-date") + " es requerido"),
+  appointmentTime: yup.string().required(globalI18n.t("dashboard.appointment-time") + " es requerido"),
+  appointmentReason: yup.string().nullable(),
+});
+
+// Initialize vee-validate form
+const { values, errors, resetForm: resetVeeForm, validate } = useForm({
+  validationSchema,
+  initialValues: {
+    newPatientFirstName: "",
+    newPatientLastName: "",
+    newPatientBirthdate: "",
+    newPatientGender: "no_especificado",
+    appointmentDate: "",
+    appointmentTime: "",
+    appointmentReason: "",
+  },
+});
+
+// Estado del formulario (refs que no están en vee-validate)
 const patientType = ref("existing");
 const selectedPatientId = ref(null);
-const newPatientFirstName = ref("");
-const newPatientLastName = ref("");
-const newPatientBirthdate = ref("");
-const newPatientGender = ref("no_especificado");
 const newPatientContacts = ref([{ type: "", phoneNumber: "" }]);
-const appointmentDate = ref("");
-const appointmentTime = ref("");
-const appointmentReason = ref("");
 const isLoading = ref(false);
+
+// Opciones de género para RadioGroup
+const genderOptions = [
+  { id: "masculino", name: "general.male" },
+  { id: "femenino", name: "general.female" },
+  { id: "no_especificado", name: "general.not-specified" },
+];
 
 // Watcher para aplicar fecha preseleccionada
 watch(
@@ -297,7 +293,12 @@ watch(
     if (isOpen) {
       resetForm();
       if (preselectedDate) {
-        appointmentDate.value = preselectedDate;
+        resetVeeForm({
+          values: {
+            ...values,
+            appointmentDate: preselectedDate,
+          },
+        });
       }
     }
   },
@@ -343,21 +344,23 @@ function removeContact(index) {
  * Resetea todos los campos del formulario
  */
 function resetForm() {
+  // Resetear vee-validate form
+  resetVeeForm({
+    values: {
+      newPatientFirstName: "",
+      newPatientLastName: "",
+      newPatientBirthdate: "",
+      newPatientGender: "no_especificado",
+      appointmentDate: props.preselectedDate || "",
+      appointmentTime: "",
+      appointmentReason: "",
+    },
+  });
+
+  // Resetear campos que no están en vee-validate
   patientType.value = "existing";
   selectedPatientId.value = null;
-  newPatientFirstName.value = "";
-  newPatientLastName.value = "";
-  newPatientBirthdate.value = "";
-  newPatientGender.value = "no_especificado";
   newPatientContacts.value = [{ type: "", phoneNumber: "" }];
-
-  // Mantenemos la fecha preseleccionada si existe, si no la reseteamos
-  if (!props.preselectedDate) {
-    appointmentDate.value = "";
-  }
-
-  appointmentTime.value = "";
-  appointmentReason.value = "";
   isLoading.value = false;
 }
 
@@ -366,6 +369,9 @@ function resetForm() {
  */
 async function handleSubmit() {
   if (isLoading.value) return;
+
+  // Validar el formulario con vee-validate
+  const { valid } = await validate({ context: { patientType: patientType.value } });
 
   // Validaciones básicas
   if (patientType.value === "existing" && !selectedPatientId.value) {
@@ -377,27 +383,16 @@ async function handleSubmit() {
     return;
   }
 
-  if (patientType.value === "new") {
-    if (!newPatientFirstName.value.trim() || !newPatientLastName.value.trim()) {
-      notificationStore.addNotification(
-        "warning",
-        "general.warning",
-        "Por favor ingrese nombre y apellido completos"
-      );
-      return;
-    }
-
-    if (!newPatientBirthdate.value) {
-      notificationStore.addNotification(
-        "warning",
-        "general.warning",
-        "Por favor ingrese la fecha de nacimiento"
-      );
-      return;
-    }
+  if (patientType.value === "new" && !valid) {
+    notificationStore.addNotification(
+      "warning",
+      "general.warning",
+      "Por favor complete todos los campos requeridos"
+    );
+    return;
   }
 
-  if (!appointmentDate.value || !appointmentTime.value) {
+  if (!valid) {
     notificationStore.addNotification(
       "warning",
       "general.warning",
@@ -422,10 +417,10 @@ async function handleSubmit() {
         }));
 
       const newPatient = await patientsStore.createPendingPatient({
-        name: newPatientFirstName.value.trim(),
-        lastName: newPatientLastName.value.trim(),
-        birthdate: newPatientBirthdate.value,
-        gender: newPatientGender.value,
+        name: values.newPatientFirstName.trim(),
+        lastName: values.newPatientLastName.trim(),
+        birthdate: values.newPatientBirthdate,
+        gender: values.newPatientGender,
         contacts: validContacts
       });
 
@@ -433,13 +428,13 @@ async function handleSubmit() {
     }
 
     // Crear la cita
-    const appointmentDateTime = `${appointmentDate.value}T${appointmentTime.value}:00`;
+    const appointmentDateTime = `${values.appointmentDate}T${values.appointmentTime}:00`;
 
     await patientsStore.createAppointment({
       patientId: patientId,
       isPendingPatient: patientType.value === "new",
       appointmentDate: appointmentDateTime,
-      reason: appointmentReason.value || null,
+      reason: values.appointmentReason || null,
       status: "pendiente"
     });
 

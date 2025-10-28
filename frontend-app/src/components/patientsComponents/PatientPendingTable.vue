@@ -14,6 +14,7 @@ import { computed, ref } from 'vue';
 import { formatAgeFromDate } from '@utils/formatAge.js';
 import { formatDateLong } from '@utils/isoFormatDate.js';
 import { storeToRefs } from "pinia";
+import { useI18n } from "vue-i18n";
 
 import GeneralTable from '@components/forms/GeneralTable.vue';
 
@@ -24,6 +25,7 @@ const props = defineProps({
   },
 });
 
+const { t } = useI18n();
 const patientsLogicStore = usePatientsLogicStore();
 const { selectPatientById } = patientsLogicStore;
 const patientsStore = usePatientsStore();
@@ -85,7 +87,7 @@ const formatContactsArray = (contacts) => {
 
   // Formatear cada contacto: "Tipo - Teléfono(s)"
   return contacts.map(c => {
-    const type = c.type || 'Contacto';
+    const type = c.type || t('patients.contact');
     const phones = c.phoneNumbers || [];
 
     if (phones.length > 0) {
