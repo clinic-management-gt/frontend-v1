@@ -132,6 +132,13 @@
                     </select>
 
                     <input
+                      v-model="contact.name"
+                      type="text"
+                      :placeholder="$t('dashboard.contact-name-placeholder')"
+                      class="block w-full rounded-md border-0 py-2 px-3 text-gray-900 shadow ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-500 sm:text-sm"
+                    />
+
+                    <input
                       v-model="contact.phoneNumber"
                       type="tel"
                       :placeholder="$t('patients.phone-contact-placeholder')"
@@ -276,7 +283,7 @@ const { values, resetForm: resetVeeForm, validate } = useForm({
 // Estado del formulario (refs que no están en vee-validate)
 const patientType = ref("existing");
 const selectedPatientId = ref(null);
-const newPatientContacts = ref([{ type: "", phoneNumber: "" }]);
+const newPatientContacts = ref([{ type: "", name: "", phoneNumber: "" }]);
 const isLoading = ref(false);
 
 // Opciones de género para RadioGroup
@@ -325,7 +332,7 @@ function handleClose() {
  * Agrega un nuevo contacto
  */
 function addContact() {
-  newPatientContacts.value.push({ type: "", phoneNumber: "" });
+  newPatientContacts.value.push({ type: "", name: "", phoneNumber: "" });
 }
 
 /**
@@ -355,7 +362,7 @@ function resetForm() {
   // Resetear campos que no están en vee-validate
   patientType.value = "existing";
   selectedPatientId.value = null;
-  newPatientContacts.value = [{ type: "", phoneNumber: "" }];
+  newPatientContacts.value = [{ type: "", name: "", phoneNumber: "" }];
   isLoading.value = false;
 }
 
@@ -408,6 +415,7 @@ async function handleSubmit() {
         .filter(contact => contact.phoneNumber.trim() !== "")
         .map(contact => ({
           type: contact.type || "Otro",
+          name: contact.name || "",
           phoneNumber: contact.phoneNumber
         }));
 

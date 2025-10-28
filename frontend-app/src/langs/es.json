@@ -116,6 +116,7 @@
     "add-contact": "Agregar contacto",
     "remove-contact": "Eliminar",
     "select-contact-type": "Seleccionar tipo",
+    "contact-name-placeholder": "Nombre completo del contacto",
     "contact-type-father": "Padre",
     "contact-type-mother": "Madre",
     "contact-type-tutor": "Tutor",

@@ -85,16 +85,25 @@ const formatContactsArray = (contacts) => {
     return ['-'];
   }
 
-  // Formatear cada contacto: "Tipo - Teléfono(s)"
+  // Formatear cada contacto: "Tipo - Nombre - Teléfono(s)"
   return contacts.map(contact => {
     const type = contact.type || t('patients.contact');
+    const name = contact.name || '';
     const phones = contact.phoneNumbers || [];
 
-    if (phones.length > 0) {
-      return `${type} - ${phones.join(', ')}`;
+    let result = type;
+
+    // Agregar nombre si existe
+    if (name.trim()) {
+      result += ` - ${name}`;
     }
 
-    return type;
+    // Agregar teléfonos si existen
+    if (phones.length > 0) {
+      result += ` - ${phones.join(', ')}`;
+    }
+
+    return result;
   });
 };
 
