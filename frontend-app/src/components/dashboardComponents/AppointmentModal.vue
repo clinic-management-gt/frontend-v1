@@ -105,15 +105,14 @@
                 <div
                   v-for="(contact, index) in newPatientContacts"
                   :key="index"
-                  class="mb-3 p-3 border rounded-md bg-gray-50"
-                >
+                  class="mb-3 p-3 border rounded-md bg-gray-50">
                   <div class="flex justify-between items-center mb-2">
                     <span class="text-sm font-medium text-gray-700">{{ $t('patients.contact') }} {{ index + 1 }}</span>
                     <button
                       v-if="newPatientContacts.length > 1"
                       type="button"
-                      @click="removeContact(index)"
                       class="text-red-600 hover:text-red-800 text-sm font-medium"
+                      @click="removeContact(index)"
                     >
                       {{ $t('dashboard.remove-contact') }}
                     </button>
@@ -149,8 +148,8 @@
 
                 <button
                   type="button"
-                  @click="addContact"
                   class="mt-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  @click="addContact"
                 >
                   + {{ $t('dashboard.add-contact') }}
                 </button>
@@ -450,7 +449,7 @@ async function handleSubmit() {
 
     handleClose();
     emit("appointment-created");
-  } catch (error) {
+  } catch {
     notificationStore.addNotification(
       "error",
       "general.error",

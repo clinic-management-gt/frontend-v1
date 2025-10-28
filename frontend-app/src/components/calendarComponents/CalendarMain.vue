@@ -942,11 +942,11 @@ onMounted(() => {
 
     <!-- Modal de edición de citas con diseño mejorado -->
     <general-dialog-modal
-      :isOpen="showEditModal"
-      dialogSize="max-w-2xl"
-      :cancelButton="true"
-      @close-modal="closeEditModal"
-    >
+        :isOpen="showEditModal"
+        dialogSize="max-w-2xl"
+        :cancelButton="true"
+        @close-modal="closeEditModal"
+      >
       <template #title>
         <p class="text-xl font-semibold">
           {{ t("calendar.edit-appointment") }}
