@@ -382,7 +382,7 @@ async function handleSubmit() {
     notificationStore.addNotification(
       "warning",
       "general.warning",
-      "Por favor complete todos los campos requeridos"
+      globalI18n.t("dashboard.please-complete-all-required-fields")
     );
     return;
   }
@@ -443,7 +443,6 @@ async function handleSubmit() {
     handleClose();
     emit("appointment-created");
   } catch (error) {
-    console.error("Error:", error);
     notificationStore.addNotification(
       "error",
       "general.error",

@@ -112,6 +112,7 @@
     "please-select-patient": "Por favor selecciona un paciente",
     "please-enter-patient-name": "Por favor ingresa el nombre del paciente",
     "please-complete-date-time": "Por favor completa fecha y hora",
+    "please-complete-all-required-fields": "Por favor complete todos los campos requeridos",
     "add-contact": "Agregar contacto",
     "remove-contact": "Eliminar",
     "select-contact-type": "Seleccionar tipo",
