@@ -171,10 +171,10 @@ export const usePatientsStore = defineStore(
       return res.data;
     }
     
-    async function createBasicPatient(patientData) {
+    async function createPendingPatient(patientData) {
       isLoadingPendingPatients.value = true;
       try {
-        const res = await instance.post(`/patients/basic`, patientData);
+        const res = await instance.post(`/patients/pending`, patientData);
         await fetchPendingPatients();
         return res.data;
       } finally {
@@ -221,7 +221,7 @@ export const usePatientsStore = defineStore(
       fetchPatientData,
       uploadFile,
       downloadFile,
-      createBasicPatient,
+      createPendingPatient,
       createAppointment,
     };
   },

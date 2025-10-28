@@ -14,6 +14,7 @@ import { computed, ref } from 'vue';
 import { formatAgeFromDate } from '@utils/formatAge.js';
 import { formatDateLong } from '@utils/isoFormatDate.js';
 import { storeToRefs } from "pinia";
+import { useI18n } from "vue-i18n";
 
 import GeneralTable from '@components/forms/GeneralTable.vue';
 
@@ -24,6 +25,7 @@ const props = defineProps({
   },
 });
 
+const { t } = useI18n();
 const patientsLogicStore = usePatientsLogicStore();
 const { selectPatientById } = patientsLogicStore;
 const patientsStore = usePatientsStore();
@@ -78,49 +80,56 @@ const pendingPatientsHeader = computed(() => ({
   iconType: 'solidIcon',
 }));
 
-const formatContactsArray = (contact) => {
-  if (!contact) return ['-'];
-  
-  // Si es un array de contactos
-  if (Array.isArray(contact)) {
-    return contact.map(c => {
-      const name = c.name || '';
-      const lastName = c.lastName || '';
-      const relationship = c.relationship || '';
-      return `${name} ${lastName} - ${relationship}`.trim();
-    });
+const formatContactsArray = (contacts) => {
+  if (!contacts || !Array.isArray(contacts) || contacts.length === 0) {
+    return ['-'];
   }
-  
-  // Si es un objeto único
-  const name = contact.name || '';
-  const lastName = contact.lastName || '';
-  const relationship = contact.relationship || '';
-  return [`${name} ${lastName} - ${relationship}`.trim()];
+
+  // Formatear cada contacto: "Tipo - Nombre - Teléfono(s)"
+  return contacts.map(contact => {
+    const type = contact.type || t('patients.contact');
+    const name = contact.name || '';
+    const phones = contact.phoneNumbers || [];
+
+    let result = type;
+
+    // Agregar nombre si existe
+    if (name.trim()) {
+      result += ` - ${name}`;
+    }
+
+    // Agregar teléfonos si existen
+    if (phones.length > 0) {
+      result += ` - ${phones.join(', ')}`;
+    }
+
+    return result;
+  });
 };
 
 const tableData = computed(() => ({
   ...pendingPatientsHeader.value,
   displayData: props.data.map(patient => ({
     id: patient.id,
-    name: [{ 
-      name: `${patient.name} ${patient.lastName}`, 
-      style: 'px-3 py-4 text-sm text-start text-gray-700' 
+    name: [{
+      name: `${patient.name} ${patient.lastName}`,
+      style: 'px-3 py-4 text-sm text-start text-gray-700'
     }],
-    age: [{ 
-      age: formatAgeFromDate(patient.birthdate, 'number'), 
-      hasLabel: true, 
-      label: formatAgeFromDate(patient.birthdate, 'number'), 
-      style: 'px-3 py-4 text-sm text-center text-gray-700' 
+    age: [{
+      age: formatAgeFromDate(patient.birthdate, 'number'),
+      hasLabel: true,
+      label: formatAgeFromDate(patient.birthdate, 'number'),
+      style: 'px-3 py-4 text-sm text-center text-gray-700'
     }],
-    contacts: [{ 
-      contacts: formatContactsArray(patient.contact).join('\n'), 
-      isMultiLine: true 
+    contacts: [{
+      contacts: formatContactsArray(patient.contacts).join('\n'),
+      isMultiLine: true
     }],
-    createdAt: [{ 
-      date: patient.createdAt, 
-      hasLabel: true, 
-      label: formatDateLong(patient.createdAt), 
-      style: 'px-3 py-4 text-sm text-start text-gray-700' 
+    createdAt: [{
+      date: patient.createdAt,
+      hasLabel: true,
+      label: formatDateLong(patient.createdAt),
+      style: 'px-3 py-4 text-sm text-start text-gray-700'
     }],
     action: () => selectPatientById(patient.id),
   }))

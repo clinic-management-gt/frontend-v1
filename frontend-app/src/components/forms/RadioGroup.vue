@@ -19,27 +19,36 @@
           <div class="flex h-6 items-center">
             <input
               :id="d.id"
-              v-model="selected"
+              v-model="value"
               :name="name"
               type="radio"
               :value="d.id"
               class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-patient-page-color checked:bg-patient-page-color focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-patient-page-color disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
+              @blur="handleBlur"
             />
           </div>
           <div class="ml-3 text-sm/6">
-            <label class="font-medium text-gray-900">
+            <label :for="d.id" class="font-medium text-gray-900 cursor-pointer">
               {{ $t(d.name) }}
             </label>
           </div>
         </div>
       </div>
     </fieldset>
+    <!-- Mensaje de error -->
+    <p
+      v-if="errorMessage"
+      class="mt-1 text-sm text-red-600"
+    >
+      {{ errorMessage }}
+    </p>
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { useField } from "vee-validate";
 import CustomLabel from "@/components/forms/CustomLabel.vue";
+
 const props = defineProps({
   title: {
     type: String,
@@ -47,7 +56,7 @@ const props = defineProps({
   },
   name: {
     type: String,
-    default: "",
+    required: true,
   },
   data: {
     type: Array,
@@ -57,26 +66,11 @@ const props = defineProps({
     type: String,
     default: "font-bold",
   },
-  currentSelected: {
-    type: Number,
-    required: true,
-  },
   required: {
     type: Boolean,
     default: false,
   },
-  setLocalMessage: {
-    type: String,
-    default: "general.empty",
-  },
 });
 
-// declarar el emit para el v-model ("update:currentSelected")
-const emit = defineEmits(["update:currentSelected"]);
-
-// sustituir defineModel por un computed con getter/setter
-const selected = computed({
-  get: () => props.currentSelected,
-  set: (val) => emit("update:currentSelected", val),
-});
+const { value, errorMessage, handleBlur } = useField(props.name);
 </script>

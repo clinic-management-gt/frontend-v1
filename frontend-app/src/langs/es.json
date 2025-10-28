@@ -111,7 +111,16 @@
     "error-scheduling-appointment": "Error al agendar la cita. Inténtalo nuevamente.",
     "please-select-patient": "Por favor selecciona un paciente",
     "please-enter-patient-name": "Por favor ingresa el nombre del paciente",
-    "please-complete-date-time": "Por favor completa fecha y hora"
+    "please-complete-date-time": "Por favor completa fecha y hora",
+    "please-complete-all-required-fields": "Por favor complete todos los campos requeridos",
+    "add-contact": "Agregar contacto",
+    "remove-contact": "Eliminar",
+    "select-contact-type": "Seleccionar tipo",
+    "contact-name-placeholder": "Nombre completo del contacto",
+    "contact-type-father": "Padre",
+    "contact-type-mother": "Madre",
+    "contact-type-tutor": "Tutor",
+    "contact-type-other": "Otro"
   },
   "patients": {
     "patients": "Pacientes",
@@ -296,6 +305,14 @@
     "invalid-email": "El correo electrónico no es válido",
     "invalid-phone": "El número de teléfono no es válido",
     "phone-min-length": "El teléfono debe tener al menos 7 dígitos"
+  },
+  "validation": {
+    "first-name-required": "El nombre es requerido",
+    "last-name-required": "El apellido es requerido",
+    "birthdate-required": "La fecha de nacimiento es requerida",
+    "gender-required": "El género es requerido",
+    "appointment-date-required": "La fecha de la cita es requerida",
+    "appointment-time-required": "La hora de la cita es requerida"
   },
   "http-errors": {
     "network-error": "Error de red",
