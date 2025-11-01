@@ -12,8 +12,26 @@ export const useAppointmentsStore = defineStore(
     const isLoadingAppointments = ref(false);
     const error = ref(null);
 
+    // Modal states
+    const showCalendarDeleteModal = ref(false);
+    const eventToDelete = ref(null);
+    const eventIndexToDelete = ref(null);
+
     const { t } = globalI18n;
     const notificationStore = useNotificationStore();
+
+    // Funciones para manejar el modal de eliminación
+    function openCalendarDeleteModal(index, eventData) {
+      eventIndexToDelete.value = index;
+      eventToDelete.value = { ...eventData };
+      showCalendarDeleteModal.value = true;
+    }
+
+    function closeCalendarDeleteModal() {
+      showCalendarDeleteModal.value = false;
+      eventToDelete.value = null;
+      eventIndexToDelete.value = null;
+    }
 
     async function fetchAppointments(filters = {}) {
       isLoadingAppointments.value = true;
@@ -151,14 +169,6 @@ export const useAppointmentsStore = defineStore(
         );
         
         return true;
-      } catch (err) {
-        error.value = err.message;
-        notificationStore.addNotification(
-          "error",
-          t("general.error"),
-          t("appointments.error-deleting-appointment")
-        );
-        throw err;
       } finally {
         isLoadingAppointments.value = false;
       }
@@ -184,6 +194,11 @@ export const useAppointmentsStore = defineStore(
       selectedAppointment,
       isLoadingAppointments,
       error,
+      showCalendarDeleteModal,
+      eventToDelete,
+      eventIndexToDelete,
+      openCalendarDeleteModal,
+      closeCalendarDeleteModal,
       fetchAppointments,
       fetchAppointmentById,
       createAppointment,

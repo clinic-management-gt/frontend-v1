@@ -46,6 +46,8 @@ import {
   ScaleIcon,
   KeyIcon,
   ChartBarSquareIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon
 } from "@heroicons/vue/24/solid";
 
 const props = defineProps({
@@ -101,5 +103,7 @@ const icons = {
   ScaleIcon,
   KeyIcon,
   ChartBarSquareIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon
 };
 </script>
