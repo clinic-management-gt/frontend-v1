@@ -82,7 +82,9 @@
     "duration": "Duración",
     "type": "Tipo",
     "medicine": "Medicamento",
-    "no-record-selected": "No hay registro seleccionado"
+    "no-record-selected": "No hay registro seleccionado",
+    "more": "más",
+    "doctor-abbreviation": "Dr."
   },
   "login": {
     "login": "Iniciar sesión",
@@ -281,6 +283,8 @@
     "date": "Fecha",
     "time": "Hora",
     "status": "Estado",
+    "agenda-for": "Agenda para",
+    "schedule-appointment": "Agendar Cita",
     "delete-appointment": "Eliminar Cita",
     "cancel": "Cancelar",
     "save-changes": "Guardar Cambios",
@@ -289,7 +293,15 @@
     "appointment-deleted-successfully": "Cita eliminada exitosamente",
     "error-updating-appointment": "Error al actualizar la cita",
     "error-deleting-appointment": "Error al eliminar la cita",
-    "no-events": "No hay actividades ni pacientes."
+    "no-events": "No hay actividades ni pacientes.",
+    "delete-event-title": "Eliminar cita",
+    "delete-event-message": "¿Estás seguro que deseas eliminar la cita de",
+    "delete-event-warning": "Esta acción no se puede deshacer.",
+    "appointment-deleted-success": "Cita eliminada exitosamente",
+    "event-deleted-success": "Evento eliminado exitosamente",
+    "error-deleting-event": "Error al eliminar el evento",
+    "end-time": "Hora de fin",
+    "reason": "Motivo: "
   },
   "vee-validate": {
     "required-input": "Este campo es obligatorio",
